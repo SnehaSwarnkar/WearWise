@@ -1,0 +1,718 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&display=swap");
+
+:root {
+  --black: #151515;
+  --cream: #fff8f1;
+  --pink: #ff3d9a;
+  --orange: #ff633d;
+  --lime: #d8ff3f;
+  --purple: #8d6bff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "DM Sans", sans-serif;
+  background: var(--cream);
+  color: var(--black);
+}
+
+a {
+  color: inherit;
+}
+
+.app {
+  overflow: hidden;
+}
+
+/* ================= NAVBAR ================= */
+
+.navbar {
+  height: 78px;
+  padding: 0 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--cream);
+  border-bottom: 1px solid #e9ddd2;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  text-decoration: none;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 19px;
+  letter-spacing: -1px;
+}
+
+.logo span {
+  color: var(--pink);
+}
+
+.nav-links {
+  display: flex;
+  gap: 35px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.nav-links a:hover {
+  color: var(--pink);
+}
+
+.nav-cta {
+  text-decoration: none;
+  background: var(--black);
+  color: white;
+  padding: 13px 21px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ================= TICKER ================= */
+
+.fashion-ticker {
+  background: var(--black);
+  color: white;
+  padding: 11px 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ticker-content {
+  display: flex;
+  gap: 35px;
+  width: max-content;
+  animation: moveTicker 20s linear infinite;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.ticker-content span:nth-child(even) {
+  color: var(--lime);
+}
+
+@keyframes moveTicker {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-30%);
+  }
+}
+
+/* ================= HERO ================= */
+
+.fashion-hero {
+  min-height: 700px;
+  padding: 80px 6%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 65px;
+  align-items: center;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(255, 61, 154, 0.1), transparent 30%),
+    var(--cream);
+}
+
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid #dfd4ca;
+  background: white;
+  padding: 9px 15px;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--pink);
+  border-radius: 50%;
+}
+
+.hero-left h1 {
+  font-family: "Archivo Black", sans-serif;
+  font-size: clamp(60px, 7vw, 110px);
+  line-height: 0.87;
+  letter-spacing: -4px;
+  margin: 25px 0;
+}
+
+.hero-left h1 span {
+  color: var(--pink);
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.hero-description {
+  max-width: 530px;
+  color: #68625d;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.main-btn,
+.outline-btn {
+  text-decoration: none;
+  padding: 16px 24px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 14px;
+  transition: transform 0.2s ease;
+}
+
+.main-btn:hover,
+.outline-btn:hover {
+  transform: translateY(-3px);
+}
+
+.main-btn {
+  background: var(--pink);
+  color: white;
+  box-shadow: 0 10px 25px rgba(255, 61, 154, 0.25);
+}
+
+.outline-btn {
+  border: 1.5px solid var(--black);
+}
+
+.mini-stats {
+  display: flex;
+  gap: 35px;
+  margin-top: 50px;
+}
+
+.mini-stats div {
+  display: flex;
+  flex-direction: column;
+}
+
+.mini-stats strong {
+  font-family: "Archivo Black", sans-serif;
+  font-size: 24px;
+}
+
+.mini-stats span {
+  margin-top: 4px;
+  color: #77706a;
+  font-size: 11px;
+}
+
+/* ================= HERO VISUAL ================= */
+
+.hero-right {
+  height: 560px;
+  position: relative;
+}
+
+.main-fashion-card {
+  height: 100%;
+  border-radius: 40px;
+  background: var(--purple);
+  position: relative;
+  overflow: hidden;
+  padding: 30px;
+  color: white;
+  transform: rotate(2deg);
+}
+
+.main-fashion-card::before {
+  content: "";
+  position: absolute;
+  width: 470px;
+  height: 470px;
+  background: var(--pink);
+  border-radius: 50%;
+  right: -120px;
+  top: -80px;
+}
+
+.main-fashion-card::after {
+  content: "";
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: var(--lime);
+  bottom: -150px;
+  left: -70px;
+}
+
+.card-top,
+.card-bottom {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+}
+
+.fashion-word {
+  position: absolute;
+  z-index: 3;
+  bottom: 80px;
+  right: 35px;
+  text-align: right;
+}
+
+.fashion-word span {
+  font-size: 14px;
+  letter-spacing: 5px;
+}
+
+.fashion-word h2 {
+  font-family: "Archivo Black", sans-serif;
+  font-size: 58px;
+  margin: 5px 0;
+  letter-spacing: -3px;
+}
+
+.card-bottom {
+  position: absolute;
+  bottom: 25px;
+  left: 30px;
+  right: 30px;
+}
+
+.floating-tag {
+  position: absolute;
+  z-index: 10;
+  padding: 14px 18px;
+  border-radius: 15px;
+  color: var(--black);
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.floating-tag span {
+  margin-right: 7px;
+}
+
+.pink-tag {
+  background: var(--pink);
+  color: white;
+  top: 50px;
+  left: -35px;
+  transform: rotate(-6deg);
+}
+
+.orange-tag {
+  background: var(--orange);
+  color: white;
+  bottom: 95px;
+  left: -55px;
+  transform: rotate(5deg);
+}
+
+.purple-tag {
+  background: white;
+  top: 220px;
+  right: -50px;
+  transform: rotate(-4deg);
+}
+
+.fashion-sticker {
+  position: absolute;
+  z-index: 20;
+  bottom: -20px;
+  right: -20px;
+  width: 120px;
+  height: 120px;
+  background: var(--lime);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transform: rotate(12deg);
+  border: 5px solid var(--cream);
+  font-size: 13px;
+}
+
+.fashion-sticker strong {
+  font-family: "Archivo Black", sans-serif;
+  font-size: 22px;
+}
+
+/* ================= JOURNEY ================= */
+
+.journey-section {
+  padding: 100px 6%;
+  background: var(--black);
+  color: white;
+}
+
+.journey-heading p,
+.explore-title p {
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: #9c9895;
+}
+
+.journey-heading h2 {
+  font-family: "Archivo Black", sans-serif;
+  font-size: clamp(48px, 6vw, 80px);
+  line-height: 0.9;
+  letter-spacing: -3px;
+  margin: 15px 0 55px;
+}
+
+.journey-heading h2 span {
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  color: var(--lime);
+}
+
+.journey-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.journey-card {
+  min-height: 330px;
+  padding: 25px;
+  border-radius: 25px;
+  position: relative;
+  text-decoration: none;
+  color: var(--black);
+  transition: 0.25s ease;
+}
+
+.journey-card:hover {
+  transform: translateY(-10px) rotate(-1deg);
+}
+
+.card-pink {
+  background: var(--pink);
+}
+
+.card-lime {
+  background: var(--lime);
+}
+
+.card-purple {
+  background: var(--purple);
+  color: white;
+}
+
+.card-orange {
+  background: var(--orange);
+  color: white;
+}
+
+.card-number {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.big-icon {
+  font-size: 48px;
+  margin-top: 35px;
+}
+
+.journey-card h3 {
+  font-family: "Archivo Black", sans-serif;
+  font-size: 23px;
+  margin: 25px 0 8px;
+}
+
+.journey-card p {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.card-arrow {
+  position: absolute;
+  bottom: 20px;
+  right: 22px;
+  font-size: 30px;
+}
+
+/* ================= EXPLORE ================= */
+
+.explore-section {
+  padding: 110px 6%;
+  background: var(--cream);
+}
+
+.explore-title h2 {
+  font-family: "Archivo Black", sans-serif;
+  font-size: clamp(42px, 5vw, 70px);
+  line-height: 0.95;
+  letter-spacing: -3px;
+  margin: 15px 0 50px;
+}
+
+.fashion-category-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 18px;
+}
+
+.fashion-category {
+  min-height: 390px;
+  padding: 28px;
+  border-radius: 28px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  transition: 0.25s ease;
+}
+
+.fashion-category:hover {
+  transform: scale(1.02);
+}
+
+.category-one {
+  background: var(--pink);
+  color: white;
+}
+
+.category-two {
+  background: var(--lime);
+}
+
+.category-three {
+  background: var(--purple);
+  color: white;
+}
+
+.category-one::after,
+.category-two::after,
+.category-three::after {
+  position: absolute;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 90px;
+  bottom: -20px;
+  right: 15px;
+  opacity: 0.18;
+}
+
+.category-one::after {
+  content: "TOP";
+}
+
+.category-two::after {
+  content: "JEANS";
+}
+
+.category-three::after {
+  content: "DRESS";
+}
+
+.category-label {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.fashion-category h3 {
+  position: absolute;
+  bottom: 55px;
+  left: 28px;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 38px;
+  margin: 0;
+}
+
+.fashion-category p {
+  position: absolute;
+  bottom: 22px;
+  left: 28px;
+  margin: 0;
+  font-size: 13px;
+}
+
+/* ================= CTA ================= */
+
+.big-cta {
+  margin: 0 6% 100px;
+  padding: 90px 8%;
+  border-radius: 40px;
+  background: var(--orange);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.big-cta p {
+  position: relative;
+  z-index: 3;
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+
+.big-cta h2 {
+  position: relative;
+  z-index: 3;
+  font-family: "Archivo Black", sans-serif;
+  font-size: clamp(50px, 6vw, 90px);
+  line-height: 0.9;
+  letter-spacing: -3px;
+  margin: 20px 0 35px;
+}
+
+.big-cta h2 span {
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+}
+
+.cta-btn {
+  position: relative;
+  z-index: 3;
+  display: inline-block;
+  background: var(--black);
+  color: white;
+  text-decoration: none;
+  padding: 17px 25px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cta-bubble {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.cta-bubble.one {
+  width: 500px;
+  height: 500px;
+  background: var(--pink);
+  right: -150px;
+  top: -200px;
+}
+
+.cta-bubble.two {
+  width: 250px;
+  height: 250px;
+  background: var(--lime);
+  right: 200px;
+  bottom: -150px;
+}
+
+/* ================= FOOTER ================= */
+
+.footer {
+  padding: 60px 6%;
+  background: var(--black);
+  color: white;
+}
+
+.footer-logo {
+  font-family: "Archivo Black", sans-serif;
+  font-size: 28px;
+}
+
+.footer-logo span {
+  color: var(--pink);
+}
+
+.footer p {
+  color: #9c9793;
+  font-size: 13px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1050px) {
+  .fashion-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-right {
+    max-width: 650px;
+    width: 100%;
+  }
+
+  .journey-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .fashion-category-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .navbar {
+    padding: 0 5%;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .fashion-hero {
+    padding: 55px 5%;
+  }
+
+  .hero-left h1 {
+    letter-spacing: -2px;
+  }
+
+  .hero-right {
+    height: 430px;
+  }
+
+  .journey-section,
+  .explore-section {
+    padding: 70px 5%;
+  }
+
+  .journey-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mini-stats {
+    gap: 20px;
+  }
+
+  .mini-stats strong {
+    font-size: 19px;
+  }
+
+  .purple-tag {
+    right: 5px;
+  }
+
+  .pink-tag,
+  .orange-tag {
+    left: 10px;
+  }
+
+  .big-cta {
+    margin: 0 5% 70px;
+    padding: 60px 8%;
+  }
+}
