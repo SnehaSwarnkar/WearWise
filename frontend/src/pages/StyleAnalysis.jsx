@@ -1,26 +1,14 @@
-import { useState } from "react";
+import "./../App.css";
 import { Link } from "react-router-dom";
-import "../App.css";
 
 function StyleAnalysis() {
-  const [step, setStep] = useState(1);
-  const [image, setImage] = useState(null);
-  const [undertone, setUndertone] = useState("");
-  const [bodyType, setBodyType] = useState("");
-
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-
-    if (file) {
-      setImage(URL.createObjectURL(file));
-    }
-  };
-
   return (
-    <div className="app">
+    <div className="app analysis-page">
+      {/* ================= NAVBAR ================= */}
+
       <nav className="navbar">
         <Link to="/" className="logo">
-          AI <span>FASHION</span>
+          AI<span>FASHION</span>
         </Link>
 
         <div className="nav-links">
@@ -28,237 +16,147 @@ function StyleAnalysis() {
           <Link to="/my-style">My Style</Link>
           <Link to="/try-on">Try On</Link>
         </div>
+
+        <Link to="/my-style" className="nav-cta">
+          My Style ✦
+        </Link>
       </nav>
 
-      <main className="analysis-page">
-        <div className="analysis-progress">
-          <div className={step >= 1 ? "active-step" : ""}>1</div>
-          <div className={step >= 2 ? "active-step" : ""}>2</div>
-          <div className={step >= 3 ? "active-step" : ""}>3</div>
-          <div className={step >= 4 ? "active-step" : ""}>4</div>
-        </div>
+      {/* ================= MAIN SECTION ================= */}
 
-        {/* STEP 1 */}
+      <main className="analysis-main">
+        {/* LEFT SIDE */}
 
-        {step === 1 && (
-          <div className="analysis-content">
-            <p className="hero-tag">STEP 1 OF 4</p>
-
-            <h1>
-              Let's see
-              <br />
-              <span>your style.</span>
-            </h1>
-
-            <p>
-              Upload a clear front-facing photo to begin creating your
-              personal fashion profile.
-            </p>
-
-            {!image ? (
-              <div className="tryon-upload-box">
-                <div className="upload-icon">📸</div>
-
-                <h2>Upload Your Photo</h2>
-
-                <label
-                  htmlFor="style-image-upload"
-                  className="primary-btn upload-btn"
-                >
-                  Choose Photo
-                </label>
-
-                <input
-                  id="style-image-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  hidden
-                />
-              </div>
-            ) : (
-              <div className="image-preview-box">
-                <img
-                  src={image}
-                  alt="Style analysis"
-                  className="image-preview"
-                />
-
-                <button
-                  className="primary-btn continue-btn"
-                  onClick={() => setStep(2)}
-                >
-                  Continue →
-                </button>
-              </div>
-            )}
+        <section className="analysis-content">
+          <div className="analysis-badge">
+            ✦ YOUR STYLE RESULTS
           </div>
-        )}
 
-        {/* STEP 2 */}
+          <h1 className="analysis-title">
+            YOUR
+            <br />
+            STYLE
+            <br />
+            <span>ERA</span> IS
+            <br />
+            HERE.
+          </h1>
 
-        {step === 2 && (
-          <div className="analysis-content">
-            <p className="hero-tag">STEP 2 OF 4</p>
+          <p className="analysis-description">
+            AI Fashion has analyzed your visual style and created a fashion
+            direction designed around your colors, personality and aesthetic.
+          </p>
 
-            <h1>
-              Discover your
-              <br />
-              <span>color profile.</span>
-            </h1>
+          <div className="analysis-buttons">
+            <Link to="/explore" className="primary-analysis-btn">
+              Explore Your Style →
+            </Link>
 
-            <p>
-              Select the undertone that feels closest to your skin.
-              Later, our AI will automatically analyze this from your photo.
-            </p>
+            <Link to="/try-on" className="secondary-analysis-btn">
+              Try Your Look
+            </Link>
+          </div>
 
-            <div className="selection-grid">
-              <button
-                className={
-                  undertone === "warm"
-                    ? "selection-card selected"
-                    : "selection-card"
-                }
-                onClick={() => setUndertone("warm")}
-              >
-                <span>☀️</span>
-                <h2>Warm</h2>
-                <p>Golden, peachy or yellow undertones.</p>
-              </button>
-
-              <button
-                className={
-                  undertone === "cool"
-                    ? "selection-card selected"
-                    : "selection-card"
-                }
-                onClick={() => setUndertone("cool")}
-              >
-                <span>❄️</span>
-                <h2>Cool</h2>
-                <p>Pink, rosy or bluish undertones.</p>
-              </button>
-
-              <button
-                className={
-                  undertone === "neutral"
-                    ? "selection-card selected"
-                    : "selection-card"
-                }
-                onClick={() => setUndertone("neutral")}
-              >
-                <span>⚖️</span>
-                <h2>Neutral</h2>
-                <p>A balanced mix of warm and cool tones.</p>
-              </button>
+          <div className="style-summary">
+            <div className="summary-item">
+              <span className="summary-number">01</span>
+              <p>COLOR<br />PROFILE</p>
             </div>
 
-            <button
-              className="primary-btn continue-btn"
-              disabled={!undertone}
-              onClick={() => setStep(3)}
-            >
-              Continue →
-            </button>
-          </div>
-        )}
-
-        {/* STEP 3 */}
-
-        {step === 3 && (
-          <div className="analysis-content">
-            <p className="hero-tag">STEP 3 OF 4</p>
-
-            <h1>
-              Understand your
-              <br />
-              <span>body profile.</span>
-            </h1>
-
-            <p>
-              Choose the body profile that feels closest to you.
-            </p>
-
-            <div className="selection-grid body-grid">
-              {[
-                "Rectangle",
-                "Hourglass",
-                "Pear",
-                "Inverted Triangle",
-                "Apple",
-              ].map((type) => (
-                <button
-                  key={type}
-                  className={
-                    bodyType === type
-                      ? "selection-card selected"
-                      : "selection-card"
-                  }
-                  onClick={() => setBodyType(type)}
-                >
-                  <span>🧍</span>
-                  <h2>{type}</h2>
-                </button>
-              ))}
+            <div className="summary-item">
+              <span className="summary-number">02</span>
+              <p>STYLE<br />VIBE</p>
             </div>
 
-            <button
-              className="primary-btn continue-btn"
-              disabled={!bodyType}
-              onClick={() => setStep(4)}
-            >
-              Generate My Profile →
-            </button>
-          </div>
-        )}
-
-        {/* STEP 4 */}
-
-        {step === 4 && (
-          <div className="analysis-content style-result">
-            <p className="hero-tag">YOUR AI FASHION PROFILE</p>
-
-            <h1>
-              Your style is
-              <br />
-              <span>taking shape.</span>
-            </h1>
-
-            <div className="profile-result">
-              <div className="profile-image">
-                {image && <img src={image} alt="Your profile" />}
-              </div>
-
-              <div className="profile-details">
-                <h2>Your Color Profile</h2>
-                <p className="result-value">
-                  {undertone.charAt(0).toUpperCase() +
-                    undertone.slice(1)}{" "}
-                  Undertone
-                </p>
-
-                <h2>Your Body Profile</h2>
-                <p className="result-value">{bodyType}</p>
-
-                <h2>Next Step</h2>
-                <p>
-                  Explore personalized clothing recommendations or try outfits
-                  virtually.
-                </p>
-
-                <div className="result-buttons">
-                  <Link to="/explore" className="primary-btn">
-                    Explore Fashion
-                  </Link>
-
-                  <Link to="/try-on" className="secondary-btn">
-                    Try On Clothes
-                  </Link>
-                </div>
-              </div>
+            <div className="summary-item">
+              <span className="summary-number">03</span>
+              <p>BODY<br />PROFILE</p>
             </div>
           </div>
-        )}
+        </section>
+
+        {/* RIGHT SIDE */}
+
+        <section className="analysis-visual">
+          {/* Main AI style orb */}
+
+          <div className="style-orb">
+            <div className="orb-glow"></div>
+            <div className="orb-small"></div>
+
+            <div className="style-text">
+              <span>AI</span>
+              <h2>STYLE</h2>
+              <p>ANALYZED</p>
+            </div>
+          </div>
+
+          {/* PAMPHLET 1 */}
+
+          <div className="fashion-card card-match">
+            <span className="card-number">01</span>
+
+            <p>YOUR BEST</p>
+
+            <h3>
+              COLOR
+              <br />
+              MATCH
+            </h3>
+
+            <div className="card-line"></div>
+
+            <span className="card-tag">
+              PERSONAL PALETTE
+            </span>
+          </div>
+
+          {/* PAMPHLET 2 */}
+
+          <div className="fashion-card card-vibe">
+            <span className="mini-star">✦</span>
+
+            <p>STYLE</p>
+
+            <h3>
+              YOUR
+              <br />
+              VIBE
+            </h3>
+
+            <span className="vibe-label">2026</span>
+          </div>
+
+          {/* PAMPHLET 3 */}
+
+          <div className="fashion-card card-fit">
+            <span className="fit-icon">✦</span>
+
+            <p>BODY</p>
+
+            <h3>PROFILE</h3>
+
+            <span className="fit-sub">
+              MADE FOR YOU
+            </span>
+          </div>
+
+          {/* LOOK GOOD STICKER */}
+
+          <div className="look-sticker">
+            <span>YOU</span>
+            <strong>LOOK</strong>
+            <strong>GOOD</strong>
+            <small>✦</small>
+          </div>
+
+          {/* Extra floating tag */}
+
+          <div className="style-tag">
+            <span>✦</span>
+            PERSONAL STYLE
+          </div>
+        </section>
       </main>
     </div>
   );

@@ -1,28 +1,31 @@
 import { useState } from "react";
 import "../App.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function TryOn() {
   const [selectedImage, setSelectedImage] = useState(null);
+  const navigate = useNavigate();
 
   const handleImageChange = (event) => {
-    const file = event.target.files[0];
+    const file = event.target.files?.[0];
 
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setSelectedImage(imageUrl);
-    }
+    if (!file) return;
+
+    const imageUrl = URL.createObjectURL(file);
+    setSelectedImage(imageUrl);
   };
 
-  const removeImage = () => {
+  const removePhoto = () => {
     setSelectedImage(null);
   };
 
   return (
-    <div className="app">
+    <div className="tryon-page">
+
+      {/* NAVBAR */}
       <nav className="navbar">
         <Link to="/" className="logo">
-          AI <span>FASHION</span>
+          AI<span>FASHION</span>
         </Link>
 
         <div className="nav-links">
@@ -31,93 +34,252 @@ function TryOn() {
           <Link to="/try-on">Try On</Link>
         </div>
 
-        <Link to="/my-style" className="profile-btn">
-          My Profile
+        <Link to="/my-style" className="nav-cta">
+          My Style ✦
         </Link>
       </nav>
 
-      <main className="placeholder-page">
-        <p className="hero-tag">VIRTUAL TRY-ON</p>
+      <main className="tryon-editorial">
 
-        <h1>
-          See it on
-          <br />
-          <span>you first.</span>
-        </h1>
+        {/* TOP LABEL */}
+        <div className="tryon-editorial-top">
+          <span>✦ AI VIRTUAL TRY ON</span>
+          <span>STEP 01 / 03</span>
+        </div>
 
-        <p>
-          Upload a clear, front-facing photo and prepare to visualize
-          different outfits on yourself.
-        </p>
+        {/* HERO */}
+        <section className="tryon-hero">
 
-        {!selectedImage ? (
-          <div className="tryon-upload-box">
-            <div className="upload-icon">🪞</div>
-
-            <h2>Upload Your Photo</h2>
-
-            <p>
-              Choose a clear, front-facing image for the best virtual try-on
-              experience.
-            </p>
-
-            <label htmlFor="image-upload" className="primary-btn upload-btn">
-              Upload Image
-            </label>
-
-            <input
-              id="image-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              hidden
-            />
-
-            <small>
-              Your image will only be used for your AI Fashion experience.
-            </small>
-          </div>
-        ) : (
-          <div className="image-preview-box">
-            <h2>Your Photo</h2>
-
-            <img
-              src={selectedImage}
-              alt="Selected for virtual try-on"
-              className="image-preview"
-            />
-
-            <div className="preview-buttons">
-              <label
-                htmlFor="image-upload"
-                className="secondary-btn upload-btn"
-              >
-                Change Photo
-              </label>
-
-              <input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                hidden
-              />
-
-              <button className="remove-btn" onClick={removeImage}>
-                Remove
-              </button>
+          {/* LEFT EDITORIAL TEXT */}
+          <div className="tryon-editorial-copy">
+            <div className="tryon-side-label">
+              YOUR DIGITAL
+              <br />
+              FITTING ROOM
             </div>
 
-            <button className="primary-btn continue-btn">
-              Continue to Try-On →
-            </button>
-          </div>
-        )}
+            <h1>
+              DROP
+              <br />
+              <span>YOUR</span>
+              <br />
+              PHOTO.
+            </h1>
 
-        <Link to="/explore" className="secondary-btn">
-          🛍 Explore Clothes First
-        </Link>
+            <p>
+              Start with a clear photo of yourself.
+              AI Fashion will use it as the canvas for
+              your next look.
+            </p>
+          </div>
+
+          {/* MAIN PHOTO DROP AREA */}
+          <div className="photo-drop-stage">
+
+            <div className="stage-purple-shape"></div>
+            <div className="stage-orange-shape"></div>
+            <div className="stage-yellow-dot"></div>
+
+            <div className="photo-drop-card">
+
+              <div className="photo-card-top">
+                <span>
+                  ✦ {selectedImage ? "PHOTO READY" : "PHOTO INPUT"}
+                </span>
+
+                <span>01 / 03</span>
+              </div>
+
+              <div className="photo-drop-center">
+
+                {!selectedImage ? (
+                  <>
+                    <div className="photo-placeholder">
+                      <div className="photo-head"></div>
+                      <div className="photo-body"></div>
+                    </div>
+
+                    <div className="drop-copy">
+                      <span>DRAG & DROP</span>
+
+                      <h2>
+                        YOUR
+                        <br />
+                        PHOTO
+                      </h2>
+
+                      <p>
+                        A clear full-body photo
+                        <br />
+                        works best.
+                      </p>
+
+                      <label className="editorial-upload-btn">
+                        CHOOSE PHOTO
+
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                        />
+                      </label>
+                    </div>
+                  </>
+                ) : (
+                  <div className="uploaded-editorial-view">
+
+                    <img
+                      src={selectedImage}
+                      alt="Selected fashion photo"
+                      className="uploaded-editorial-image"
+                    />
+
+                    <div className="uploaded-editorial-overlay">
+                      <div>
+                        <span>✦ PHOTO LOADED</span>
+                        <h3>READY FOR YOUR LOOK</h3>
+                      </div>
+
+                      <div className="photo-actions">
+
+                        <label className="change-photo-btn">
+                          CHANGE PHOTO
+
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                          />
+                        </label>
+
+                        <button
+                          type="button"
+                          className="remove-photo-btn"
+                          onClick={removePhoto}
+                        >
+                          REMOVE PHOTO
+                        </button>
+
+                      </div>
+                    </div>
+
+                  </div>
+                )}
+
+              </div>
+
+              <div className="photo-card-bottom">
+
+                <span>
+                  {selectedImage
+                    ? "PHOTO READY FOR AI"
+                    : "FRONT VIEW PREFERRED"}
+                </span>
+
+                {selectedImage ? (
+                  <button
+                    type="button"
+                    className="continue-to-look-btn"
+                    onClick={() => navigate("/choose-look")}
+                  >
+                    CONTINUE TO STEP 2 →
+                  </button>
+                ) : (
+                  <span>JPG / PNG</span>
+                )}
+
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* RIGHT EDITORIAL INFO */}
+          <div className="tryon-right-details">
+
+            <div className="right-detail-number">
+              2026
+            </div>
+
+            <div className="right-detail-text">
+              YOUR LOOK
+              <br />
+              STARTS
+              <br />
+              HERE
+            </div>
+
+            <div className="tryon-star">
+              ✦
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* BOTTOM SECTION */}
+        <section className="tryon-bottom">
+
+          <div className="tryon-privacy">
+            <span>✦</span>
+            PRIVATE PHOTO PROCESSING
+          </div>
+
+          <div className="tryon-flow">
+
+            <div
+              className={`flow-item ${
+                selectedImage ? "complete" : "active"
+              }`}
+            >
+              <span>01</span>
+
+              <div>
+                <strong>UPLOAD</strong>
+
+                <small>
+                  {selectedImage ? "Photo ready" : "Your photo"}
+                </small>
+              </div>
+            </div>
+
+            <div className="flow-line"></div>
+
+            <div
+              className={`flow-item ${
+                selectedImage ? "active" : ""
+              }`}
+            >
+              <span>02</span>
+
+              <div>
+                <strong>CHOOSE</strong>
+                <small>Your outfit</small>
+              </div>
+            </div>
+
+            <div className="flow-line"></div>
+
+            <div className="flow-item">
+              <span>03</span>
+
+              <div>
+                <strong>TRY ON</strong>
+                <small>Your AI look</small>
+              </div>
+            </div>
+
+          </div>
+
+          <div className="tryon-bottom-tag">
+            AI FASHION
+            <span>✦</span>
+          </div>
+
+        </section>
+
       </main>
+
     </div>
   );
 }
