@@ -124,11 +124,11 @@ function MyStyle() {
           </div>
 
           <div className="visual-ai">
-            AI
+            Wear
           </div>
 
           <div className="visual-fashion">
-            FASHION
+            Wise
           </div>
 
           <div className="visual-bottom-label">

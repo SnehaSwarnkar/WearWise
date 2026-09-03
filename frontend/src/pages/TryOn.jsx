@@ -25,7 +25,7 @@ function TryOn() {
       {/* NAVBAR */}
       <nav className="navbar">
         <Link to="/" className="logo">
-          AI<span>FASHION</span>
+          Wear<span>Wise</span>
         </Link>
 
         <div className="nav-links">

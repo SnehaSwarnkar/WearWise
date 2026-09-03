@@ -8,7 +8,7 @@ function Home() {
       {/* NAVBAR */}
       <nav className="navbar">
         <Link to="/" className="logo">
-          AI<span>FASHION</span>
+          Wear<span>Wise</span>
         </Link>
 
         <div className="nav-links">
@@ -105,8 +105,8 @@ function Home() {
             </div>
 
             <div className="fashion-word">
-              <span>AI</span>
-              <h2>FASHION</h2>
+              <span>Wear</span>
+              <h2>Wise</h2>
             </div>
 
             <div className="card-bottom">
@@ -265,7 +265,7 @@ function Home() {
       <footer className="footer">
 
         <div className="footer-logo">
-          AI<span>FASHION</span>
+          Wear<span>Wise</span>
         </div>
 
         <p>

@@ -1,14 +1,25 @@
 import "./../App.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 function StyleAnalysis() {
+    const location = useLocation();
+const navigate = useNavigate();
+
+const selectedLook = location.state?.selectedLook;
+const handleBackToChoose = () => {
+  navigate("/choose-look");
+};
+ if (!selectedLook) {
+
+ }
+      // fallback screen
   return (
     <div className="app analysis-page">
       {/* ================= NAVBAR ================= */}
 
       <nav className="navbar">
         <Link to="/" className="logo">
-          AI<span>FASHION</span>
+          Wear<span>Wise</span>
         </Link>
 
         <div className="nav-links">
