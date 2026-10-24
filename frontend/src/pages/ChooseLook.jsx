@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
+import Header from "./Header";
 
 function ChooseLook() {
   const navigate = useNavigate();
@@ -53,21 +54,7 @@ function ChooseLook() {
 
   return (
     <div className="choose-look-page">
-      <nav className="navbar">
-        <Link to="/" className="logo">
-          AI<span>FASHION</span>
-        </Link>
-
-        <div className="nav-links">
-          <Link to="/explore">Explore</Link>
-          <Link to="/my-style">My Style</Link>
-          <Link to="/try-on">Try On</Link>
-        </div>
-
-        <Link to="/my-style" className="nav-cta">
-          My Style ✦
-        </Link>
-      </nav>
+      <Header />
 
       <main className="choose-editorial">
         <div className="choose-editorial-top">

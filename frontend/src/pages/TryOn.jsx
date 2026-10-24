@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "../App.css";
 import { Link, useNavigate } from "react-router-dom";
+import Header from "./Header";
 
 function TryOn() {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -21,24 +22,8 @@ function TryOn() {
 
   return (
     <div className="tryon-page">
-
-      {/* NAVBAR */}
-      <nav className="navbar">
-        <Link to="/" className="logo">
-          Wear<span>Wise</span>
-        </Link>
-
-        <div className="nav-links">
-          <Link to="/explore">Explore</Link>
-          <Link to="/my-style">My Style</Link>
-          <Link to="/try-on">Try On</Link>
-        </div>
-
-        <Link to="/my-style" className="nav-cta">
-          My Style ✦
-        </Link>
-      </nav>
-
+      <Header />
+      
       <main className="tryon-editorial">
 
         {/* TOP LABEL */}

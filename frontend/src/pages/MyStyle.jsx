@@ -46,12 +46,12 @@ function MyStyle() {
               />
             </label>
 
-            <button
-              className="analyze-btn"
-              onClick={() => navigate("/style-analysis")}
-            >
-              Analyze My Style →
-            </button>
+          <button
+  className="analyze-btn"
+  onClick={() => navigate("/build-avatar")}
+>
+  Build My Style →
+</button>
           </div>
 
           <div className="style-stats">

@@ -5259,3 +5259,1771 @@ a {
   }
 }
 
+/* =========================================================
+   WEARWISE — AVATAR BUILDER
+   Vibrant Neon Editorial Theme
+========================================================= */
+
+.avatar-builder-page {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: #fff8f1;
+  color: #171923;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ---------------- HEADER ---------------- */
+
+.avatar-builder-header {
+  height: 86px;
+  padding: 0 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(23, 25, 35, 0.12);
+  position: relative;
+  z-index: 10;
+}
+
+.avatar-logo {
+  border: 0;
+  background: transparent;
+  font-size: 28px;
+  font-weight: 950;
+  letter-spacing: -2px;
+  cursor: pointer;
+  color: #202432;
+}
+
+.avatar-logo span {
+  color: #ff3b91;
+}
+
+.avatar-step-label,
+.avatar-progress {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+
+/* ---------------- BACKGROUND SHAPES ---------------- */
+
+.avatar-bg-shape {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.avatar-bg-pink {
+  width: 420px;
+  height: 420px;
+  background: #ff3b91;
+  right: -120px;
+  top: 80px;
+  opacity: 0.9;
+}
+
+.avatar-bg-purple {
+  width: 380px;
+  height: 380px;
+  background: #8264ff;
+  right: 180px;
+  bottom: -180px;
+}
+
+.avatar-bg-orange {
+  width: 220px;
+  height: 220px;
+  background: #ff5a36;
+  left: -80px;
+  bottom: 50px;
+}
+
+.avatar-bg-lime {
+  width: 150px;
+  height: 150px;
+  background: #d8ff32;
+  right: 30%;
+  top: 120px;
+}
+
+/* ---------------- INTRO ---------------- */
+
+.avatar-intro {
+  width: min(850px, 86%);
+  margin: 70px auto 45px;
+  position: relative;
+  z-index: 2;
+}
+
+.avatar-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #6544bd;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 3px;
+  margin-bottom: 22px;
+}
+
+.avatar-intro h1,
+.builder-content h1,
+.ai-builder-content h1 {
+  margin: 0;
+  font-size: clamp(55px, 8vw, 105px);
+  line-height: 0.84;
+  letter-spacing: -6px;
+  font-weight: 950;
+}
+
+.avatar-intro h1 span,
+.builder-content h1 span,
+.ai-builder-content h1 span {
+  color: #ff3b91;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.avatar-intro p {
+  max-width: 580px;
+  margin-top: 28px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #646875;
+}
+
+/* ---------------- MODE CARDS ---------------- */
+
+.avatar-mode-grid {
+  width: min(850px, 86%);
+  margin: 0 auto 100px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  position: relative;
+  z-index: 3;
+}
+
+.avatar-mode-card {
+  min-height: 310px;
+  padding: 30px;
+  text-align: left;
+  border: 0;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease;
+}
+
+.avatar-mode-card:hover {
+  transform: translateY(-8px) rotate(-1deg);
+}
+
+.manual-card {
+  background: #8264ff;
+  color: white;
+}
+
+.ai-card {
+  background: #ff3b91;
+  color: white;
+}
+
+.mode-number {
+  position: absolute;
+  top: 25px;
+  right: 28px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+
+.mode-icon {
+  width: 65px;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d8ff32;
+  color: #171923;
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: 950;
+  margin-bottom: 35px;
+}
+
+.avatar-mode-card h2 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: -1px;
+}
+
+.avatar-mode-card p {
+  max-width: 350px;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+.mode-arrow {
+  position: absolute;
+  bottom: 28px;
+  left: 30px;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 2px;
+}
+
+/* ---------------- FLOATING LABELS ---------------- */
+
+.avatar-floating-label {
+  position: absolute;
+  z-index: 4;
+  padding: 11px 18px;
+  border-radius: 30px;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 2px;
+  box-shadow: 5px 7px 0 rgba(23, 25, 35, 0.12);
+}
+
+.label-one {
+  top: 28%;
+  right: 6%;
+  background: #d8ff32;
+}
+
+.label-two {
+  bottom: 20%;
+  left: 4%;
+  background: #ff5a36;
+  color: white;
+}
+
+.label-three {
+  top: 48%;
+  right: 2%;
+  background: white;
+}
+
+/* =========================================================
+   MANUAL BUILDER
+========================================================= */
+
+.manual-builder {
+  background: #fff8f1;
+}
+
+.builder-layout {
+  width: min(1250px, 88%);
+  margin: 50px auto;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 70px;
+  position: relative;
+  z-index: 2;
+}
+
+.builder-description {
+  max-width: 650px;
+  color: #656a78;
+  line-height: 1.65;
+  font-size: 16px;
+  margin: 25px 0 35px;
+}
+
+/* ---------------- COLOUR OPTIONS ---------------- */
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.choice-card {
+  min-height: 130px;
+  padding: 22px;
+  border: 2px solid rgba(23, 25, 35, 0.1);
+  background: white;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.choice-card:hover,
+.choice-card.selected {
+  border-color: #ff3b91;
+  transform: translateY(-3px);
+  box-shadow: 6px 7px 0 #d8ff32;
+}
+
+.choice-card strong {
+  display: block;
+  font-size: 17px;
+  margin-bottom: 7px;
+}
+
+.choice-card small {
+  color: #727582;
+  line-height: 1.4;
+}
+
+.colour-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+.colour-dot.warm {
+  background: #ff7a45;
+}
+
+.colour-dot.cool {
+  background: #8264ff;
+}
+
+.colour-dot.neutral {
+  background: #e7cdb9;
+}
+
+.colour-dot.bold {
+  background: linear-gradient(
+    135deg,
+    #ff3b91,
+    #d8ff32,
+    #8264ff,
+    #ff5a36
+  );
+}
+
+/* ---------------- BODY TYPES ---------------- */
+
+.body-type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.body-type-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px;
+  min-height: 110px;
+  background: white;
+  border: 2px solid rgba(23, 25, 35, 0.1);
+  cursor: pointer;
+  text-align: left;
+  transition: 0.2s ease;
+}
+
+.body-type-card:hover,
+.body-type-card.selected {
+  border-color: #8264ff;
+  box-shadow: 5px 5px 0 #ff3b91;
+}
+
+.body-type-card strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.body-type-card small {
+  display: block;
+  color: #777b86;
+  line-height: 1.35;
+}
+
+/* Simple avatar silhouette */
+
+.body-avatar {
+  width: 55px;
+  height: 75px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.body-avatar-head {
+  width: 22px;
+  height: 22px;
+  background: #8264ff;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.body-avatar-body {
+  width: 38px;
+  height: 48px;
+  background: #8264ff;
+  border-radius: 18px 18px 10px 10px;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Visual variations */
+
+.body-avatar.pear .body-avatar-body {
+  width: 46px;
+  border-radius: 15px 15px 22px 22px;
+}
+
+.body-avatar.rectangle .body-avatar-body {
+  width: 34px;
+  border-radius: 10px;
+}
+
+.body-avatar.apple .body-avatar-body {
+  width: 43px;
+  height: 43px;
+  border-radius: 22px 22px 12px 12px;
+}
+
+.body-avatar.inverted-triangle .body-avatar-body {
+  width: 48px;
+  border-radius: 25px 25px 10px 10px;
+}
+
+.body-avatar.athletic .body-avatar-body {
+  width: 39px;
+  border-radius: 12px;
+}
+
+/* ---------------- FIT ---------------- */
+
+.fit-selection {
+  margin-top: 35px;
+}
+
+.fit-selection h3 {
+  font-size: 11px;
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+}
+
+.fit-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.fit-buttons button {
+  border: 1px solid #242735;
+  background: transparent;
+  padding: 12px 18px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.fit-buttons button.selected {
+  background: #242735;
+  color: white;
+}
+
+/* ---------------- STYLE CHIPS ---------------- */
+
+.style-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.style-chip-grid button {
+  border: 2px solid #242735;
+  background: white;
+  padding: 15px 22px;
+  border-radius: 30px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.style-chip-grid button:hover,
+.style-chip-grid button.selected {
+  background: #ff3b91;
+  color: white;
+  border-color: #ff3b91;
+}
+
+/* ---------------- NAVIGATION ---------------- */
+
+.builder-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 45px;
+}
+
+.next-button {
+  border: 0;
+  padding: 17px 28px;
+  background: #ff3b91;
+  color: white;
+  font-weight: 950;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 5px 6px 0 #242735;
+}
+
+.next-button:hover {
+  transform: translate(-2px, -2px);
+}
+
+.back-button {
+  border: 0;
+  background: transparent;
+  font-weight: 900;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+/* ---------------- AVATAR PREVIEW ---------------- */
+
+.avatar-preview-panel {
+  background: #8264ff;
+  min-height: 620px;
+  position: relative;
+  overflow: hidden;
+  padding: 25px;
+}
+
+.preview-label {
+  color: white;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 3px;
+  position: relative;
+  z-index: 4;
+}
+
+.avatar-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-stage-circle {
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: #ff3b91;
+  position: absolute;
+}
+
+.large-avatar {
+  width: 180px;
+  height: 370px;
+  position: relative;
+  z-index: 2;
+}
+
+.large-avatar-head {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #ffd0b5;
+  position: absolute;
+  top: 0;
+  left: 40px;
+  z-index: 3;
+}
+
+.large-avatar-hair {
+  width: 115px;
+  height: 75px;
+  border-radius: 55px 55px 20px 20px;
+  background: #242735;
+  position: absolute;
+  top: -8px;
+  left: 32px;
+  z-index: 4;
+}
+
+.large-avatar-body {
+  width: 145px;
+  height: 180px;
+  background: #d8ff32;
+  border-radius: 65px 65px 25px 25px;
+  position: absolute;
+  top: 95px;
+  left: 17px;
+}
+
+.large-avatar-legs {
+  width: 105px;
+  height: 115px;
+  background: #242735;
+  position: absolute;
+  bottom: 0;
+  left: 38px;
+  border-radius: 20px 20px 10px 10px;
+}
+
+.preview-bubble {
+  position: absolute;
+  right: 25px;
+  bottom: 70px;
+  width: 105px;
+  height: 105px;
+  border-radius: 50%;
+  background: #d8ff32;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 950;
+  line-height: 0.95;
+  transform: rotate(8deg);
+  z-index: 5;
+}
+
+.preview-info {
+  position: absolute;
+  bottom: 25px;
+  left: 25px;
+  color: white;
+  z-index: 5;
+}
+
+.preview-info span,
+.preview-info strong {
+  display: block;
+}
+
+.preview-info span {
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+.preview-info strong {
+  font-size: 18px;
+  margin-top: 5px;
+}
+
+/* ---------------- FINAL CARD ---------------- */
+
+.avatar-final-preview {
+  margin-top: 35px;
+  padding: 18px;
+  background: #d8ff32;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.mini-avatar {
+  width: 55px;
+  height: 75px;
+  position: relative;
+}
+
+.mini-head {
+  width: 25px;
+  height: 25px;
+  background: #ffd0b5;
+  border-radius: 50%;
+  margin: auto;
+}
+
+.mini-body {
+  width: 42px;
+  height: 45px;
+  background: #8264ff;
+  border-radius: 20px 20px 8px 8px;
+  margin: 5px auto;
+}
+
+.avatar-final-preview span,
+.avatar-final-preview strong {
+  display: block;
+}
+
+.avatar-final-preview span {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.avatar-final-preview strong {
+  margin-top: 4px;
+}
+
+/* =========================================================
+   AI BUILDER
+========================================================= */
+
+.ai-builder {
+  background: #fff4f8;
+}
+
+/* =========================================================
+   AI BUILDER — WEARWISE STYLE STARTER
+========================================================= */
+
+.ai-builder {
+  min-height: calc(100vh - 88px);
+  background: #fff7f2;
+  color: #20222c;
+  overflow: hidden;
+}
+
+.ai-builder-layout {
+  width: min(1380px, 92%);
+  min-height: calc(100vh - 88px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 0.95fr;
+  gap: 0;
+  align-items: stretch;
+}
+
+/* =========================================================
+   LEFT PANEL
+========================================================= */
+
+.ai-builder-layout > :first-child {
+  padding: 70px 70px 55px 0;
+  max-width: 650px;
+}
+
+.ai-builder-layout > :first-child::before {
+  content: "✦  AI STYLE STARTER";
+  display: block;
+  margin-bottom: 20px;
+  color: #8d6bff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+
+/* =========================================================
+   AI BUILDER TITLE
+========================================================= */
+
+.ai-builder h1,
+.ai-builder .page-title,
+.ai-builder .builder-title {
+  font-family: "Archivo Black", sans-serif;
+  font-size: clamp(55px, 5.5vw, 86px);
+  line-height: 0.9;
+  letter-spacing: -4px;
+  margin: 0 0 25px;
+  color: #181a24;
+}
+
+.ai-builder h1 span,
+.ai-builder .page-title span,
+.ai-builder .builder-title span {
+  color: #ff3d9a;
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-weight: 700;
+}
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.ai-builder p {
+  color: #656875;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   UPLOAD BOX
+========================================================= */
+
+.ai-upload-box {
+  min-height: 150px;
+  margin-top: 25px;
+  border: 2px dashed #a66cff;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.8);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+
+  transition: 0.25s ease;
+}
+
+.ai-upload-box:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 5px 6px 0 #d8ff3f;
+}
+
+.upload-plus {
+  font-size: 42px;
+  color: #ff3d9a;
+  line-height: 1;
+}
+
+.ai-upload-box strong {
+  font-size: 16px;
+  margin: 8px 0;
+  color: #20222c;
+  letter-spacing: 0.5px;
+}
+
+.ai-upload-box span {
+  font-size: 11px;
+  color: #777985;
+}
+
+.uploaded-photo-name {
+  font-weight: 900;
+  color: #8d6bff;
+}
+
+/* =========================================================
+   SKIN TONE SECTION
+========================================================= */
+
+.ai-colour-section {
+  margin-top: 35px;
+}
+
+.ai-colour-section .section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 2.5px;
+  margin-bottom: 12px;
+}
+
+.ai-colour-section .section-heading span:last-child {
+  color: #656875;
+}
+
+/* =========================================================
+   HUMAN SKIN TONE PALETTE
+========================================================= */
+
+.skin-tone-picker {
+  position: relative;
+  width: 100%;
+  height: 58px;
+
+  border: 2px solid #242735;
+  border-radius: 2px;
+
+  background: linear-gradient(
+    90deg,
+    #f7e6d7 0%,
+    #f2dfcf 14%,
+    #e6d2c2 28%,
+    #eacbb4 42%,
+    #e6c2a6 56%,
+    #d9a67d 70%,
+    #b87852 84%,
+    #744027 100%
+  );
+
+  cursor: pointer;
+}
+
+.skin-tone-cursor {
+  position: absolute;
+
+  width: 22px;
+  height: 22px;
+
+  left: 42%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background: #e6bb97;
+
+  border: 4px solid white;
+
+  box-shadow:
+    0 0 0 2px #242735,
+    0 3px 8px rgba(0,0,0,0.2);
+}
+
+/* =========================================================
+   ROUND SKIN SWATCHES
+========================================================= */
+
+.skin-tone-options {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.skin-tone-swatch {
+  width: 48px;
+  height: 48px;
+
+  flex: 0 0 48px;
+
+  border-radius: 50%;
+
+  border: 2px solid rgba(36, 39, 53, 0.2);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border 0.2s ease;
+}
+
+.skin-tone-swatch:hover {
+  transform: translateY(-4px);
+}
+
+.skin-tone-swatch.selected {
+  border: 3px solid #ff3d9a;
+  box-shadow: 0 0 0 3px #fff7f2;
+}
+
+/* =========================================================
+   SELECTED TONE
+========================================================= */
+
+.selected-skin-tone {
+  width: 100%;
+  min-height: 70px;
+
+  margin-top: 18px;
+
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  background: #fffaf7;
+  border: 1px solid #eadfd7;
+  padding: 12px 18px;
+  box-sizing: border-box;
+}
+
+.selected-skin-tone::before {
+  content: "";
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+
+  border-radius: 50%;
+  background: #e6bb97;
+
+  border: 1px solid rgba(36,39,53,0.15);
+}
+
+.selected-skin-tone span {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #20222c;
+}
+
+/* =========================================================
+   ANALYSE BUTTON
+========================================================= */
+
+.ai-analyze-button {
+  margin-top: 25px;
+
+  padding: 16px 28px;
+
+  border: none;
+
+  background: #ff3d9a;
+  color: white;
+
+  font-family: "DM Sans", sans-serif;
+
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+
+  cursor: pointer;
+
+  box-shadow: 6px 6px 0 #242735;
+
+  transition: 0.2s ease;
+}
+
+.ai-analyze-button:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0 #242735;
+}
+
+.ai-upload-box {
+  min-height: 190px;
+  border: 2px dashed #8264ff;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.ai-upload-box:hover {
+  background: #f2edff;
+}
+
+.ai-upload-box input {
+  display: none;
+}
+
+.upload-plus {
+  font-size: 45px;
+  color: #ff3b91;
+  line-height: 1;
+}
+
+.ai-upload-box strong {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.ai-upload-box span {
+  font-size: 11px;
+  color: #777b86;
+}
+
+.uploaded-photo-name {
+  font-weight: 900;
+  color: #8264ff;
+}
+
+/* ---------------- COLOUR PICKER ---------------- */
+
+.ai-colour-section {
+  margin-top: 35px;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+
+.ai-colour-section p {
+  color: #707482;
+  font-size: 13px;
+}
+
+.ai-analyze-button {
+  margin-top: 25px;
+}
+
+/* =========================================================
+   AI PREVIEW — RIGHT SIDE
+========================================================= */
+
+.ai-avatar-preview {
+  min-height: 100%;
+  min-height: 720px;
+
+  background: #242735;
+
+  position: relative;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================================================
+   GRADIENT CIRCLE
+========================================================= */
+
+.ai-avatar-stage {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.neon-orb {
+  width: 470px;
+  height: 470px;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff3d9a 0%,
+      #b43cff 55%,
+      #8264ff 100%
+    );
+
+  box-shadow:
+    0 0 70px rgba(255, 61, 154, 0.25),
+    0 0 110px rgba(141, 107, 255, 0.2);
+
+  position: absolute;
+}
+
+/* =========================================================
+   AVATAR
+========================================================= */
+
+.ai-avatar-preview .large-avatar {
+  position: relative;
+  z-index: 3;
+
+  transform: scale(1.35);
+}
+
+/* =========================================================
+   AI READY CARD
+========================================================= */
+
+.ai-floating-card {
+  position: absolute;
+
+  right: 45px;
+  top: 75px;
+
+  width: 145px;
+  min-height: 135px;
+
+  box-sizing: border-box;
+
+  padding: 20px;
+
+  background: #d8ff3f;
+  color: #20222c;
+
+  transform: rotate(6deg);
+
+  z-index: 8;
+
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.18);
+}
+
+.ai-floating-card span {
+  display: block;
+
+  font-size: 9px;
+  font-weight: 950;
+
+  letter-spacing: 2px;
+}
+
+.ai-floating-card strong {
+  display: block;
+
+  font-size: 21px;
+  line-height: 0.95;
+
+  margin-top: 13px;
+}
+
+/* =========================================================
+   EXTRA BADGES
+========================================================= */
+
+.ai-avatar-preview::before {
+  content: "✦  PERSONAL";
+
+  position: absolute;
+
+  right: 42px;
+  bottom: 180px;
+
+  padding: 13px 23px;
+
+  border-radius: 30px;
+
+  background: #ff633d;
+  color: white;
+
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+
+  transform: rotate(4deg);
+
+  z-index: 8;
+}
+
+.ai-avatar-preview::after {
+  content: "✦  SMART";
+
+  position: absolute;
+
+  right: 75px;
+  bottom: 115px;
+
+  padding: 13px 28px;
+
+  border-radius: 30px;
+
+  background: #8d6bff;
+  color: white;
+
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+
+  transform: rotate(2deg);
+
+  z-index: 8;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .avatar-mode-grid,
+  .builder-layout,
+  .ai-builder-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .avatar-preview-panel,
+  .ai-avatar-preview {
+    min-height: 500px;
+  }
+
+  .avatar-floating-label {
+    display: none;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .avatar-builder-header {
+    padding: 0 20px;
+  }
+
+  .avatar-intro,
+  .avatar-mode-grid,
+  .builder-layout,
+  .ai-builder-layout {
+    width: 90%;
+  }
+
+  .avatar-intro h1,
+  .builder-content h1,
+  .ai-builder-content h1 {
+    font-size: 54px;
+    letter-spacing: -3px;
+  }
+
+  .choice-grid,
+  .body-type-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .avatar-mode-grid {
+    margin-bottom: 50px;
+  }
+
+}
+
+
+/* ============================================
+   HEADER
+============================================ */
+
+.site-header {
+  width: 100%;
+  height: 82px;
+  background: var(--cream);
+  border-bottom: 1px solid rgba(21, 21, 21, 0.1);
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 100;
+}
+
+.header-inner {
+  width: min(1180px, 92%);
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+/* LOGO */
+
+.brand {
+  justify-self: start;
+  text-decoration: none;
+
+  font-family: "Archivo Black", sans-serif;
+  font-size: 27px;
+  letter-spacing: -1.5px;
+  color: var(--black);
+}
+
+.brand span {
+  color: var(--pink);
+}
+
+/* CENTER NAV */
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+}
+
+.nav-links a {
+  position: relative;
+
+  text-decoration: none;
+  color: var(--black);
+
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.nav-links a:hover {
+  color: var(--purple);
+  transform: translateY(-2px);
+}
+
+/* AVATAR */
+
+.avatar-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.avatar-nav-link::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: var(--lime);
+  border: 2px solid var(--black);
+  border-radius: 50%;
+}
+
+/* RIGHT CTA */
+
+.header-cta {
+  justify-self: end;
+
+  padding: 15px 24px;
+  border-radius: 40px;
+
+  background: var(--black);
+  color: white;
+
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 900;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.header-cta:hover {
+  background: var(--purple);
+  transform: translateY(-2px);
+}
+
+/* =========================================================
+   WEARWISE HEADER
+========================================================= */
+
+.navbar {
+  width: 100%;
+  min-height: 90px;
+
+  padding: 0 7%;
+
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: 180px 1fr auto;
+
+  align-items: center;
+
+  gap: 35px;
+
+  background: var(--cream);
+
+  border-bottom: 1px solid #e5ded6;
+
+  position: relative;
+  z-index: 100;
+}
+
+
+/* LOGO */
+
+.logo {
+  color: var(--black);
+
+  text-decoration: none;
+
+  font-family: "Archivo Black", sans-serif;
+
+  font-size: 26px;
+
+  letter-spacing: -1.5px;
+}
+
+.logo span {
+  color: var(--pink);
+}
+
+
+/* NAVIGATION */
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 34px;
+}
+
+.nav-links a {
+  color: var(--black);
+
+  text-decoration: none;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.nav-links a:hover {
+  color: var(--pink);
+}
+
+
+/* =========================================================
+   HEADER ACTIONS
+========================================================= */
+
+.header-actions {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  gap: 18px;
+
+  flex-shrink: 0;
+
+  position: relative;
+
+  z-index: 101;
+}
+
+
+/* =========================================================
+   AI ASSISTANT
+========================================================= */
+
+.ai-assistant-icon {
+  width: 44px;
+  height: 44px;
+
+  flex: 0 0 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  border: 2px solid var(--black);
+
+  border-radius: 50%;
+
+  background: var(--purple);
+
+  color: white;
+
+  text-decoration: none;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.ai-assistant-icon span {
+  font-size: 23px;
+
+  line-height: 1;
+}
+
+.ai-assistant-icon:hover {
+  background: var(--pink);
+
+  transform: translateY(-3px) rotate(-5deg);
+}
+
+
+/* =========================================================
+   SAVED HEART
+========================================================= */
+
+.saved-icon {
+  width: 44px;
+  height: 44px;
+
+  flex: 0 0 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  border: 2px solid var(--black);
+
+  border-radius: 50%;
+
+  background: white;
+
+  text-decoration: none;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.saved-icon svg {
+  width: 27px;
+  height: 27px;
+
+  display: block;
+
+  fill: #ff3d3d;
+
+  stroke: var(--black);
+
+  stroke-width: 1.8;
+
+  stroke-linecap: round;
+
+  stroke-linejoin: round;
+}
+
+.saved-icon:hover {
+  background: var(--pink);
+
+  transform: translateY(-3px) scale(1.05);
+}
+
+.saved-icon:hover svg {
+  fill: white;
+}
+
+
+/* =========================================================
+   SHOPPING CART
+========================================================= */
+
+.cart-icon {
+  width: 44px;
+  height: 44px;
+
+  flex: 0 0 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  border: 2px solid var(--black);
+
+  border-radius: 50%;
+
+  background: var(--lime);
+
+  color: var(--black);
+
+  text-decoration: none;
+
+  position: relative;
+
+  z-index: 102;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.cart-icon svg {
+  width: 23px;
+  height: 23px;
+
+  display: block;
+
+  fill: none;
+
+  stroke: var(--black);
+
+  stroke-width: 1.8;
+
+  stroke-linecap: round;
+
+  stroke-linejoin: round;
+}
+
+.cart-icon:hover {
+  background: var(--pink);
+
+  transform: translateY(-3px) rotate(-5deg);
+}
+
+
+/* =========================================================
+   GET STYLED
+========================================================= */
+
+.nav-cta {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 46px;
+
+  padding: 0 25px;
+
+  box-sizing: border-box;
+
+  background: #202735;
+
+  color: white;
+
+  border-radius: 30px;
+
+  text-decoration: none;
+
+  font-size: 13px;
+
+  font-weight: 900;
+
+  white-space: nowrap;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.nav-cta:hover {
+  background: var(--pink);
+
+  transform: translateY(-3px);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1050px) {
+  .navbar {
+    grid-template-columns: 150px 1fr auto;
+
+    padding: 0 4%;
+
+    gap: 20px;
+  }
+
+  .nav-links {
+    gap: 20px;
+  }
+
+  .header-actions {
+    gap: 10px;
+  }
+
+  .nav-cta {
+    padding: 0 17px;
+  }
+}
+
+
+@media (max-width: 800px) {
+  .navbar {
+    grid-template-columns: 1fr auto;
+
+    min-height: 75px;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .header-actions {
+    gap: 10px;
+  }
+}
+
+
+@media (max-width: 500px) {
+  .ai-assistant-icon,
+  .saved-icon,
+  .cart-icon {
+    width: 40px;
+    height: 40px;
+
+    flex-basis: 40px;
+  }
+
+  .nav-cta {
+    display: none;
+  }
+
+  .logo {
+    font-size: 22px;
+  }
+}

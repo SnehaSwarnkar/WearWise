@@ -1,5 +1,6 @@
 import "./../App.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import Header from "./Header";
 
 function StyleAnalysis() {
     const location = useLocation();
@@ -16,22 +17,8 @@ const handleBackToChoose = () => {
   return (
     <div className="app analysis-page">
       {/* ================= NAVBAR ================= */}
-
-      <nav className="navbar">
-        <Link to="/" className="logo">
-          Wear<span>Wise</span>
-        </Link>
-
-        <div className="nav-links">
-          <Link to="/explore">Explore</Link>
-          <Link to="/my-style">My Style</Link>
-          <Link to="/try-on">Try On</Link>
-        </div>
-
-        <Link to="/my-style" className="nav-cta">
-          My Style ✦
-        </Link>
-      </nav>
+      <Header />
+      
 
       {/* ================= MAIN SECTION ================= */}
 
