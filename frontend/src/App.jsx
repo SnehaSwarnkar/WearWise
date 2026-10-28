@@ -11,7 +11,8 @@ import Wardrobe from "./pages/Wardrobe";
 import FashionAssistant from "./pages/FashionAssistant";
 import SavedLooks from "./pages/SavedLooks";
 import Cart from "./pages/Cart";
-
+import Checkout from "./pages/Checkout";
+import OrderConfirmation from "./pages/OrderConfirmation";
 
 function App() {
   return (
@@ -26,14 +27,10 @@ function App() {
       <Route path="/wardrobe" element={<Wardrobe />} />
       <Route path="/saved" element={<SavedLooks />} />
       <Route path="/cart" element={<Cart />} />
-  
-
-      <Route
-  path="/fashion-assistant"
-  element={<FashionAssistant />}
-/>
+      <Route path="/checkout" element={<Checkout />} />
+      <Route path="/order-confirmation" element={<OrderConfirmation />} />
+      <Route path="/fashion-assistant" element={<FashionAssistant />} />
     </Routes>
-    
   );
 }
 

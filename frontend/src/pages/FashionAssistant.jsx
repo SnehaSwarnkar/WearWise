@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./FashionAssistant.css";
 import Header from "./Header";
+import { sendChatMessage } from "../api/assistant";
 
 function FashionAssistant() {
   const [message, setMessage] = useState("");
@@ -20,31 +21,35 @@ function FashionAssistant() {
     "Compare these two looks"
   ];
 
-  const sendMessage = (text = message) => {
+  const sendMessage = async (text = message) => {
     if (!text.trim()) return;
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        type: "user",
-        text
-      },
-      {
-        type: "ai",
-        text: "I'm checking your style profile, wardrobe and available fashion options to build the best recommendation for you."
-      }
-    ]);
-
+    const userMsg = { type: "user", text };
+    setMessages((prev) => [...prev, userMsg]);
     setMessage("");
+
+    try {
+      const res = await sendChatMessage(text, messages);
+      setMessages((prev) => [
+        ...prev,
+        { type: "ai", text: res.reply },
+      ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "ai",
+          text: "I'm checking your style profile and wardrobe to build the best recommendation for you.",
+        },
+      ]);
+    }
   };
 
   return (
-    <main className="fashion-assistant-page">
-         <Header />
+    <>
+      <Header />
 
-      {/* HEADER */}
-
-    
+      <main className="fashion-assistant-page">
 
 
       {/* MAIN AREA */}
@@ -198,6 +203,7 @@ function FashionAssistant() {
       </section>
 
     </main>
+    </>
   );
 }
 

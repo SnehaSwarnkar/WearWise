@@ -2,44 +2,31 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./SavedLooks.css";
 import Header from "./Header";
+import { getSavedLooks, removeSavedLook } from "../api/saved";
+import { getWishlist, removeFromWishlist } from "../api/saved";
 
 function SavedLooks() {
-  const [savedLooks, setSavedLooks] = useState(() => {
-    const saved = localStorage.getItem("wearwise-saved-looks");
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [wishlist, setWishlist] = useState(() => {
-    const saved = localStorage.getItem("wearwise-wishlist");
-    return saved ? JSON.parse(saved) : [];
-  });
-
+  const [savedLooks, setSavedLooks] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
   const [activeTab, setActiveTab] = useState("looks");
 
   useEffect(() => {
-    localStorage.setItem(
-      "wearwise-saved-looks",
-      JSON.stringify(savedLooks)
-    );
-  }, [savedLooks]);
+    getSavedLooks().then(setSavedLooks).catch(() => setSavedLooks([]));
+    getWishlist().then(setWishlist).catch(() => setWishlist([]));
+  }, []);
 
-  useEffect(() => {
-    localStorage.setItem(
-      "wearwise-wishlist",
-      JSON.stringify(wishlist)
-    );
-  }, [wishlist]);
-
-  const removeLook = (id) => {
-    setSavedLooks((prev) =>
-      prev.filter((look) => look.id !== id)
-    );
+  const handleRemoveLook = async (id) => {
+    try {
+      await removeSavedLook(id);
+      setSavedLooks((prev) => prev.filter((l) => l.id !== id));
+    } catch { /* ignore */ }
   };
 
-  const removeWishlistItem = (id) => {
-    setWishlist((prev) =>
-      prev.filter((item) => item.id !== id)
-    );
+  const handleRemoveWishlistItem = async (id) => {
+    try {
+      await removeFromWishlist(id);
+      setWishlist((prev) => prev.filter((w) => w.id !== id));
+    } catch { /* ignore */ }
   };
 
   return (
@@ -151,7 +138,7 @@ function SavedLooks() {
 
                       <button
                         className="remove-save"
-                        onClick={() => removeLook(look.id)}
+                        onClick={() => handleRemoveLook(look.id)}
                         aria-label="Remove saved look"
                       >
                         ×
@@ -242,7 +229,7 @@ function SavedLooks() {
                       <button
                         className="remove-save"
                         onClick={() =>
-                          removeWishlistItem(item.id)
+                          handleRemoveWishlistItem(item.id)
                         }
                         aria-label="Remove wishlist item"
                       >

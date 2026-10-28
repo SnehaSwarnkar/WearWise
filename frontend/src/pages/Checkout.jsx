@@ -2,14 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import "./Checkout.css";
+import { getCart } from "../api/cart";
+import { placeOrder } from "../api/orders";
 
 function Checkout() {
   const navigate = useNavigate();
 
-  const [cart, setCart] = useState(() => {
-    const saved = localStorage.getItem("wearwise-cart");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [cart, setCart] = useState({ items: [], subtotal: 0, shipping: 0, total: 0 });
+  const [loadingCart, setLoadingCart] = useState(true);
+  const [placing, setPlacing] = useState(false);
 
   const [paymentMethod, setPaymentMethod] = useState("upi");
 
@@ -24,80 +25,53 @@ function Checkout() {
     pincode: "",
   });
 
+  // Load cart from API on mount
   useEffect(() => {
-    if (cart.length === 0) {
-      return;
-    }
-  }, [cart]);
+    getCart()
+      .then(setCart)
+      .catch(() => {})
+      .finally(() => setLoadingCart(false));
+  }, []);
+
+  // handled by the conditional render below — no redirect needed
+  const items = cart.items || [];
 
   const updateForm = (e) => {
     const { name, value } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const subtotal = useMemo(() => {
-    return cart.reduce((total, item) => {
-      const price =
-        Number(
-          String(item.price || "").replace(/[^\d.]/g, "")
-        ) || 0;
+  const subtotal = cart.subtotal || 0;
+  const shipping = cart.shipping || 0;
+  const total = cart.total || 0;
 
-      return total + price * (item.quantity || 1);
-    }, 0);
-  }, [cart]);
-
-  const shipping =
-    subtotal === 0
-      ? 0
-      : subtotal >= 2000
-      ? 0
-      : 99;
-
-  const total = subtotal + shipping;
-
-  const handlePlaceOrder = (e) => {
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
-
-    const order = {
-      id: `WW${Date.now().toString().slice(-6)}`,
-      items: cart,
-      customer: form,
-      paymentMethod,
-      subtotal,
-      shipping,
-      total,
-      createdAt: new Date().toISOString(),
-      status: "Confirmed",
-    };
-
-    localStorage.setItem(
-      "wearwise-last-order",
-      JSON.stringify(order)
-    );
-
-    const existingOrders =
-      JSON.parse(
-        localStorage.getItem("wearwise-orders") || "[]"
-      );
-
-    localStorage.setItem(
-      "wearwise-orders",
-      JSON.stringify([
-        order,
-        ...existingOrders,
-      ])
-    );
-
-    localStorage.removeItem("wearwise-cart");
-
-    navigate("/order-confirmation");
+    setPlacing(true);
+    try {
+      const order = await placeOrder(form, paymentMethod);
+      // Store the confirmed order for the confirmation page
+      localStorage.setItem("wearwise-last-order", JSON.stringify(order));
+      navigate("/order-confirmation");
+    } catch (err) {
+      alert(err.message || "Could not place order. Please try again.");
+    } finally {
+      setPlacing(false);
+    }
   };
 
-  if (cart.length === 0) {
+  if (loadingCart) {
+    return (
+      <main className="checkout-page">
+        <Header />
+        <section className="checkout-empty">
+          <p>Loading your bag…</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (items.length === 0) {
     return (
       <main className="checkout-page">
         <Header />
@@ -404,7 +378,7 @@ function Checkout() {
 
           <div className="checkout-items">
 
-            {cart.map((item) => (
+            {items.map((item) => (
 
               <div
                 className="checkout-item"
@@ -412,10 +386,11 @@ function Checkout() {
               >
 
                 <div className="checkout-item-image">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                  />
+                  {item.image ? (
+                    <img src={item.image} alt={item.name} />
+                  ) : (
+                    <div className="cart-item-placeholder" style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 900 }}>AI</div>
+                  )}
 
                   <span>
                     {item.quantity || 1}
@@ -431,14 +406,7 @@ function Checkout() {
                 </div>
 
                 <strong>
-                  ₹
-                  {(
-                    (Number(
-                      String(item.price || "")
-                        .replace(/[^\d.]/g, "")
-                    ) || 0) *
-                    (item.quantity || 1)
-                  ).toLocaleString("en-IN")}
+                  ₹{(item.price * (item.quantity || 1)).toLocaleString("en-IN")}
                 </strong>
 
               </div>
@@ -479,8 +447,9 @@ function Checkout() {
           <button
             type="submit"
             className="place-order"
+            disabled={placing}
           >
-            Place Order →
+            {placing ? "Placing Order…" : "Place Order →"}
           </button>
 
           <p className="secure-note">

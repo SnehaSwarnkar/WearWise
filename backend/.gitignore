@@ -1,0 +1,7 @@
+fastapi_env/
+venv/
+__pycache__/
+*.pyc
+data/
+uploads/
+.env

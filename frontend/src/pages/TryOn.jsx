@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "../App.css";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 
 function TryOn() {

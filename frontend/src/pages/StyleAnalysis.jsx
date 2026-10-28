@@ -1,19 +1,20 @@
 import "./../App.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import Header from "./Header";
 
 function StyleAnalysis() {
-    const location = useLocation();
-const navigate = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-const selectedLook = location.state?.selectedLook;
-const handleBackToChoose = () => {
-  navigate("/choose-look");
-};
- if (!selectedLook) {
+  const selectedLook = location.state?.selectedLook;
 
- }
-      // fallback screen
+  // If the user lands here directly without going through the flow, send them back
+  useEffect(() => {
+    if (!selectedLook) {
+      navigate("/try-on", { replace: true });
+    }
+  }, [selectedLook, navigate]);
   return (
     <div className="app analysis-page">
       {/* ================= NAVBAR ================= */}

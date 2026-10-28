@@ -1,233 +1,161 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import "./Cart.css";
+import { getCart, updateCartQuantity, removeFromCart } from "../api/cart";
 
 function Cart() {
-  const [cart, setCart] = useState(() => {
-    const saved = localStorage.getItem("wearwise-cart");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const navigate = useNavigate();
+  const [cart, setCart] = useState({ items: [], subtotal: 0, shipping: 0, total: 0 });
+  const [loading, setLoading] = useState(true);
+
+  const loadCart = () => {
+    getCart()
+      .then(setCart)
+      .catch(() => setCart({ items: [], subtotal: 0, shipping: 0, total: 0 }))
+      .finally(() => setLoading(false));
+  };
 
   useEffect(() => {
-    localStorage.setItem("wearwise-cart", JSON.stringify(cart));
-  }, [cart]);
+    loadCart();
+  }, []);
 
-  const updateQuantity = (id, change) => {
-    setCart((prev) =>
-      prev
-        .map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                quantity: Math.max(
-                  1,
-                  (item.quantity || 1) + change
-                ),
-              }
-            : item
-        )
-    );
+  const handleQuantityChange = async (itemId, change) => {
+    const item = cart.items.find((i) => i.id === itemId);
+    if (!item) return;
+    const newQty = Math.max(1, (item.quantity || 1) + change);
+    try {
+      const updated = await updateCartQuantity(itemId, newQty);
+      setCart(updated);
+    } catch {
+      // ignore
+    }
   };
 
-  const removeItem = (id) => {
-    setCart((prev) =>
-      prev.filter((item) => item.id !== id)
-    );
+  const handleRemove = async (itemId) => {
+    try {
+      const updated = await removeFromCart(itemId);
+      setCart(updated);
+    } catch {
+      // ignore
+    }
   };
 
-  const subtotal = useMemo(() => {
-    return cart.reduce((total, item) => {
-      const price =
-        Number(
-          String(item.price || "")
-            .replace(/[^\d.]/g, "")
-        ) || 0;
+  if (loading) {
+    return (
+      <main className="cart-page">
+        <Header />
+        <section className="cart-hero">
+          <div>
+            <span className="cart-label">✦ YOUR SELECTION</span>
+            <h1>YOUR<br /><span>BAG.</span></h1>
+          </div>
+        </section>
+        <section className="cart-content">
+          <div className="cart-empty">
+            <p>Loading your bag…</p>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
-      return total + price * (item.quantity || 1);
-    }, 0);
-  }, [cart]);
-
-  const shipping =
-    subtotal === 0
-      ? 0
-      : subtotal >= 2000
-      ? 0
-      : 99;
-
-  const total = subtotal + shipping;
+  const items = cart.items || [];
 
   return (
     <main className="cart-page">
-
       <Header />
 
       {/* HERO */}
       <section className="cart-hero">
         <div>
-          <span className="cart-label">
-            ✦ YOUR SELECTION
-          </span>
-
+          <span className="cart-label">✦ YOUR SELECTION</span>
           <h1>
             YOUR
             <br />
             <span>BAG.</span>
           </h1>
-
-          <p>
-            Everything you loved, selected and ready
-            for your next look.
-          </p>
+          <p>Everything you loved, selected and ready for your next look.</p>
         </div>
-
         <div className="cart-count">
-          <strong>{cart.length}</strong>
+          <strong>{items.length}</strong>
           <span>ITEMS</span>
         </div>
       </section>
 
-
       {/* CART */}
       <section className="cart-content">
-
-        {cart.length === 0 ? (
-
+        {items.length === 0 ? (
           <div className="cart-empty">
-
-            <div className="cart-empty-icon">
-              🛍
-            </div>
-
-            <h2>
-              Your bag is waiting.
-            </h2>
-
-            <p>
-              Explore fashion, find your favorites and
-              add them to your bag.
-            </p>
-
-            <Link
-              to="/explore"
-              className="cart-action"
-            >
+            <div className="cart-empty-icon">🛍</div>
+            <h2>Your bag is waiting.</h2>
+            <p>Explore fashion, find your favorites and add them to your bag.</p>
+            <Link to="/explore" className="cart-action">
               Continue Shopping →
             </Link>
-
           </div>
-
         ) : (
-
           <div className="cart-layout">
-
             {/* ITEMS */}
             <div className="cart-items">
-
               <div className="cart-items-header">
                 <span>
-                  {cart.length} SELECTED ITEM
-                  {cart.length !== 1 ? "S" : ""}
+                  {items.length} SELECTED ITEM{items.length !== 1 ? "S" : ""}
                 </span>
               </div>
 
-              {cart.map((item) => (
-
-                <article
-                  className="cart-item"
-                  key={item.id}
-                >
-
+              {items.map((item) => (
+                <article className="cart-item" key={item.id}>
                   <div className="cart-item-image">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                    />
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} />
+                    ) : (
+                      <div className="cart-item-placeholder">AI</div>
+                    )}
                   </div>
 
                   <div className="cart-item-details">
-
-                    <span className="cart-brand">
-                      {item.brand || "WEARWISE EDIT"}
-                    </span>
-
-                    <h2>
-                      {item.name}
-                    </h2>
-
-                    {item.color && (
-                      <p>
-                        Color: {item.color}
-                      </p>
-                    )}
-
-                    {item.size && (
-                      <p>
-                        Size: {item.size}
-                      </p>
-                    )}
+                    <span className="cart-brand">{item.brand || "WEARWISE EDIT"}</span>
+                    <h2>{item.name}</h2>
+                    {item.color && <p>Color: {item.color}</p>}
+                    {item.size && <p>Size: {item.size}</p>}
 
                     <div className="cart-item-bottom">
-
                       <div className="quantity-control">
-
                         <button
-                          onClick={() =>
-                            updateQuantity(item.id, -1)
-                          }
+                          onClick={() => handleQuantityChange(item.id, -1)}
                           aria-label="Decrease quantity"
                         >
                           −
                         </button>
-
-                        <span>
-                          {item.quantity || 1}
-                        </span>
-
+                        <span>{item.quantity || 1}</span>
                         <button
-                          onClick={() =>
-                            updateQuantity(item.id, 1)
-                          }
+                          onClick={() => handleQuantityChange(item.id, 1)}
                           aria-label="Increase quantity"
                         >
                           +
                         </button>
-
                       </div>
 
                       <strong className="cart-price">
-                        ₹
-                        {(
-                          (Number(
-                            String(item.price || "")
-                              .replace(/[^\d.]/g, "")
-                          ) || 0) *
-                          (item.quantity || 1)
-                        ).toLocaleString("en-IN")}
+                        ₹{(item.price * (item.quantity || 1)).toLocaleString("en-IN")}
                       </strong>
-
                     </div>
-
                   </div>
 
                   <button
                     className="cart-remove"
-                    onClick={() => removeItem(item.id)}
+                    onClick={() => handleRemove(item.id)}
                     aria-label="Remove item"
                   >
                     ×
                   </button>
-
                 </article>
-
               ))}
-
             </div>
-
 
             {/* SUMMARY */}
             <aside className="order-summary">
-
               <div className="summary-heading">
                 <span>ORDER SUMMARY</span>
                 <span>✦</span>
@@ -235,56 +163,39 @@ function Cart() {
 
               <div className="summary-row">
                 <span>Subtotal</span>
-                <strong>
-                  ₹{subtotal.toLocaleString("en-IN")}
-                </strong>
+                <strong>₹{cart.subtotal.toLocaleString("en-IN")}</strong>
               </div>
 
               <div className="summary-row">
                 <span>Shipping</span>
-
-                <strong>
-                  {shipping === 0
-                    ? "FREE"
-                    : `₹${shipping}`}
-                </strong>
+                <strong>{cart.shipping === 0 ? "FREE" : `₹${cart.shipping}`}</strong>
               </div>
 
-              {subtotal >= 2000 && (
-                <div className="free-shipping">
-                  ✦ You unlocked free shipping
-                </div>
+              {cart.subtotal >= 2000 && (
+                <div className="free-shipping">✦ You unlocked free shipping</div>
               )}
 
               <div className="summary-divider" />
 
               <div className="summary-total">
                 <span>TOTAL</span>
-
-                <strong>
-                  ₹{total.toLocaleString("en-IN")}
-                </strong>
+                <strong>₹{cart.total.toLocaleString("en-IN")}</strong>
               </div>
 
-              <button className="checkout-button">
+              <button
+                className="checkout-button"
+                onClick={() => navigate("/checkout")}
+              >
                 Proceed to Checkout →
               </button>
 
-              <Link
-                to="/explore"
-                className="continue-shopping"
-              >
+              <Link to="/explore" className="continue-shopping">
                 ← Continue Shopping
               </Link>
-
             </aside>
-
           </div>
-
         )}
-
       </section>
-
     </main>
   );
 }

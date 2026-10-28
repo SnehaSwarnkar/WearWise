@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 import Header from "./Header";
+import { saveAvatarProfile, analyzeAvatarPhoto } from "../api/avatar";
 
 function BuildAvatar() {
     
@@ -83,14 +84,30 @@ function BuildAvatar() {
     }));
   };
 
-  const handleFinish = () => {
-    console.log("WearWise Avatar Profile:", profile);
-
+  const handleFinish = async () => {
+    try {
+      await saveAvatarProfile({ mode: mode || "manual", ...profile });
+    } catch {
+      // Non-blocking — still navigate
+    }
     navigate("/style-analysis", {
-      state: {
-        avatarProfile: profile,
-      },
+      state: { avatarProfile: profile },
     });
+  };
+
+  const handleAiAnalyze = async () => {
+    if (!profile.photo) {
+      handleFinish();
+      return;
+    }
+    try {
+      const result = await analyzeAvatarPhoto(profile.photo, profile.selectedColour);
+      const mergedProfile = { ...profile, ...result };
+      await saveAvatarProfile({ mode: "ai", ...mergedProfile });
+      navigate("/style-analysis", { state: { avatarProfile: mergedProfile } });
+    } catch {
+      handleFinish();
+    }
   };
 
   /* --------------------------------
@@ -571,7 +588,7 @@ function BuildAvatar() {
 
           <button
             className="next-button ai-analyze-button"
-            onClick={handleFinish}
+            onClick={handleAiAnalyze}
           >
             ANALYSE MY STYLE ✦
           </button>

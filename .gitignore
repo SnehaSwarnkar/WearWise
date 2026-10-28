@@ -1,0 +1,38 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+*.env
+.venv/
+venv/
+backend/venv/
+backend/fastapi_env/
+
+# ── Backend runtime data (generated at run time, not source) ──────────────────
+backend/data/
+backend/uploads/
+
+# ── Node / frontend ───────────────────────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# ── Environment files ─────────────────────────────────────────────────────────
+# frontend/.env only contains VITE_API_URL (no secrets) — safe to commit.
+*.env.local
+*.env.production
+backend/.env
+*.env
+!frontend/.env
+
+# ── OS / editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

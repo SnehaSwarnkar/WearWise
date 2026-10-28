@@ -99,6 +99,14 @@
   align-items: start;
 }
 
+/* FORM COLUMN */
+
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
 
 /* FORM */
 
