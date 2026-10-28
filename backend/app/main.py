@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from app.routers import products, cart, orders, avatar, wardrobe, saved, assistant, tryon
+from app.routers import products, cart, orders, avatar, wardrobe, saved, assistant, tryon, auth, catalogue
 
 # ── App instance ──────────────────────────────────────────────────────────────
 
@@ -64,6 +64,8 @@ app.include_router(wardrobe.router)
 app.include_router(saved.router)
 app.include_router(assistant.router)
 app.include_router(tryon.router)
+app.include_router(auth.router)
+app.include_router(catalogue.router)
 
 
 # ── Health check ──────────────────────────────────────────────────────────────

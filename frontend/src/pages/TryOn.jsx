@@ -9,9 +9,7 @@ function TryOn() {
 
   const handleImageChange = (event) => {
     const file = event.target.files?.[0];
-
     if (!file) return;
-
     const imageUrl = URL.createObjectURL(file);
     setSelectedImage(imageUrl);
   };
@@ -23,20 +21,21 @@ function TryOn() {
   return (
     <div className="tryon-page">
       <Header />
-      
+
       <main className="tryon-editorial">
 
-        {/* TOP LABEL */}
+        {/* TOP LABEL BAR */}
         <div className="tryon-editorial-top">
           <span>✦ AI VIRTUAL TRY ON</span>
           <span>STEP 01 / 03</span>
         </div>
 
-        {/* HERO */}
+        {/* HERO GRID */}
         <section className="tryon-hero">
 
-          {/* LEFT EDITORIAL TEXT */}
+          {/* LEFT — COPY */}
           <div className="tryon-editorial-copy">
+
             <div className="tryon-side-label">
               YOUR DIGITAL
               <br />
@@ -53,25 +52,40 @@ function TryOn() {
 
             <p>
               Start with a clear photo of yourself.
-              AI Fashion will use it as the canvas for
+              WearWise will use it as the canvas for
               your next look.
             </p>
+
+            {/* STEP STATS — mirrors mini-stats from Home */}
+            <div className="tryon-steps-info">
+              <div className="tryon-step-stat">
+                <strong>01</strong>
+                <span>Upload<br />Photo</span>
+              </div>
+              <div className="tryon-step-stat">
+                <strong>02</strong>
+                <span>Choose<br />Look</span>
+              </div>
+              <div className="tryon-step-stat">
+                <strong>03</strong>
+                <span>See Your<br />Style</span>
+              </div>
+            </div>
+
           </div>
 
-          {/* MAIN PHOTO DROP AREA */}
+          {/* CENTRE — PHOTO DROP CARD */}
           <div className="photo-drop-stage">
 
+            {/* Decorative shapes using project variables */}
             <div className="stage-purple-shape"></div>
             <div className="stage-orange-shape"></div>
-            <div className="stage-yellow-dot"></div>
+            <div className="stage-lime-dot"></div>
 
             <div className="photo-drop-card">
 
               <div className="photo-card-top">
-                <span>
-                  ✦ {selectedImage ? "PHOTO READY" : "PHOTO INPUT"}
-                </span>
-
+                <span>✦ {selectedImage ? "PHOTO READY" : "PHOTO INPUT"}</span>
                 <span>01 / 03</span>
               </div>
 
@@ -79,6 +93,7 @@ function TryOn() {
 
                 {!selectedImage ? (
                   <>
+                    {/* Silhouette placeholder */}
                     <div className="photo-placeholder">
                       <div className="photo-head"></div>
                       <div className="photo-body"></div>
@@ -100,8 +115,7 @@ function TryOn() {
                       </p>
 
                       <label className="editorial-upload-btn">
-                        CHOOSE PHOTO
-
+                        CHOOSE PHOTO ✦
                         <input
                           type="file"
                           accept="image/*"
@@ -112,7 +126,6 @@ function TryOn() {
                   </>
                 ) : (
                   <div className="uploaded-editorial-view">
-
                     <img
                       src={selectedImage}
                       alt="Selected fashion photo"
@@ -126,10 +139,8 @@ function TryOn() {
                       </div>
 
                       <div className="photo-actions">
-
                         <label className="change-photo-btn">
                           CHANGE PHOTO
-
                           <input
                             type="file"
                             accept="image/*"
@@ -142,26 +153,21 @@ function TryOn() {
                           className="remove-photo-btn"
                           onClick={removePhoto}
                         >
-                          REMOVE PHOTO
+                          REMOVE
                         </button>
-
                       </div>
                     </div>
-
                   </div>
                 )}
 
               </div>
 
               <div className="photo-card-bottom">
-
                 <span>
-                  {selectedImage
-                    ? "PHOTO READY FOR AI"
-                    : "FRONT VIEW PREFERRED"}
+                  {selectedImage ? "PHOTO READY FOR AI" : "FRONT VIEW PREFERRED · JPG / PNG"}
                 </span>
 
-                {selectedImage ? (
+                {selectedImage && (
                   <button
                     type="button"
                     className="continue-to-look-btn"
@@ -169,23 +175,15 @@ function TryOn() {
                   >
                     CONTINUE TO STEP 2 →
                   </button>
-                ) : (
-                  <span>JPG / PNG</span>
                 )}
-
               </div>
 
             </div>
-
           </div>
 
-          {/* RIGHT EDITORIAL INFO */}
+          {/* RIGHT — EDITORIAL DETAIL */}
           <div className="tryon-right-details">
-
-            <div className="right-detail-number">
-              2026
-            </div>
-
+            <div className="right-detail-number">2026</div>
             <div className="right-detail-text">
               YOUR LOOK
               <br />
@@ -193,16 +191,12 @@ function TryOn() {
               <br />
               HERE
             </div>
-
-            <div className="tryon-star">
-              ✦
-            </div>
-
+            <div className="tryon-star">✦</div>
           </div>
 
         </section>
 
-        {/* BOTTOM SECTION */}
+        {/* BOTTOM BAR */}
         <section className="tryon-bottom">
 
           <div className="tryon-privacy">
@@ -211,32 +205,18 @@ function TryOn() {
           </div>
 
           <div className="tryon-flow">
-
-            <div
-              className={`flow-item ${
-                selectedImage ? "complete" : "active"
-              }`}
-            >
+            <div className={`flow-item ${selectedImage ? "complete" : "active"}`}>
               <span>01</span>
-
               <div>
                 <strong>UPLOAD</strong>
-
-                <small>
-                  {selectedImage ? "Photo ready" : "Your photo"}
-                </small>
+                <small>{selectedImage ? "Photo ready" : "Your photo"}</small>
               </div>
             </div>
 
             <div className="flow-line"></div>
 
-            <div
-              className={`flow-item ${
-                selectedImage ? "active" : ""
-              }`}
-            >
+            <div className={`flow-item ${selectedImage ? "active" : ""}`}>
               <span>02</span>
-
               <div>
                 <strong>CHOOSE</strong>
                 <small>Your outfit</small>
@@ -247,24 +227,20 @@ function TryOn() {
 
             <div className="flow-item">
               <span>03</span>
-
               <div>
                 <strong>TRY ON</strong>
                 <small>Your AI look</small>
               </div>
             </div>
-
           </div>
 
           <div className="tryon-bottom-tag">
-            AI FASHION
-            <span>✦</span>
+            WEARWISE <span>✦</span>
           </div>
 
         </section>
 
       </main>
-
     </div>
   );
 }

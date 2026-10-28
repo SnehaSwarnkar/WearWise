@@ -6,15 +6,16 @@ import { fetchProducts } from "../api/products";
 import { addToCart } from "../api/cart";
 import { addToWishlist } from "../api/saved";
 
+const CATEGORIES = ["All", "Tops", "Jeans", "Dresses", "Jackets"];
+
 function Explore() {
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [sortPrice, setSortPrice] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [cartFeedback, setCartFeedback] = useState(null);   // id of item just added
-  const [wishlisted, setWishlisted] = useState(new Set());  // product ids in wishlist
+  const [sortPrice, setSortPrice]               = useState(false);
+  const [products, setProducts]                 = useState([]);
+  const [loading, setLoading]                   = useState(true);
+  const [cartFeedback, setCartFeedback]         = useState(null);
+  const [wishlisted, setWishlisted]             = useState(new Set());
 
-  // Fetch products from API whenever filters change
   useEffect(() => {
     setLoading(true);
     fetchProducts(selectedCategory, sortPrice)
@@ -34,27 +35,22 @@ function Explore() {
       });
       setCartFeedback(product.id);
       setTimeout(() => setCartFeedback(null), 1500);
-    } catch {
-      // Silently fail — user can try again
-    }
+    } catch { /* silent */ }
   };
 
   const handleWishlist = async (product) => {
-    if (wishlisted.has(product.id)) return; // already saved
+    if (wishlisted.has(product.id)) return;
     try {
       await addToWishlist(product);
-      setWishlisted((prev) => new Set([...prev, product.id]));
-    } catch {
-      // e.g. 409 already in wishlist — still mark it locally
-      setWishlisted((prev) => new Set([...prev, product.id]));
-    }
+    } catch { /* silent — 409 means already in wishlist */ }
+    setWishlisted((prev) => new Set([...prev, product.id]));
   };
 
   return (
     <div className="explore-page">
       <Header />
 
-      {/* EXPLORE HERO */}
+      {/* ── HERO ── */}
       <section className="explore-hero">
         <div>
           <p className="explore-tag">FASHION DISCOVERY MODE ✦</p>
@@ -75,47 +71,43 @@ function Explore() {
         </div>
       </section>
 
-      {/* CATEGORY FILTER */}
-      <section className="explore-controls">
-        <div className="category-filter">
-          {["All", "Tops", "Jeans", "Dresses", "Jackets"].map((category) => (
+      {/* ── CONTROLS ── */}
+      <section className="unified-controls">
+        <div className="unified-tabs">
+          {CATEGORIES.map((cat) => (
             <button
-              key={category}
-              className={
-                selectedCategory === category
-                  ? "category-btn active-category"
-                  : "category-btn"
-              }
-              onClick={() => setSelectedCategory(category)}
+              key={cat}
+              className={`unified-tab ${selectedCategory === cat ? "unified-tab-active" : ""}`}
+              onClick={() => setSelectedCategory(cat)}
             >
-              {category}
+              {cat}
             </button>
           ))}
         </div>
 
-        <button
-          className={sortPrice ? "price-sort-btn price-active" : "price-sort-btn"}
-          onClick={() => setSortPrice(!sortPrice)}
-        >
-          {sortPrice ? "Price: Low to High ✓" : "Sort by Price"}
-        </button>
+        <div className="unified-right-controls">
+          <button
+            className={`unified-sort-btn ${sortPrice ? "unified-sort-active" : ""}`}
+            onClick={() => setSortPrice(!sortPrice)}
+          >
+            {sortPrice ? "Price ↑ ✓" : "Sort by Price"}
+          </button>
+        </div>
       </section>
 
-      {/* AI MESSAGE */}
+      {/* ── AI NOTE ── */}
       <section className="ai-message">
         <div className="ai-message-icon">✦</div>
         <div>
           <p>AI STYLE NOTE</p>
-          <h3>
-            These picks are shown based on current fashion exploration trends.
-          </h3>
+          <h3>These picks are shown based on current fashion exploration trends.</h3>
         </div>
         <Link to="/my-style">Personalize My Feed →</Link>
       </section>
 
-      {/* PRODUCTS */}
-      <section className="products-section">
-        <div className="products-header">
+      {/* ── PRODUCTS ── */}
+      <section className="unified-products">
+        <div className="unified-products-header">
           <div>
             <p>CURATED FOR EXPLORATION</p>
             <h2>
@@ -124,24 +116,25 @@ function Explore() {
               <span>Obsess.</span>
             </h2>
           </div>
-          <span className="product-count">
-            {loading ? "..." : `${products.length} pieces`}
+          <span className="unified-count">
+            {loading ? "…" : `${products.length} pieces`}
           </span>
         </div>
 
         {loading ? (
-          <div className="explore-loading">Loading products…</div>
+          <div className="shop-loading">Loading products…</div>
         ) : (
-          <div className="product-grid">
+          <div className="unified-grid">
             {products.map((product) => (
-              <div className="product-card" key={product.id}>
-                <div className={`product-image ${product.className}`}>
-                  <div className="product-badge">✦ {product.match}</div>
-                  <div className="product-placeholder">
+              <div className="shop-card" key={product.id}>
+
+                {/* IMAGE */}
+                <div className={`shop-card-image ${product.className}`}>
+                  <div className="shop-card-badge">✦ {product.match}</div>
+                  <div className="shop-card-placeholder">
                     <span>AI</span>
                     <strong>FASHION</strong>
                   </div>
-
                   <button
                     className={`heart-btn ${wishlisted.has(product.id) ? "heart-active" : ""}`}
                     onClick={() => handleWishlist(product)}
@@ -152,41 +145,39 @@ function Explore() {
                   </button>
                 </div>
 
-                <div className="product-info">
+                {/* INFO */}
+                <div className="shop-card-info">
                   <div>
                     <h3>{product.name}</h3>
-                    <p>₹{product.price}</p>
+                    <p>₹{product.price.toLocaleString("en-IN")}</p>
                   </div>
                   <div className="color-options">
-                    {product.colors.map((color, index) => (
-                      <span
-                        key={index}
-                        className="color-dot"
-                        style={{ background: color }}
-                      />
+                    {product.colors.map((color, i) => (
+                      <span key={i} className="color-dot" style={{ background: color }} />
                     ))}
                   </div>
                 </div>
 
-                <div className="product-actions">
+                {/* ACTIONS */}
+                <div className="shop-card-actions">
                   <button
-                    className="try-product-btn"
+                    className="shop-add-btn"
                     onClick={() => handleAddToCart(product)}
                   >
                     {cartFeedback === product.id ? "Added ✓" : "Add to Bag ✦"}
                   </button>
-
-                  <Link to="/try-on" className="compare-product-btn">
+                  <Link to="/try-on" className="shop-try-btn">
                     Try On
                   </Link>
                 </div>
+
               </div>
             ))}
           </div>
         )}
       </section>
 
-      {/* COLOR EXPLORATION */}
+      {/* ── COLOR SECTION ── */}
       <section className="color-explore-section">
         <div className="color-explore-text">
           <p>PLAY WITH COLOR</p>
@@ -203,7 +194,6 @@ function Explore() {
             Compare Colors →
           </Link>
         </div>
-
         <div className="color-visual">
           <div className="color-shirt shirt-one">TOP</div>
           <div className="color-shirt shirt-two">TOP</div>
@@ -211,7 +201,7 @@ function Explore() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* ── CTA ── */}
       <section className="explore-cta">
         <p>FOUND SOMETHING YOU LIKE?</p>
         <h2>
