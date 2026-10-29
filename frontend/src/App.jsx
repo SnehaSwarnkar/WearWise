@@ -26,6 +26,7 @@ import KidsSetup       from "./pages/KidsSetup";
 import MenShop         from "./pages/MenShop";
 import WomenShop       from "./pages/WomenShop";
 import KidsShop        from "./pages/KidsShop";
+import MyOrders        from "./pages/MyOrders";
 
 /** Redirect unauthenticated users to /login */
 function PrivateRoute({ children }) {
@@ -66,6 +67,10 @@ function App() {
       <Route path="/checkout"           element={<Checkout />} />
       <Route path="/order-confirmation" element={<OrderConfirmation />} />
       <Route path="/fashion-assistant"  element={<FashionAssistant />} />
+
+      {/* ── Orders ── */}
+      <Route path="/orders"     element={<PrivateRoute><MyOrders /></PrivateRoute>} />
+      <Route path="/orders/:id" element={<PrivateRoute><MyOrders /></PrivateRoute>} />
     </Routes>
   );
 }

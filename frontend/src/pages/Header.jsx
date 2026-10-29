@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 
 const GENDER_MENU = [
   {
@@ -42,7 +43,21 @@ const GENDER_MENU = [
 
 function Header() {
   const { user, logout } = useAuth();
+  const { theme, toggle } = useTheme();
   const navigate = useNavigate();
+
+  // Animate icon on click
+  const [switching, setSwitching] = useState(false);
+  const switchTimer = useRef(null);
+
+  const handleThemeToggle = useCallback(() => {
+    setSwitching(true);
+    toggle();
+    // Remove the switching class after the icon animation completes
+    switchTimer.current = setTimeout(() => setSwitching(false), 480);
+  }, [toggle]);
+
+  useEffect(() => () => clearTimeout(switchTimer.current), []);
 
   // Which gender item is hovered (shows occasion fly-out)
   const [activeGender, setActiveGender] = useState(null);
@@ -97,6 +112,7 @@ function Header() {
 
       {/* NAVIGATION */}
       <nav className="nav-links">
+        <Link to="/">Home</Link>
         <Link to="/explore">Explore</Link>
 
         {/* GENDER DROPDOWN */}
@@ -161,6 +177,7 @@ function Header() {
 
         <Link to="/try-on">Try On</Link>
         <Link to="/build-avatar">Avatar</Link>
+        {user && <Link to="/orders">Orders</Link>}
       </nav>
 
       {/* ACTIONS */}
@@ -198,6 +215,18 @@ function Header() {
             <path d="M9 12c.8.8 1.7 1.2 3 1.2s2.2-.4 3-1.2" />
           </svg>
         </Link>
+
+        {/* THEME TOGGLE */}
+        <button
+          className={`theme-toggle${switching ? " is-switching" : ""}`}
+          onClick={handleThemeToggle}
+          aria-label={`Switch to ${theme === "negative" ? "light" : "dark"} mode`}
+          title={theme === "negative" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        >
+          <span className="theme-toggle-icon" aria-hidden="true">
+            {theme === "negative" ? "☀" : "☾"}
+          </span>
+        </button>
 
         {user ? (
           <div className="header-user">
