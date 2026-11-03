@@ -1,0 +1,20 @@
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Ensure smooth scrollbar color matches theme */
+html {
+  color-scheme: light;
+}
+
+html[data-theme="negative"] {
+  color-scheme: dark;
+}

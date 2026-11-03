@@ -1,0 +1,563 @@
+.fashion-assistant-page {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  padding: 70px 6%;
+}
+
+.assistant-header {
+  max-width: 1200px;
+  margin: 0 auto 45px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+}
+
+.assistant-label {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--purple);
+}
+
+.assistant-header h1 {
+  margin: 15px 0;
+  font-family: "Anton", sans-serif;
+  font-size: clamp(55px, 7vw, 95px);
+  line-height: 0.85;
+}
+
+.assistant-header h1 span {
+  color: var(--pink);
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+}
+
+.assistant-header p {
+  max-width: 600px;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+
+.assistant-status {
+  padding: 12px 18px;
+  border: 1.5px solid var(--border-soft);
+  border-radius: 30px;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--text);
+  background: var(--bg-alt);
+}
+
+.assistant-status span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+}
+
+/* MAIN */
+
+.assistant-layout {
+  max-width: 1200px;
+  margin: auto;
+
+  display: grid;
+  grid-template-columns: 1fr 330px;
+  gap: 25px;
+}
+
+/* CHAT */
+
+.assistant-chat {
+  min-height: 650px;
+  background: var(--bg-alt);
+  border: 1.5px solid var(--border-soft);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-top {
+  padding: 20px 25px;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--bg-raised);
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.assistant-avatar {
+  width: 45px;
+  height: 45px;
+  background: var(--lavender-bg, #F5E6FF);
+  border: 1.5px solid var(--border-soft);
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--purple);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.chat-top strong,
+.chat-top small {
+  display: block;
+}
+
+.chat-top small {
+  color: var(--text-soft);
+  margin-top: 4px;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 30px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.chat-message {
+  max-width: 70%;
+  padding: 15px 18px;
+  line-height: 1.5;
+}
+
+.chat-message.ai {
+  align-self: flex-start;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px 16px 16px 4px;
+  color: var(--text);
+}
+
+.chat-message.user {
+  align-self: flex-end;
+  background: var(--pink);
+  border-radius: 16px 16px 4px 16px;
+  color: white;
+}
+
+/* SUGGESTIONS */
+
+.suggestions {
+  padding: 0 25px 15px;
+
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.suggestions button {
+  border: 1.5px solid var(--border-soft);
+  background: var(--bg-raised);
+  border-radius: 25px;
+  color: var(--text-soft);
+
+  padding: 9px 13px;
+
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.suggestions button:hover {
+  border-color: var(--pink);
+  color: var(--pink);
+  background: var(--soft-pink-bg, #FFE8F0);
+}
+
+/* INPUT */
+
+.chat-input {
+  padding: 18px;
+  border-top: 1px solid var(--border-soft);
+  background: var(--bg-raised);
+
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input input {
+  flex: 1;
+  min-width: 0;
+
+  border: 1.5px solid var(--border-soft);
+  border-radius: 50px;
+  padding: 13px 18px;
+  background: var(--input-bg);
+  color: var(--text);
+
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.chat-input input:focus {
+  border-color: var(--input-focus);
+}
+
+.chat-input input::placeholder { color: var(--text-xsoft); }
+
+.chat-input button {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+
+  border: none;
+  border-radius: 50%;
+  background: var(--pink);
+  color: white;
+
+  font-size: 20px;
+  font-weight: 900;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.chat-input button:hover {
+  background: var(--purple);
+}
+
+/* CONTEXT */
+
+.assistant-context {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.context-card {
+  background: var(--bg-alt);
+  border: 1.5px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: var(--shadow-card);
+}
+
+.context-card > span {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: var(--purple);
+}
+
+.context-card h2 {
+  margin: 10px 0;
+}
+
+.context-card p {
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.context-card a {
+  color: var(--pink);
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.context-avatar {
+  background: var(--lavender-bg, #F5E6FF);
+}
+
+.context-avatar .context-avatar {
+  font-size: 55px;
+  margin: 15px 0;
+}
+
+.context-heading {
+  display: flex;
+  justify-content: space-between;
+}
+
+.wardrobe-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+  margin: 15px 0;
+}
+
+.wardrobe-mini-grid div {
+  aspect-ratio: 1;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 25px;
+}
+
+.context-card > button {
+  width: 100%;
+  margin-top: 10px;
+
+  padding: 12px 14px;
+  border-radius: 10px;
+
+  background: var(--bg-raised);
+  border: 1.5px solid var(--border-soft);
+  color: var(--text);
+
+  text-align: left;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.context-card > button:hover {
+  background: var(--soft-pink-bg, #FFE8F0);
+  border-color: var(--pink);
+  color: var(--pink);
+}
+
+/* MOBILE */
+
+@media (max-width: 850px) {
+  .assistant-header {
+    flex-direction: column;
+    align-items: start;
+    gap: 25px;
+  }
+
+  .assistant-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   AI FASHION ASSISTANT ICON
+========================================================= */
+
+.ai-assistant-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border: 1.5px solid var(--border-soft);
+  border-radius: 50%;
+
+  background: var(--lavender-bg, #F5E6FF);
+  color: var(--purple);
+
+  text-decoration: none;
+  font-size: 23px;
+  font-weight: 900;
+  line-height: 1;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.ai-assistant-icon:hover {
+  transform: translateY(-3px) rotate(-5deg);
+  background: var(--pink);
+  border-color: var(--pink);
+  color: white;
+}
+
+/* ================================
+   SAVED HEART
+================================ */
+
+.saved-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border: 2px solid var(--black);
+  border-radius: 50%;
+
+  background: var(--cream);
+
+  text-decoration: none;
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.saved-icon svg {
+  width: 25px;
+  height: 25px;
+
+  display: block;
+
+  fill: rgba(255, 57, 149, 0.2);
+  stroke: var(--black);
+
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  transition: transform 0.2s ease;
+}
+
+.saved-icon:hover {
+  transform: translateY(-3px) rotate(-5deg);
+  background: var(--pink);
+}
+
+.saved-icon:hover svg {
+  transform: scale(1.08);
+}
+
+
+/* =================================================================
+   FASHION ASSISTANT — DARK MODE OVERRIDES
+================================================================= */
+
+[data-theme="negative"] .fashion-assistant-page {
+  background: var(--bg);
+  color: var(--text);
+}
+
+[data-theme="negative"] .assistant-header h1 { color: var(--text); }
+[data-theme="negative"] .assistant-header h1 span { color: var(--purple); }
+[data-theme="negative"] .assistant-header p { color: var(--text-soft); }
+[data-theme="negative"] .assistant-label { color: var(--purple); }
+
+[data-theme="negative"] .assistant-status {
+  border-color: var(--border-soft);
+  color: var(--text);
+  background: var(--bg-raised);
+}
+
+[data-theme="negative"] .assistant-status span { background: #00DCC1; }
+
+[data-theme="negative"] .assistant-chat {
+  background: var(--bg-raised);
+  border-color: var(--border-soft);
+}
+
+[data-theme="negative"] .chat-top { border-bottom-color: var(--border-soft); }
+[data-theme="negative"] .chat-top strong { color: var(--text); }
+[data-theme="negative"] .chat-top small  { color: var(--text-soft); }
+
+[data-theme="negative"] .assistant-avatar {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: var(--border-soft);
+  color: var(--purple);
+}
+
+[data-theme="negative"] .chat-message.ai {
+  background: var(--bg-alt);
+  color: var(--text);
+}
+
+[data-theme="negative"] .chat-message.user {
+  background: rgba(0, 220, 193, 0.15);
+  color: var(--text);
+}
+
+[data-theme="negative"] .suggestions button {
+  border-color: var(--border-soft);
+  background: var(--bg-raised);
+  color: var(--text);
+}
+
+[data-theme="negative"] .suggestions button:hover {
+  background: rgba(0, 220, 193, 0.15);
+  border-color: #00DCC1;
+  color: #00DCC1;
+}
+
+[data-theme="negative"] .chat-input { border-top-color: var(--border-soft); background: var(--bg-raised); }
+[data-theme="negative"] .chat-input input {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text);
+}
+[data-theme="negative"] .chat-input input::placeholder { color: var(--text-xsoft); }
+[data-theme="negative"] .chat-input button { background: #00DCC1; color: var(--text-invert, #071321); border-color: #00DCC1; }
+[data-theme="negative"] .chat-input button:hover { background: #00BFA8; }
+
+[data-theme="negative"] .context-card {
+  background: var(--bg-raised);
+  border-color: var(--border-soft);
+}
+
+[data-theme="negative"] .context-card > span { color: var(--purple); }
+[data-theme="negative"] .context-card h2 { color: var(--text); }
+[data-theme="negative"] .context-card p { color: var(--text-soft); }
+[data-theme="negative"] .context-card strong { color: var(--text-soft); }
+[data-theme="negative"] .context-card a { color: #00DCC1; }
+[data-theme="negative"] .context-card button {
+  background: var(--bg-alt);
+  border-color: var(--border-soft);
+  color: var(--text);
+}
+[data-theme="negative"] .context-card button:hover { background: var(--bg-sunken); }
+
+[data-theme="negative"] .wardrobe-mini-grid div { background: var(--bg-alt); }
+[data-theme="negative"] .avatar-context { border-color: #00DCC1; }
+
+[data-theme="negative"] .context-heading span,
+[data-theme="negative"] .context-heading a { color: var(--text-soft); }
+
+/* AI Assistant Icon — dark mode (already in App.css, ensure consistent) */
+[data-theme="negative"] .ai-assistant-icon {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: var(--border-soft);
+  color: var(--purple);
+}
+
+[data-theme="negative"] .ai-assistant-icon:hover {
+  background: #00DCC1;
+  border-color: #00DCC1;
+  color: var(--text-invert, #071321);
+}
+
+/* Saved icon — dark mode */
+[data-theme="negative"] .saved-icon {
+  background: var(--bg-raised);
+  border-color: var(--border-soft);
+}
+
+[data-theme="negative"] .saved-icon svg {
+  fill: rgba(255, 91, 170, 0.3);
+  stroke: var(--text-soft);
+}
+
+[data-theme="negative"] .saved-icon:hover {
+  background: rgba(255, 91, 170, 0.15);
+  border-color: #FF5BAA;
+}
+
+[data-theme="negative"] .saved-icon:hover svg {
+  fill: rgba(255, 91, 170, 0.5);
+  stroke: #FF5BAA;
+}
