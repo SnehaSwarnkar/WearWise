@@ -31,6 +31,11 @@ function Home() {
       {/* HERO */}
       <section className="fashion-hero">
 
+        {/* Decorative background circles */}
+        <div className="hero-bg-circle circle-a" aria-hidden="true"></div>
+        <div className="hero-bg-circle circle-b" aria-hidden="true"></div>
+        <div className="hero-bg-curve" aria-hidden="true"></div>
+
         <div className="hero-left">
 
           <div className="hero-pill">
@@ -40,8 +45,15 @@ function Home() {
 
           <h1>
             DRESS LIKE
+            {/* Tiny sparkle stars around headline */}
+            <span className="h1-star h1-star-a" aria-hidden="true">✦</span>
+            <span className="h1-star h1-star-b" aria-hidden="true">✧</span>
             <br />
-            <span>THE MAIN</span>
+            <span className="hero-span-main">
+              THE MAIN
+              <span className="hero-underline" aria-hidden="true"></span>
+            </span>
+            <span className="h1-star h1-star-c" aria-hidden="true">✦</span>
             <br />
             CHARACTER.
           </h1>
@@ -78,54 +90,95 @@ function Home() {
             </div>
           </div>
 
+          {/* Scroll indicator */}
+          <div className="scroll-indicator" aria-hidden="true">
+            <span className="scroll-label">EXPLORE YOUR STYLE</span>
+            <span className="scroll-arrow">↓</span>
+          </div>
+
         </div>
 
 
         {/* HERO RIGHT */}
-        <div className="hero-right">
+       
+{/* HERO RIGHT - FLOATING FASHION COLLAGE */}
+<div className="hero-right">
 
-          <div className="hero-card main-fashion-card">
+  <div className="fashion-collage">
 
-            <div className="card-top">
-              <span>YOUR STYLE ERA</span>
-              <span>2026</span>
-            </div>
+    {/* Background glow */}
+    <div className="collage-glow"></div>
 
-            <div className="fashion-word">
-              <span>Wear</span>
-              <h2>Wise</h2>
-            </div>
+    {/* Orbit lines */}
+    <div className="collage-orbit orbit-a" aria-hidden="true"></div>
+    <div className="collage-orbit orbit-b" aria-hidden="true"></div>
 
-            <div className="card-bottom">
-              <span>PERSONAL STYLE,</span>
-              <span>REIMAGINED.</span>
-            </div>
+    {/* Sunglasses */}
+    <img
+      src="/images/sunglasses.png"
+      alt="Black sunglasses"
+      className="collage-item collage-sunglasses"
+    />
 
-          </div>
+    {/* Blue jacket */}
+    <img
+      src="/images/jacket.png"
+      alt="Blue puffer jacket"
+      className="collage-item collage-jacket"
+    />
 
+    {/* Denim jeans */}
+    <img
+      src="/images/jeans.png"
+      alt="Blue denim jeans"
+      className="collage-item collage-jeans"
+    />
 
-          <div className="floating-tag pink-tag">
-            <span>✦</span>
-            COLOR MATCH
-          </div>
+    {/* Handbag */}
+    <img
+      src="/images/handbag.png"
+      alt="Black handbag"
+      className="collage-item collage-handbag"
+    />
 
-          <div className="floating-tag orange-tag">
-            <span>◉</span>
-            BODY FIT
-          </div>
+    {/* Red headphones */}
+    <img
+      src="/images/headphones.png"
+      alt="Red headphones"
+      className="collage-item collage-headphones"
+    />
 
-          <div className="floating-tag purple-tag">
-            <span>♧</span>
-            VIRTUAL TRY ON
-          </div>
+    {/* Floating labels */}
+    <div className="collage-tag tag-effortless">
+      ✦ Effortless
+    </div>
 
-          <div className="fashion-sticker">
-            <span>YOU</span>
-            <strong>LOOK</strong>
-            <span>GOOD</span>
-          </div>
+    <div className="collage-tag tag-trendy">
+      ✦ Trendy
+    </div>
 
-        </div>
+    <div className="collage-tag tag-comfortable">
+      ✦ Comfortable
+    </div>
+
+    <div className="collage-tag tag-versatile">
+      ✦ Versatile
+    </div>
+
+    {/* Decorative sparkles */}
+    <span className="collage-star star-one" aria-hidden="true">✧</span>
+    <span className="collage-star star-two" aria-hidden="true">✦</span>
+    <span className="collage-star star-three" aria-hidden="true">✦</span>
+    <span className="collage-heart" aria-hidden="true">♡</span>
+
+    <div className="collage-signature" aria-hidden="true">
+      Your Style
+      <span>Era</span>
+    </div>
+
+  </div>
+
+</div>
 
       </section>
 
