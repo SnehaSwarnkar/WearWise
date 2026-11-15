@@ -31,6 +31,11 @@ function Home() {
       {/* HERO */}
       <section className="fashion-hero">
 
+        {/* Decorative background circles */}
+        <div className="hero-bg-circle circle-a" aria-hidden="true"></div>
+        <div className="hero-bg-circle circle-b" aria-hidden="true"></div>
+        <div className="hero-bg-curve" aria-hidden="true"></div>
+
         <div className="hero-left">
 
           <div className="hero-pill">
@@ -40,8 +45,15 @@ function Home() {
 
           <h1>
             DRESS LIKE
+            {/* Tiny sparkle stars around headline */}
+            <span className="h1-star h1-star-a" aria-hidden="true">✦</span>
+            <span className="h1-star h1-star-b" aria-hidden="true">✧</span>
             <br />
-            <span>THE MAIN</span>
+            <span className="hero-span-main">
+              THE MAIN
+              <span className="hero-underline" aria-hidden="true"></span>
+            </span>
+            <span className="h1-star h1-star-c" aria-hidden="true">✦</span>
             <br />
             CHARACTER.
           </h1>
@@ -78,6 +90,12 @@ function Home() {
             </div>
           </div>
 
+          {/* Scroll indicator */}
+          <div className="scroll-indicator" aria-hidden="true">
+            <span className="scroll-label">EXPLORE YOUR STYLE</span>
+            <span className="scroll-arrow">↓</span>
+          </div>
+
         </div>
 
 
@@ -90,6 +108,10 @@ function Home() {
 
     {/* Background glow */}
     <div className="collage-glow"></div>
+
+    {/* Orbit lines */}
+    <div className="collage-orbit orbit-a" aria-hidden="true"></div>
+    <div className="collage-orbit orbit-b" aria-hidden="true"></div>
 
     {/* Sunglasses */}
     <img
@@ -143,12 +165,13 @@ function Home() {
       ✦ Versatile
     </div>
 
-    {/* Decorative elements */}
-    <span className="collage-star star-one">✧</span>
-    <span className="collage-star star-two">✦</span>
-    <span className="collage-heart">♡</span>
+    {/* Decorative sparkles */}
+    <span className="collage-star star-one" aria-hidden="true">✧</span>
+    <span className="collage-star star-two" aria-hidden="true">✦</span>
+    <span className="collage-star star-three" aria-hidden="true">✦</span>
+    <span className="collage-heart" aria-hidden="true">♡</span>
 
-    <div className="collage-signature">
+    <div className="collage-signature" aria-hidden="true">
       Your Style
       <span>Era</span>
     </div>
