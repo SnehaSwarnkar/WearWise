@@ -2,7 +2,7 @@
 
 **Project:** WearWise AI Fashion & Honest Fit Platform  
 **Document:** Avatar Engine Interface Specification (AES-001)  
-**Revision:** 1.1 (Engine-Isolated Domain Architecture)  
+**Revision:** 1.2 (Engine-Isolated Domain Architecture & Shape Evaluation Port)  
 **Date:** 2026-11-23  
 **Status:** Approved Technical Architecture  
 
@@ -15,7 +15,7 @@ The **Avatar Engine** subsystem is responsible for converting an engine-independ
 ### The Inviolable Adapter Boundary:
 - NAVER Anny v0.6.2, PyTorch, tensor manipulation, and low-level morph names (e.g. `measure-shoulder-dist-incr`, `l-upperarm-scale-horiz-incr`) are **strictly encapsulated within `app/avatar_engine/adapters/anny_adapter.py`**.
 - No other module in the codebase may import `anny` or `torch`.
-- Higher-level modules (Orchestration Service, BICE, Anthropometry, API) interact with 3D generation **exclusively via the abstract `AvatarEngine` protocol**.
+- Higher-level modules (Orchestration Service, BICE, Anthropometry, API) interact with 3D generation **exclusively via abstract engine protocols** (`AvatarEngine`, `ShapeEvaluationPort`, and `LandmarkProvider`).
 - The `AvatarEngine` interface makes **no assumptions of fixed mesh topology** (such as 13,718 vertices or 27,420 faces). Future replacement engines with different mesh topologies are first-class citizens.
 
 ---
@@ -52,6 +52,36 @@ class LandmarkProvider(Protocol):
         ...
 
 @dataclass(frozen=True)
+class RegionalDisplacementSummary:
+    """Summary of vertex displacements in a specific anatomical zone."""
+    region_code: str
+    mean_displacement_m: float
+    max_displacement_m: float
+    vertex_count: int
+
+@dataclass(frozen=True)
+class ShapeEvaluationResult:
+    """Geometric feedback returned to BICE for locality regularization."""
+    metric_version: str            # "1.1-rmsr-pvsr"
+    regional_displacements: Dict[str, RegionalDisplacementSummary]
+    target_region_mean_m: float
+    max_non_target_mean_m: float
+    rmsr: float                    # Regional Mean Spillover Ratio
+    pvsr: Optional[float]          # Peak Vertex Spillover Ratio (when computed)
+    is_plausible: bool
+    diagnostic_notes: str
+
+class ShapeEvaluationPort(Protocol):
+    """Abstract port for evaluating geometric displacements without importing engine internals."""
+    def evaluate_shape(
+        self, 
+        shape_spec: Any, 
+        target_region: str, 
+        requested_regions: List[str]
+    ) -> ShapeEvaluationResult:
+        ...
+
+@dataclass(frozen=True)
 class MeshValidationReport:
     """Structural health and geometric validity report."""
     is_valid: bool
@@ -72,6 +102,7 @@ class EngineMetadata:
     engine_version: str
     topology_identifier: str
     supports_lbs: bool
+    supported_capabilities: List[str] # ["mesh_generation", "glb_export", "shape_evaluation", "landmark_provider"]
     device_type: str  # "cpu" or "cuda"
 
 class AvatarEngine(Protocol):
@@ -96,10 +127,6 @@ class AvatarEngine(Protocol):
         """
         ...
         
-    def evaluate_shape(self, shape_spec: Any, target_landmarks: List[str]) -> Dict[str, LandmarkData]:
-        """Engine-independent shape evaluation capability for calibration workflows."""
-        ...
-        
     def validate_mesh(self, mesh_data: MeshData) -> MeshValidationReport:
         """Perform topological, manifold, and coordinate bounds checks."""
         ...
@@ -113,6 +140,10 @@ class AvatarEngine(Protocol):
         
     def get_landmark_provider(self) -> LandmarkProvider:
         """Return neutral landmark query interface for Anthropometry Engine."""
+        ...
+
+    def get_shape_evaluation_port(self) -> ShapeEvaluationPort:
+        """Return neutral shape evaluation interface for BICE regularized solver."""
         ...
         
     def get_metadata(self) -> EngineMetadata:
@@ -151,8 +182,17 @@ flowchart TD
 
 ### 3.1 Parameter Mapping & Traceable Clamping Policy
 The adapter never silently changes inputs without traceability:
-1. It maps `AvatarShapeSpec.regional_scales` to Anny blendshape weights using a verified internal mapping dictionary.
-2. If any parameter exceeds the adapter's safe hardware boundary, it clamps the value and appends an explicit warning to `GenerationMetadata.clamped_parameters`.
+1. It maps `AvatarShapeSpec.regional_scales` to Anny blendshape weights using a verified internal mapping dictionary:
+   - `shoulder_scale.scale_x` $\rightarrow$ `measure-shoulder-dist-incr`
+   - `shoulder_scale.scale_y` $\rightarrow$ `l-upperarm-shoulder-muscle-incr` / `r-upperarm-shoulder-muscle-incr`
+   - `chest_scale.scale_y` $\rightarrow$ `breast-volume-vert-up`
+   - `belly_scale.scale_y` $\rightarrow$ `stomach-pregnant-incr`
+   - `waist_scale.scale_x` $\rightarrow$ `measure-waist-circ-incr`
+   - `arm_scale.scale_x` $\rightarrow$ `l-upperarm-scale-horiz-incr`, `r-upperarm-scale-horiz-incr`
+   - `hip_scale.scale_x` $\rightarrow$ `hip-trans-out`
+   - `thigh_scale.scale_x` $\rightarrow$ `l-upperleg-fat-incr`, `r-upperleg-fat-incr`
+   - `calf_scale.scale_x` $\rightarrow$ `measure-calf-circ-incr`
+2. If any mapped parameter exceeds the adapter's safe hardware boundary, it clamps the value and appends an explicit warning to `GenerationMetadata.clamped_parameters`.
 3. If an input contains `NaN`, `Inf`, or violates anatomical structure, it raises a structured `InvalidParameterError`.
 
 ### 3.2 PyTorch CPU Execution & Windows Smart App Control
@@ -161,16 +201,23 @@ The adapter never silently changes inputs without traceability:
 - **CUDA Fallback:** Supported for batch offline tasks.
 
 ### 3.3 Neutral Landmark Mapping via `AnnyLandmarkProvider`
-To ensure `AnthropometryEngine` does not depend on Anny-specific vertex indices, `AnnyAdapter` provides an internal `AnnyLandmarkProvider`:
+To ensure `AnthropometryEngine` does not depend on Anny-specific vertex indices, `AnnyAdapter` implements `AnnyLandmarkProvider`:
 - Translates Anny vertex indices (e.g. index $6721$ for C7 vertebra, index $4129$ for left acromion) into engine-independent `LandmarkData` with coordinates in meters.
 - Exposes anatomical region masks (head, shoulders, torso, arms, hips, thighs, calves) as boolean masks without exposing raw mesh indices to Anthropometry.
+
+### 3.4 Shape Evaluation Port via `AnnyShapeEvaluationPort`
+`AnnyAdapter` implements `ShapeEvaluationPort`:
+- Executes forward passes with candidate `AvatarShapeSpec` and reference baseline.
+- Computes vertex displacement vectors $\Delta \mathbf{x} = \mathbf{x}_{\text{cand}} - \mathbf{x}_{\text{ref}}$.
+- Evaluates regional means $\bar{\Delta}_R$ across internal region masks.
+- Returns `ShapeEvaluationResult` containing RMSR and PVSR metrics to BICE, with $\epsilon = 10^{-6}\text{ m}$ safeguard.
 
 ---
 
 ## 4. GLB Export & Structured Failure Handling
 
 ### 4.1 In-Memory Export Contract
-- The `export_glb(mesh_data: MeshData) -> bytes` method returns raw glTF 2.0 binary bytes directly.
+- The `export_glb(mesh_data: MeshData) -> bytes` method returns raw glTF 2.0 binary bytes directly in memory.
 - The Avatar Engine is **not responsible for file persistence or storage paths**. Storage is handled by the application-level `AssetStorageService`.
 
 ### 4.2 Structured Exception Hierarchy
@@ -206,4 +253,5 @@ Any future avatar engine replacing Anny must satisfy these invariant requirement
 2. **Neutral Mesh Units:** Output mesh coordinates must be strictly in **METERS**.
 3. **Reference Pose:** Must generate vertices in the Standard Neutral A-Pose.
 4. **Landmark Provider:** Must implement `LandmarkProvider` to supply required anatomical landmarks (acromion, C7, waist, hips).
-5. **No Topology Restriction:** Does **not** need 13,718 vertices or 27,420 faces. The architecture natively supports arbitrary watertight manifold meshes.
+5. **Shape Evaluation Port:** Must implement `ShapeEvaluationPort` to provide displacement feedback for BICE regularization.
+6. **No Topology Restriction:** Does **not** need 13,718 vertices or 27,420 faces. The architecture natively supports arbitrary watertight manifold meshes.
