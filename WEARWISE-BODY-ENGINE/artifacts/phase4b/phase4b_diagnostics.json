@@ -1,0 +1,1388 @@
+{
+  "phase": "4B",
+  "milestone": "Anthropometry Extraction from Real Anny Meshes",
+  "algorithm_version": "1.2.1-mesh-plane-graph",
+  "generated_at": "2026-11-23T11:39:04Z",
+  "benchmark": {
+    "benchmark_iterations": 5,
+    "mean_latency_ms": 4514.95,
+    "mean_latency_seconds": 4.515,
+    "peak_memory_allocated_mb": 0.299,
+    "triangle_count": 27420,
+    "vertex_count": 13718
+  },
+  "landmark_audit": {
+    "acromion_left": {
+      "vertex_index": 8260,
+      "region": "shoulders",
+      "derivation": "lateral bony acromial process"
+    },
+    "acromion_right": {
+      "vertex_index": 1604,
+      "region": "shoulders",
+      "derivation": "lateral bony acromial process"
+    },
+    "sternum_lower": {
+      "vertex_index": 3930,
+      "region": "torso_chest",
+      "derivation": "anterior midline xiphoid/lower sternum at bust level"
+    },
+    "umbilicus": {
+      "vertex_index": 4044,
+      "region": "waist_abdomen",
+      "derivation": "anterior midline navel/waist indentation"
+    },
+    "sacrum_mid": {
+      "vertex_index": 4313,
+      "region": "hips",
+      "derivation": "posterior midline dorsal sacrum at maximal gluteal level"
+    },
+    "cervicale_c7": {
+      "vertex_index": 1402,
+      "region": "torso_chest",
+      "derivation": "posterior prominent C7 vertebra"
+    },
+    "suprasternale": {
+      "vertex_index": 1600,
+      "region": "torso_chest",
+      "derivation": "jugular notch of sternum manubrium"
+    }
+  },
+  "avatars": {
+    "neutral_masculine": {
+      "avatar_id": "neutral_masculine",
+      "algorithm_version": "1.2.1-mesh-plane-graph",
+      "extraction_timestamp": "2026-11-23T11:38:38.174190+00:00",
+      "measurements": {
+        "stature": {
+          "measurement_code": "stature",
+          "value_cm": 156.83,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              -0.8445727229118347
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 0,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "z_min_m": -0.8445727229118347,
+              "z_max_m": 0.7237272262573242,
+              "stature_m": 1.568299949169159
+            }
+          },
+          "selected_loop": null,
+          "all_loops_count": 0
+        },
+        "shoulder_biacromial_breadth": {
+          "measurement_code": "shoulder_biacromial_breadth",
+          "value_cm": 37.2,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              -0.021041598170995712,
+              0.4239802658557892
+            ],
+            "plane_normal": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "intersected_triangles_count": 0,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "acromion_left_m": [
+                0.18599961698055267,
+                -0.02104160748422146,
+                0.4239802658557892
+              ],
+              "acromion_right_m": [
+                -0.18599961698055267,
+                -0.021041588857769966,
+                0.4239802658557892
+              ],
+              "distance_m": 0.37199923396110535
+            }
+          },
+          "selected_loop": null,
+          "all_loops_count": 0
+        },
+        "chest_circumference": {
+          "measurement_code": "chest_circumference",
+          "value_cm": 77.85,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              0.28747159242630005
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 236,
+            "extracted_loops_count": 3,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "sternum_lower",
+              "landmark_point_m": [
+                -5.46066247775201e-10,
+                0.047962486743927,
+                0.28747159242630005
+              ],
+              "slice_z_m": 0.28747159242630005,
+              "loop_vertex_count": 144
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              -4.3027486473470567e-10,
+              -0.06806232924096507,
+              0.28747159242630005
+            ],
+            "bounding_box_min_m": [
+              -0.12841614928162395,
+              -0.13547731596194956,
+              0.28747159242630005
+            ],
+            "bounding_box_max_m": [
+              0.12841614928162395,
+              0.05537456400838018,
+              0.28747159242630005
+            ],
+            "perimeter_cm": 77.85038417455505,
+            "vertex_count": 144
+          },
+          "all_loops_count": 3
+        },
+        "waist_planar_circumference": {
+          "measurement_code": "waist_planar_circumference",
+          "value_cm": 65.96,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              0.11637299507856369
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 200,
+            "extracted_loops_count": 3,
+            "selected_loop_index": 2,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "umbilicus",
+              "landmark_point_m": [
+                -1.0108783385018305e-12,
+                0.04109282046556473,
+                0.11637299507856369
+              ],
+              "slice_z_m": 0.11637299507856369,
+              "loop_vertex_count": 88
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              -9.258830287058166e-15,
+              -0.027483814263032126,
+              0.11637299507856369
+            ],
+            "bounding_box_min_m": [
+              -0.12403093076751674,
+              -0.11255221776767142,
+              0.11637299507856369
+            ],
+            "bounding_box_max_m": [
+              0.12403093076751674,
+              0.04212439349820733,
+              0.11637299507856369
+            ],
+            "perimeter_cm": 65.95534446608133,
+            "vertex_count": 88
+          },
+          "all_loops_count": 3
+        },
+        "hip_circumference": {
+          "measurement_code": "hip_circumference",
+          "value_cm": 91.62,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "provisional",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              -0.035848334431648254
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 86,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "sacrum_mid",
+              "landmark_point_m": [
+                4.200763435019406e-12,
+                -0.09662030637264252,
+                -0.035848334431648254
+              ],
+              "slice_z_m": -0.035848334431648254,
+              "loop_vertex_count": 86
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              6.530604545512558e-14,
+              0.011241403338543442,
+              -0.035848334431648254
+            ],
+            "bounding_box_min_m": [
+              -0.16664931765767302,
+              -0.09662030637264252,
+              -0.035848334431648254
+            ],
+            "bounding_box_max_m": [
+              0.16664931765767302,
+              0.10287507417906343,
+              -0.035848334431648254
+            ],
+            "perimeter_cm": 91.61948297941018,
+            "vertex_count": 86
+          },
+          "all_loops_count": 1
+        }
+      }
+    },
+    "neutral_feminine": {
+      "avatar_id": "neutral_feminine",
+      "algorithm_version": "1.2.1-mesh-plane-graph",
+      "extraction_timestamp": "2026-11-23T11:38:39.176569+00:00",
+      "measurements": {
+        "stature": {
+          "measurement_code": "stature",
+          "value_cm": 156.83,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              -0.8299509286880493
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 0,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "z_min_m": -0.8299509286880493,
+              "z_max_m": 0.7383490800857544,
+              "stature_m": 1.5683000087738037
+            }
+          },
+          "selected_loop": null,
+          "all_loops_count": 0
+        },
+        "shoulder_biacromial_breadth": {
+          "measurement_code": "shoulder_biacromial_breadth",
+          "value_cm": 36.91,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              -0.00128488102927804,
+              0.4757021367549896
+            ],
+            "plane_normal": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "intersected_triangles_count": 0,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "acromion_left_m": [
+                0.18457286059856415,
+                -0.0012848795158788562,
+                0.4757021367549896
+              ],
+              "acromion_right_m": [
+                -0.18457286059856415,
+                -0.0012848826590925455,
+                0.4757021367549896
+              ],
+              "distance_m": 0.3691457211971283
+            }
+          },
+          "selected_loop": null,
+          "all_loops_count": 0
+        },
+        "chest_circumference": {
+          "measurement_code": "chest_circumference",
+          "value_cm": 83.0,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              0.30647188425064087
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 240,
+            "extracted_loops_count": 3,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "sternum_lower",
+              "landmark_point_m": [
+                -1.9483743232077272e-14,
+                0.06844856590032578,
+                0.30647188425064087
+              ],
+              "slice_z_m": 0.30647188425064087,
+              "loop_vertex_count": 146
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              4.523493451959467e-15,
+              -0.056170065364274144,
+              0.30647188425064087
+            ],
+            "bounding_box_min_m": [
+              -0.1387504345646146,
+              -0.12466420486653479,
+              0.30647188425064087
+            ],
+            "bounding_box_max_m": [
+              0.1387504345646146,
+              0.07731068980096575,
+              0.30647188425064087
+            ],
+            "perimeter_cm": 83.00488950760409,
+            "vertex_count": 146
+          },
+          "all_loops_count": 3
+        },
+        "waist_planar_circumference": {
+          "measurement_code": "waist_planar_circumference",
+          "value_cm": 69.81,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              0.14774519205093384
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 194,
+            "extracted_loops_count": 3,
+            "selected_loop_index": 2,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "umbilicus",
+              "landmark_point_m": [
+                -8.948833292226829e-14,
+                0.05082103982567787,
+                0.14774519205093384
+              ],
+              "slice_z_m": 0.14774519205093384,
+              "loop_vertex_count": 86
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              -6.334564655764611e-16,
+              -0.02293771988321971,
+              0.14774519205093384
+            ],
+            "bounding_box_min_m": [
+              -0.13015291724044517,
+              -0.11127852439914378,
+              0.14774519205093384
+            ],
+            "bounding_box_max_m": [
+              0.13015291724044517,
+              0.05286894989993612,
+              0.14774519205093384
+            ],
+            "perimeter_cm": 69.80709879806565,
+            "vertex_count": 86
+          },
+          "all_loops_count": 3
+        },
+        "hip_circumference": {
+          "measurement_code": "hip_circumference",
+          "value_cm": 84.96,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "provisional",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              -0.012665140442550182
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 86,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "sacrum_mid",
+              "landmark_point_m": [
+                -1.4342895360980323e-12,
+                -0.10959610342979431,
+                -0.012665140442550182
+              ],
+              "slice_z_m": -0.012665140442550182,
+              "loop_vertex_count": 86
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              -1.4040334675334005e-13,
+              -0.000831314950192077,
+              -0.012665140442550182
+            ],
+            "bounding_box_min_m": [
+              -0.14920480411495451,
+              -0.11001591416791266,
+              -0.012665140442550182
+            ],
+            "bounding_box_max_m": [
+              0.14920480411495451,
+              0.09086642738377158,
+              -0.012665140442550182
+            ],
+            "perimeter_cm": 84.95996022169956,
+            "vertex_count": 86
+          },
+          "all_loops_count": 1
+        }
+      }
+    },
+    "modified_athletic": {
+      "avatar_id": "modified_athletic",
+      "algorithm_version": "1.2.1-mesh-plane-graph",
+      "extraction_timestamp": "2026-11-23T11:38:40.154839+00:00",
+      "measurements": {
+        "stature": {
+          "measurement_code": "stature",
+          "value_cm": 180.0,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              -0.9929004311561584
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 0,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "z_min_m": -0.9929004311561584,
+              "z_max_m": 0.8070995807647705,
+              "stature_m": 1.800000011920929
+            }
+          },
+          "selected_loop": null,
+          "all_loops_count": 0
+        },
+        "shoulder_biacromial_breadth": {
+          "measurement_code": "shoulder_biacromial_breadth",
+          "value_cm": 42.75,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              7.450580596923828e-09,
+              -0.033556170761585236,
+              0.47870221734046936
+            ],
+            "plane_normal": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "intersected_triangles_count": 0,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "acromion_left_m": [
+                0.21374118328094482,
+                -0.03355617821216583,
+                0.47870221734046936
+              ],
+              "acromion_right_m": [
+                -0.21374116837978363,
+                -0.03355615958571434,
+                0.47870221734046936
+              ],
+              "distance_m": 0.42748236656188965
+            }
+          },
+          "selected_loop": null,
+          "all_loops_count": 0
+        },
+        "chest_circumference": {
+          "measurement_code": "chest_circumference",
+          "value_cm": 86.36,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              0.33185288310050964
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 236,
+            "extracted_loops_count": 3,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "sternum_lower",
+              "landmark_point_m": [
+                -5.196518215733192e-10,
+                0.044720716774463654,
+                0.33185288310050964
+              ],
+              "slice_z_m": 0.33185288310050964,
+              "loop_vertex_count": 144
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              1.5776205322824854e-10,
+              -0.08433336360665324,
+              0.33185288310050964
+            ],
+            "bounding_box_min_m": [
+              -0.1429276985097082,
+              -0.15579574257148432,
+              0.33185288310050964
+            ],
+            "bounding_box_max_m": [
+              0.14292770922778752,
+              0.05264453799614128,
+              0.33185288310050964
+            ],
+            "perimeter_cm": 86.35641780574512,
+            "vertex_count": 144
+          },
+          "all_loops_count": 3
+        },
+        "waist_planar_circumference": {
+          "measurement_code": "waist_planar_circumference",
+          "value_cm": 69.87,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              0.1379624307155609
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 192,
+            "extracted_loops_count": 3,
+            "selected_loop_index": 2,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "umbilicus",
+              "landmark_point_m": [
+                3.389253938265724e-13,
+                0.03819846361875534,
+                0.1379624307155609
+              ],
+              "slice_z_m": 0.1379624307155609,
+              "loop_vertex_count": 84
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              6.150895764944764e-15,
+              -0.03163773912477159,
+              0.1379624307155609
+            ],
+            "bounding_box_min_m": [
+              -0.13353854619992722,
+              -0.11819659327800384,
+              0.1379624307155609
+            ],
+            "bounding_box_max_m": [
+              0.13353854619992722,
+              0.03935704444899939,
+              0.1379624307155609
+            ],
+            "perimeter_cm": 69.86601978401184,
+            "vertex_count": 84
+          },
+          "all_loops_count": 3
+        },
+        "hip_circumference": {
+          "measurement_code": "hip_circumference",
+          "value_cm": 99.93,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "provisional",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              -0.03680455684661865
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 86,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "sacrum_mid",
+              "landmark_point_m": [
+                -3.009436103096341e-11,
+                -0.1057993546128273,
+                -0.03680455684661865
+              ],
+              "slice_z_m": -0.03680455684661865,
+              "loop_vertex_count": 86
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              -1.3688029634169867e-12,
+              0.011569868353853766,
+              -0.03680455684661865
+            ],
+            "bounding_box_min_m": [
+              -0.18118216338588347,
+              -0.1057993546128273,
+              -0.03680455684661865
+            ],
+            "bounding_box_max_m": [
+              0.18118216338588347,
+              0.11241728743268956,
+              -0.03680455684661865
+            ],
+            "perimeter_cm": 99.92525816655699,
+            "vertex_count": 86
+          },
+          "all_loops_count": 1
+        }
+      }
+    },
+    "stature_min_100cm": {
+      "avatar_id": "stature_min_100cm",
+      "algorithm_version": "1.2.1-mesh-plane-graph",
+      "extraction_timestamp": "2026-11-23T11:38:41.130282+00:00",
+      "measurements": {
+        "stature": {
+          "measurement_code": "stature",
+          "value_cm": 100.0,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              -0.4895229637622833
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 0,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "z_min_m": -0.4895229637622833,
+              "z_max_m": 0.5104769468307495,
+              "stature_m": 0.9999999105930328
+            }
+          },
+          "selected_loop": null,
+          "all_loops_count": 0
+        },
+        "shoulder_biacromial_breadth": {
+          "measurement_code": "shoulder_biacromial_breadth",
+          "value_cm": 27.81,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.006221671588718891,
+              0.27936601638793945
+            ],
+            "plane_normal": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "intersected_triangles_count": 0,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "acromion_left_m": [
+                0.13905800879001617,
+                0.006221667863428593,
+                0.27936601638793945
+              ],
+              "acromion_right_m": [
+                -0.13905800879001617,
+                0.006221674848347902,
+                0.27936601638793945
+              ],
+              "distance_m": 0.27811601758003235
+            }
+          },
+          "selected_loop": null,
+          "all_loops_count": 0
+        },
+        "chest_circumference": {
+          "measurement_code": "chest_circumference",
+          "value_cm": 56.92,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              0.1777266561985016
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 252,
+            "extracted_loops_count": 3,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "sternum_lower",
+              "landmark_point_m": [
+                -5.594529284280725e-10,
+                0.05080218240618706,
+                0.1777266561985016
+              ],
+              "slice_z_m": 0.1777266561985016,
+              "loop_vertex_count": 130
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              1.8949463686225042e-11,
+              -0.02937752287834211,
+              0.1777266561985016
+            ],
+            "bounding_box_min_m": [
+              -0.09408432875167536,
+              -0.08411145570634042,
+              0.1777266561985016
+            ],
+            "bounding_box_max_m": [
+              0.09408432875167536,
+              0.056753469757369605,
+              0.1777266561985016
+            ],
+            "perimeter_cm": 56.917757602643434,
+            "vertex_count": 130
+          },
+          "all_loops_count": 3
+        },
+        "waist_planar_circumference": {
+          "measurement_code": "waist_planar_circumference",
+          "value_cm": 50.24,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              0.06381765007972717
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 260,
+            "extracted_loops_count": 3,
+            "selected_loop_index": 2,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "umbilicus",
+              "landmark_point_m": [
+                5.249203849366779e-13,
+                0.033456120640039444,
+                0.06381765007972717
+              ],
+              "slice_z_m": 0.06381765007972717,
+              "loop_vertex_count": 90
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              7.688872686687867e-15,
+              -0.01874236448841561,
+              0.06381765007972717
+            ],
+            "bounding_box_min_m": [
+              -0.09545615016502114,
+              -0.08164244678723258,
+              0.06381765007972717
+            ],
+            "bounding_box_max_m": [
+              0.09545615016502114,
+              0.034188927896617385,
+              0.06381765007972717
+            ],
+            "perimeter_cm": 50.23697481604825,
+            "vertex_count": 90
+          },
+          "all_loops_count": 3
+        },
+        "hip_circumference": {
+          "measurement_code": "hip_circumference",
+          "value_cm": 69.22,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "provisional",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              -0.03243867680430412
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 86,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "sacrum_mid",
+              "landmark_point_m": [
+                9.647033172299757e-11,
+                -0.07124969363212585,
+                -0.03243867680430412
+              ],
+              "slice_z_m": -0.03243867680430412,
+              "loop_vertex_count": 86
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              -4.407578146128717e-12,
+              0.007357421441869334,
+              -0.03243867680430412
+            ],
+            "bounding_box_min_m": [
+              -0.1272190331249314,
+              -0.07124969363212585,
+              -0.03243867680430412
+            ],
+            "bounding_box_max_m": [
+              0.1272190331249314,
+              0.07762571136504384,
+              -0.03243867680430412
+            ],
+            "perimeter_cm": 69.22458156729317,
+            "vertex_count": 86
+          },
+          "all_loops_count": 1
+        }
+      }
+    },
+    "stature_max_230cm": {
+      "avatar_id": "stature_max_230cm",
+      "algorithm_version": "1.2.1-mesh-plane-graph",
+      "extraction_timestamp": "2026-11-23T11:38:42.116854+00:00",
+      "measurements": {
+        "stature": {
+          "measurement_code": "stature",
+          "value_cm": 230.0,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              -1.295059323310852
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 0,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "z_min_m": -1.295059323310852,
+              "z_max_m": 1.0049405097961426,
+              "stature_m": 2.2999998331069946
+            }
+          },
+          "selected_loop": null,
+          "all_loops_count": 0
+        },
+        "shoulder_biacromial_breadth": {
+          "measurement_code": "shoulder_biacromial_breadth",
+          "value_cm": 50.0,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              1.4901161193847656e-08,
+              -0.05373108386993408,
+              0.6103038787841797
+            ],
+            "plane_normal": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "intersected_triangles_count": 0,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "acromion_left_m": [
+                0.25001534819602966,
+                -0.053731080144643784,
+                0.6103038787841797
+              ],
+              "acromion_right_m": [
+                -0.2500153183937073,
+                -0.05373108759522438,
+                0.6103038787841797
+              ],
+              "distance_m": 0.5000306367874146
+            }
+          },
+          "selected_loop": null,
+          "all_loops_count": 0
+        },
+        "chest_circumference": {
+          "measurement_code": "chest_circumference",
+          "value_cm": 104.78,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              0.4262527823448181
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 226,
+            "extracted_loops_count": 3,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "sternum_lower",
+              "landmark_point_m": [
+                -5.770108280067632e-10,
+                0.04669833183288574,
+                0.4262527823448181
+              ],
+              "slice_z_m": 0.4262527823448181,
+              "loop_vertex_count": 138
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              1.6915894178560296e-10,
+              -0.10836122987730933,
+              0.4262527823448181
+            ],
+            "bounding_box_min_m": [
+              -0.1740736966080552,
+              -0.19843435476345972,
+              0.4262527823448181
+            ],
+            "bounding_box_max_m": [
+              0.1740736966080552,
+              0.05621464020791484,
+              0.4262527823448181
+            ],
+            "perimeter_cm": 104.776778947638,
+            "vertex_count": 138
+          },
+          "all_loops_count": 3
+        },
+        "waist_planar_circumference": {
+          "measurement_code": "waist_planar_circumference",
+          "value_cm": 87.94,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "eligible",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              0.1818903535604477
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 190,
+            "extracted_loops_count": 3,
+            "selected_loop_index": 2,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "umbilicus",
+              "landmark_point_m": [
+                2.8448387309060186e-12,
+                0.05028022080659866,
+                0.1818903535604477
+              ],
+              "slice_z_m": 0.1818903535604477,
+              "loop_vertex_count": 86
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              9.746160596914719e-15,
+              -0.043284183229749966,
+              0.1818903535604477
+            ],
+            "bounding_box_min_m": [
+              -0.16515871831727347,
+              -0.15706569786984845,
+              0.1818903535604477
+            ],
+            "bounding_box_max_m": [
+              0.16515871831727347,
+              0.05207098608761452,
+              0.1818903535604477
+            ],
+            "perimeter_cm": 87.93519594924852,
+            "vertex_count": 86
+          },
+          "all_loops_count": 3
+        },
+        "hip_circumference": {
+          "measurement_code": "hip_circumference",
+          "value_cm": 121.78,
+          "unit": "cm",
+          "acquisition_method": "geometry_extracted",
+          "validation_state": "internally_consistent",
+          "lifecycle_status": "active",
+          "assessment_state": "provisional",
+          "diagnostic": {
+            "algorithm_version": "1.2.1-mesh-plane-graph",
+            "plane_origin_m": [
+              0.0,
+              0.0,
+              -0.04139726236462593
+            ],
+            "plane_normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "intersected_triangles_count": 86,
+            "extracted_loops_count": 1,
+            "selected_loop_index": 0,
+            "closure_error_m": 0.0,
+            "graph_is_2_regular": true,
+            "is_plausible": true,
+            "status_code": "SUCCESS",
+            "details": {
+              "landmark": "sacrum_mid",
+              "landmark_point_m": [
+                6.666982244052377e-11,
+                -0.13039518892765045,
+                -0.04139726236462593
+              ],
+              "slice_z_m": -0.04139726236462593,
+              "loop_vertex_count": 86
+            }
+          },
+          "selected_loop": {
+            "is_closed": true,
+            "centroid_3d_m": [
+              -2.511664568188208e-13,
+              0.01264387992920371,
+              -0.04139726236462593
+            ],
+            "bounding_box_min_m": [
+              -0.21983530683965088,
+              -0.13039518892765045,
+              -0.04139726236462593
+            ],
+            "bounding_box_max_m": [
+              0.21983530683965088,
+              0.13718802307742411,
+              -0.04139726236462593
+            ],
+            "perimeter_cm": 121.77690298960317,
+            "vertex_count": 86
+          },
+          "all_loops_count": 1
+        }
+      }
+    }
+  }
+}
