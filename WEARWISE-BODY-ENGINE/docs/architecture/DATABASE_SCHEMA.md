@@ -2,7 +2,7 @@
 
 **Project:** WearWise AI Fashion & Honest Fit Platform  
 **Document:** Database Schema & Persistence Design (DBS-001)  
-**Revision:** 1.1 (Complete ERD Agreement, Outbox Pattern & Privacy Controls)  
+**Revision:** 1.2 (Exact 12-Table Agreement, Blob Reference Safety & Outbox Pattern)  
 **Date:** 2026-11-23  
 **Status:** Approved Technical Architecture  
 
@@ -26,7 +26,7 @@
 
 ## 2. Complete Entity Relationship Diagram (ERD)
 
-All 11 entities in the ERD correspond 1:1 with the DDL specifications below:
+All **12 entities** in the ERD correspond 1:1 with the DDL specifications below. Notice that `ASSET_DELETION_OUTBOX` maintains an unconstrained reference to `asset_id` so it can survive the deletion of the associated `AVATAR_ASSETS` row:
 
 ```mermaid
 erDiagram
@@ -44,7 +44,7 @@ erDiagram
     PROFILE_REVISIONS ||--o{ FIT_RECOMMENDATIONS : requests
     GARMENT_REVISIONS ||--o{ FIT_RECOMMENDATIONS : evaluates
     
-    AVATAR_ASSETS ||--o{ ASSET_DELETION_OUTBOX : queues
+    AVATAR_ASSETS ..o{ ASSET_DELETION_OUTBOX : "triggers cleanup"
 
     BODY_PROFILES {
         uuid id PK
@@ -73,7 +73,8 @@ erDiagram
         varchar unit
         varchar acquisition_method
         varchar validation_state
-        varchar status
+        varchar lifecycle_status
+        varchar assessment_state
         varchar landmark_convention
         decimal tolerance_cm
         decimal reliability_weight
@@ -118,7 +119,7 @@ erDiagram
 
     GARMENT_PROFILES {
         uuid id PK
-        uuid brand_id
+        uuid brand_id "Merchant Principal"
         varchar sku
         varchar title
         varchar category
@@ -148,6 +149,8 @@ erDiagram
         varchar dimension_code
         decimal value_cm
         decimal tolerance_cm
+        varchar measurement_procedure
+        varchar provenance
     }
 
     FIT_RECOMMENDATIONS {
@@ -163,7 +166,8 @@ erDiagram
 
     ASSET_DELETION_OUTBOX {
         uuid id PK
-        uuid asset_id FK
+        uuid asset_id "Unconstrained ref"
+        varchar sha256_checksum
         varchar storage_uri
         varchar status
         int retry_count
@@ -173,7 +177,7 @@ erDiagram
 
 ---
 
-## 3. Authoritative DDL Specifications
+## 3. Authoritative DDL Specifications (Exactly 12 Tables)
 
 ```sql
 -- 1. Body Profiles (Identity anchor)
@@ -212,9 +216,10 @@ CREATE TABLE body_measurements (
     validation_state VARCHAR(32) NOT NULL CHECK (validation_state IN (
         'unvalidated', 'internally_consistent', 'externally_validated', 'disputed'
     )),
-    status VARCHAR(16) NOT NULL CHECK (status IN ('active', 'superseded', 'provisional', 'rejected')),
+    lifecycle_status VARCHAR(16) NOT NULL CHECK (lifecycle_status IN ('active', 'superseded', 'draft', 'purged')),
+    assessment_state VARCHAR(16) NOT NULL CHECK (assessment_state IN ('eligible', 'provisional', 'unassessed', 'rejected')),
     landmark_convention VARCHAR(128) NOT NULL,
-    tolerance_cm NUMERIC(4, 2) NOT NULL DEFAULT 1.00,
+    tolerance_cm NUMERIC(4, 2) NOT NULL DEFAULT 1.00 CHECK (tolerance_cm >= 0.0),
     reliability_weight NUMERIC(3, 2) NOT NULL DEFAULT 1.00 CHECK (reliability_weight BETWEEN 0.0 AND 1.0),
     captured_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uq_rev_measurement_code UNIQUE (revision_id, measurement_code)
@@ -266,7 +271,7 @@ CREATE INDEX idx_avatar_assets_sha256 ON avatar_assets(sha256_checksum);
 -- 7. Garment Profiles
 CREATE TABLE garment_profiles (
     id UUID PRIMARY KEY,
-    brand_id UUID NOT NULL,
+    brand_id UUID NOT NULL, -- Authenticated merchant principal
     sku VARCHAR(64) NOT NULL,
     title VARCHAR(256) NOT NULL,
     category VARCHAR(64) NOT NULL,
@@ -301,7 +306,9 @@ CREATE TABLE garment_measurements (
     size_id UUID NOT NULL REFERENCES garment_sizes(id) ON DELETE CASCADE,
     dimension_code VARCHAR(64) NOT NULL,
     value_cm NUMERIC(5, 2) NOT NULL CHECK (value_cm > 0.0),
-    tolerance_cm NUMERIC(4, 2) NOT NULL DEFAULT 1.00,
+    tolerance_cm NUMERIC(4, 2) NOT NULL DEFAULT 1.00 CHECK (tolerance_cm >= 0.0),
+    measurement_procedure VARCHAR(64) NOT NULL,
+    provenance VARCHAR(32) NOT NULL DEFAULT 'brand_size_chart',
     CONSTRAINT uq_size_dimension UNIQUE (size_id, dimension_code)
 );
 
@@ -317,15 +324,17 @@ CREATE TABLE fit_recommendations (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- 12. Asset Deletion Outbox (Reliable asynchronous external asset cleanup)
+-- 12. Asset Deletion Outbox (Survives asset row deletion; manages blob reference counting)
 CREATE TABLE asset_deletion_outbox (
     id UUID PRIMARY KEY,
-    asset_id UUID NOT NULL,
+    asset_id UUID NOT NULL, -- Unconstrained reference (no FK) to survive relational asset purge
+    sha256_checksum VARCHAR(64) NOT NULL,
     storage_uri VARCHAR(512) NOT NULL,
     status VARCHAR(16) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
     retry_count INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX idx_deletion_outbox_status ON asset_deletion_outbox(status);
 ```
 
 ---
@@ -336,10 +345,38 @@ CREATE TABLE asset_deletion_outbox (
 - `body_measurements` (with code `'stature'`) is the **single canonical source of truth for body height**.
 - `body_profiles.stature_cm` is a derived, denormalized read-projection kept synchronized on revision save to avoid repeated joins.
 
-### 4.2 Reliable Asynchronous Deletion Workflow (Outbox Pattern)
-Deleting personal 3D avatar assets cannot be handled purely inside a SQL transaction because filesystem / S3 operations cannot participate in database two-phase commit:
-1. When a user requests profile deletion, `body_profiles.is_deleted` is set to `TRUE`.
-2. A row is inserted into `asset_deletion_outbox` for each associated `avatar_asset`.
-3. An asynchronous worker sweeps `asset_deletion_outbox`, securely removes the binary `.glb` file from storage, verifies file removal, and updates outbox status to `completed`.
-4. SQL cascade then purges the relational records.
+### 4.2 Shared Content-Addressable Blob Safety & Deletion Workflow
+Because storage is content-addressable, multiple avatar configurations or different profiles with identical shapes can produce identical SHA-256 digests. Deleting one avatar must **never delete a physical `.glb` blob that is still referenced by another live asset**:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant App as Application / User
+    participant DB as Relational Database
+    participant Outbox as asset_deletion_outbox
+    participant Worker as Outbox Sweep Worker
+    participant Storage as File / S3 Storage
+
+    App->>DB: Soft-delete Profile (is_deleted = TRUE)
+    DB->>Outbox: INSERT INTO asset_deletion_outbox(asset_id, sha256_checksum, storage_uri)
+    DB-->>App: Acknowledge Deletion Request
+
+    Worker->>Outbox: Poll pending rows (SELECT WHERE status='pending')
+    Note over Worker: Check remaining live references across all avatar_assets:
+    Worker->>DB: SELECT COUNT(*) FROM avatar_assets WHERE sha256_checksum = :sha256 AND id != :asset_id
+    DB-->>Worker: count = N
+
+    alt N > 0 (Blob is still referenced by other avatars)
+        Note over Worker: Shared blob retained! Do not delete file.
+        Worker->>Outbox: UPDATE status = 'completed' (reason: "shared blob retained")
+    else N == 0 (Zero live references remain)
+        Worker->>Storage: Delete file (/data/assets/glb/{sha256}.glb)
+        Storage-->>Worker: File deleted
+        Worker->>Storage: Verify file no longer exists
+        Worker->>Outbox: UPDATE status = 'completed' (reason: "blob physically removed")
+    end
+
+    Worker->>DB: Purge relational avatar_assets, configurations & profile records
+```
+
 5. **Legal Boundary:** These privacy mechanisms represent architectural designs to support future compliance audits (GDPR / DPDP) and do not constitute formal legal certification.
