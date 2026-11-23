@@ -2,7 +2,7 @@
 
 **Project:** WearWise AI Fashion & Honest Fit Platform  
 **Document:** System Architecture Specification (SAS-001)  
-**Revision:** 1.1 (Engine-Isolated Modular Monolith)  
+**Revision:** 1.2 (Engine-Isolated Modular Monolith & Evaluation Port)  
 **Date:** 2026-11-23  
 **Status:** Approved Technical Architecture  
 
@@ -15,7 +15,7 @@ WearWise is an AI fashion and honest-fit intelligence platform designed to elimi
 ### Architectural Constraints & Invariants:
 1. **Python Modular Monolith (FastAPI):** A single unified deployable backend process with strictly decoupled internal module boundaries. No microservices, distributed message brokers, or Kubernetes orchestration are permitted at this stage.
 2. **Strict Unidirectional Dependency Direction:** API routers invoke application-level services. Low-level domain engines (Avatar Engine, Anthropometry, BICE, Fit Engine) never orchestrate higher-level modules or each other.
-3. **Engine-Neutral Avatar Generation:** NAVER Anny v0.6.2 is encapsulated completely behind an engine-independent `AvatarEngine` interface in `app/avatar_engine/adapters/anny_adapter.py`. BICE and Anthropometry communicate with the engine solely via neutral contracts (`AvatarShapeSpec`, `MeshData`, `LandmarkProvider`).
+3. **Engine-Neutral Avatar Generation & Evaluation:** NAVER Anny v0.6.2 is encapsulated completely behind abstract engine interfaces in `app/avatar_engine/adapters/anny_adapter.py`. BICE consumes `ShapeEvaluationPort` and outputs `AvatarShapeSpec`. Anthropometry consumes `MeshData` and `LandmarkProvider`.
 4. **Local Hardware Budget Compliance (₹0 Mandate):** Real-time interactive avatar previews run on CPU PyTorch tensors ($20.82\text{ ms}$ model latency on an AMD Ryzen 7 6800H), achieving ₹0 infrastructure viability.
 5. **Frontend Preservation:** The existing frontend is a decoupled React 19 + Vite application. It renders 3D avatar assets using Three.js / React Three Fiber. The backend provides an authenticated, private binary GLB streaming contract (`/api/v1/avatar/assets/{avatar_id}.glb`).
 
@@ -45,7 +45,7 @@ flowchart TD
         subgraph CoreDomainModules["Internal Domain & Engine Modules"]
             BICE["BICE Module (app.bice)<br>(Semantic Normalization & Bounds Enforcer)"]
             AvatarMod["Avatar Engine (app.avatar_engine)<br>(Interface & Anny Adapter)"]
-            AnthroMod["Anthropometry Engine (app.anthropometry)<br>(Mesh-Plane Slicing & Landmark Analysis)"]
+            AnthroMod["Anthropometry Engine (app.anthropometry)<br>(Exact Mesh-Plane Slicing & Landmark Analysis)"]
             FitMod["Honest Fit Engine (app.fit_engine)<br>(Ease Calculation & Fit Scoring)"]
         end
     end
@@ -92,11 +92,11 @@ flowchart TD
     end
 
     subgraph Layer3["3. Domain Engine Layer (app.domain, app.bice, app.avatar_engine, app.anthropometry, app.fit_engine)"]
-        BICE["BICE<br>(Input: Controls -> Output: AvatarShapeSpec)"]
+        BICE["BICE<br>(Input: Controls, ShapeEvaluationPort -> Output: AvatarShapeSpec)"]
         AvatarEngine["AvatarEngine (Interface)<br>(Input: AvatarShapeSpec -> Output: MeshData, GLB bytes)"]
         Anthro["AnthropometryEngine<br>(Input: MeshData, LandmarkProvider -> Output: Measurements)"]
         FitEngine["HonestFitEngine<br>(Input: Body & Garment Measurements -> Output: FitResult)"]
-        DomainContracts["Domain Entities & Interfaces<br>(BodyProfile, BodyMeasurement, GarmentProfile)"]
+        DomainContracts["Domain Entities & Interfaces<br>(BodyProfile, BodyMeasurement, GarmentProfile, ShapeEvaluationPort)"]
     end
 
     subgraph Layer4["4. Infrastructure & Persistence Layer (app.infrastructure)"]
@@ -111,20 +111,15 @@ flowchart TD
     Layer3 --> DomainContracts
     Layer4 --> DomainContracts
     Adapters -.->|Implements| AvatarEngine
+    Adapters -.->|Implements| DomainContracts
 ```
 
-### 3.2 Authoritative Module Responsibilities & Dependency Matrix
-
-| Module | Core Responsibility | Inbound Dependencies (Allowed Callers) | Outbound Dependencies (Allowed Callees) | Forbidden Dependencies |
-|---|---|---|---|---|
-| `app.api` | Request parsing, authentication context extraction, response serialization, HTTP error translation. | Client (Browser) | `app.services`, `app.domain` | Zero direct calls to `app.avatar_engine`, `app.bice`, or DB models. |
-| `app.services.avatar_orchestration` | Coordinates end-to-end avatar workflow: fetching profile, generating `AvatarShapeSpec`, invoking engine, extracting measurements, saving GLB, persisting revisions. | `app.api` | `app.bice`, `app.avatar_engine`, `app.anthropometry`, `app.infrastructure`, `app.domain` | No Anny-specific or PyTorch dependencies. |
-| `app.services.fit_orchestration` | Coordinates fit recommendation flow: fetching active profile measurements and garment sizing data, running fit evaluation, formatting advice. | `app.api` | `app.fit_engine`, `app.infrastructure`, `app.domain` | No avatar or 3D rendering dependencies. |
-| `app.bice` | Normalizes semantic sliders; enforces semantic invariants; computes engine-independent `AvatarShapeSpec`. | `app.services.avatar_orchestration` | `app.domain` | Strictly zero Anny imports, zero PyTorch imports, zero mesh imports. |
-| `app.avatar_engine` | Encapsulates 3D mesh generation. Exposes `AvatarEngine` protocol. Concrete `AnnyAdapter` handles PyTorch LBS forward pass and binary GLB serialization. | `app.services.avatar_orchestration` | `app.domain` | Must NOT depend on `app.anthropometry`, `app.fit_engine`, or DB persistence. |
-| `app.anthropometry` | Performs triangle-mesh-plane intersections; stitches closed contour loops; extracts perimeters and lengths using `LandmarkProvider`. | `app.services.avatar_orchestration` | `app.domain` | Must NOT depend on Anny topology, vertex indices, or `app.avatar_engine`. |
-| `app.fit_engine` | Calculates dimensional ease ($G - B$); evaluates non-overlapping regional fit classifications; computes bounded fit scores. | `app.services.fit_orchestration` | `app.domain` | Strictly zero 3D mesh, geometry, or avatar dependencies. |
-| `app.infrastructure` | Relational persistence (SQLAlchemy / SQLite / PostgreSQL), external binary file storage, and isolated concrete engine adapters. | `app.services` | `app.domain` | Domain logic must not leak into SQL queries. |
+### 3.2 Clear Package Structure (Separation of Domain, Transport, and Persistence)
+To prevent transport concerns or ORM decorators from polluting domain logic, the codebase enforces distinct package roots:
+- **`app/domain/entities/`:** Pure Python dataclasses / domain entities (`BodyProfile`, `BodyMeasurement`, `AvatarShapeSpec`). Zero framework dependencies.
+- **`app/domain/interfaces/`:** Abstract domain protocols (`AvatarEngine`, `ShapeEvaluationPort`, `LandmarkProvider`, `StorageProvider`).
+- **`app/schemas/`:** Pydantic v2 schemas used strictly for HTTP request/response validation and serialization.
+- **`app/infrastructure/models/`:** SQLAlchemy 2.0 ORM models mapped to relational tables.
 
 ---
 
@@ -152,8 +147,11 @@ sequenceDiagram
     Orch->>Repo: GetActiveProfileRevision(profile_id)
     Repo-->>Orch: BodyProfile(rev_N, measurements, controls)
 
-    Orch->>BICE: ComputeShapeSpec(measurements, controls)
-    Note over BICE: 1. Normalize sliders [0, 1]<br/>2. Apply semantic invariants<br/>3. Synthesize neutral AvatarShapeSpec
+    Orch->>Engine: GetShapeEvaluationPort()
+    Engine-->>Orch: ShapeEvaluationPort (Implemented by AnnyAdapter)
+
+    Orch->>BICE: ComputeShapeSpec(measurements, controls, ShapeEvaluationPort)
+    Note over BICE: 1. Normalize sliders [0, 1]<br/>2. Optional iterative locality check via ShapeEvaluationPort<br/>3. Synthesize neutral AvatarShapeSpec
     BICE-->>Orch: AvatarShapeSpec
 
     Orch->>Engine: GenerateAvatar(AvatarShapeSpec)
@@ -166,7 +164,7 @@ sequenceDiagram
     Engine-->>Orch: LandmarkProvider
 
     Orch->>Anthro: ExtractMeasurements(MeshData, LandmarkProvider)
-    Note over Anthro: 1. Triangle-mesh-plane intersections<br/>2. Stitch closed contour loops<br/>3. Select anatomical loops via landmark masks<br/>4. Calculate perimeters (cm)
+    Note over Anthro: 1. Exact triangle-mesh-plane intersections<br/>2. Stitch closed contour loops<br/>3. Select anatomical loops via landmark proximity<br/>4. Calculate perimeters (cm)
     Anthro-->>Orch: ExtractedMeasurements (chest, waist, hips, etc.)
 
     Orch->>Engine: ExportGLB(MeshData)
@@ -185,7 +183,7 @@ sequenceDiagram
     API-->>User: 200 OK (AvatarGenerationResponse)
 ```
 
-### 4.2 Authenticated GLB Delivery Flow
+### 4.2 Authenticated GLB Delivery Flow (Private No-Store Policy)
 
 ```mermaid
 sequenceDiagram
@@ -194,21 +192,21 @@ sequenceDiagram
     participant API as FastAPI Router (/api/v1/avatar/assets/{id}.glb)
     participant Storage as AssetStorageService
 
-    Browser->>API: GET /api/v1/avatar/assets/{id}.glb<br/>Headers: Authorization, If-None-Match: "sha256"
-    Note over API: 1. Validate authorization principal<br/>2. Verify user owns the avatar profile<br/>3. Check ETag match
+    Browser->>API: GET /api/v1/avatar/assets/{id}.glb<br/>Headers: Authorization / Cookie, If-None-Match: "sha256"
+    Note over API: 1. Authenticate caller<br/>2. Verify user owns the avatar profile<br/>3. Check If-None-Match ETag
     
-    alt ETag Matches
+    alt ETag Matches & Asset Valid
         API-->>Browser: 304 Not Modified
     else ETag Differs / Fresh Request
         API->>Storage: ReadAssetBytes(asset_id)
         Storage-->>API: raw_glb_bytes
-        API-->>Browser: 200 OK<br/>Content-Type: model/gltf-binary<br/>Cache-Control: private, max-age=86400, immutable<br/>ETag: "sha256_hash"
+        API-->>Browser: 200 OK<br/>Content-Type: model/gltf-binary<br/>Cache-Control: private, no-store<br/>ETag: "sha256_hash"
     end
 ```
 
 ---
 
-## 5. Architectural Decision Records (Revision 1.1)
+## 5. Architectural Decision Records (Revision 1.2)
 
 ### ADR-01: Modular Monolith Architecture
 - **Status:** Approved.
@@ -220,12 +218,12 @@ sequenceDiagram
 - **Context:** Phase 0 proved single-mesh inference on an AMD Ryzen 7 6800H CPU takes **$20.82\text{ ms}$**, whereas single-mesh GPU inference on the RTX 3050 takes $74.45\text{ ms}$ due to CUDA kernel launch overhead.
 - **Decision:** Default interactive avatar generation worker threads to run on CPU PyTorch tensors. CUDA execution is reserved for batch offline jobs.
 
-### ADR-03: Two-Phase Authenticated GLB Asset Delivery Contract
-- **Status:** Approved (Revision 1.1).
-- **Context:** Avatar assets represent personal 3D body representations. Public shared CDN caching violates user privacy.
-- **Decision:** Avatar generation returns metadata and asset URL: `/api/v1/avatar/assets/{avatar_id}.glb`. Serving requires authentication and returns `Cache-Control: private, max-age=86400, immutable` with content-derived ETag (SHA-256).
+### ADR-03: Two-Phase Authenticated GLB Asset Delivery Contract (`private, no-store`)
+- **Status:** Approved (Revision 1.2).
+- **Context:** Avatar assets represent personal 3D body representations. Shared public CDN caching violates user privacy.
+- **Decision:** Serving requires authentication and returns `Cache-Control: private, no-store` with content-derived ETag (SHA-256).
 
 ### ADR-04: Strict Isolation of Avatar Engine & Application-Level Orchestration
-- **Status:** Approved (Revision 1.1).
+- **Status:** Approved (Revision 1.2).
 - **Context:** Coupling BICE or Anthropometry to Anny creates severe vendor lock-in. Avatar Engine must not orchestrate measurement extraction.
-- **Decision:** `AvatarOrchestrationService` coordinates the workflow. BICE outputs `AvatarShapeSpec`. AnnyAdapter translates `AvatarShapeSpec` to Anny parameters and provides `LandmarkProvider`. Anthropometry operates strictly on neutral meshes and landmark coordinates.
+- **Decision:** `AvatarOrchestrationService` coordinates the workflow. BICE outputs `AvatarShapeSpec` and accesses displacement feedback through `ShapeEvaluationPort`. AnnyAdapter translates `AvatarShapeSpec` to Anny parameters and provides `LandmarkProvider`. Anthropometry operates strictly on neutral meshes and landmark coordinates.
