@@ -2,7 +2,7 @@
 
 **Project:** WearWise AI Fashion & Honest Fit Platform  
 **Document:** Database Schema & Persistence Design (DBS-001)  
-**Revision:** 1.2 (Exact 12-Table Agreement, Blob Reference Safety & Outbox Pattern)  
+**Revision:** 1.2.1 (Atomic Blob Deletion Synchronization, Strict DDL & Traceable Outbox)  
 **Date:** 2026-11-23  
 **Status:** Approved Technical Architecture  
 
@@ -345,8 +345,65 @@ CREATE INDEX idx_deletion_outbox_status ON asset_deletion_outbox(status);
 - `body_measurements` (with code `'stature'`) is the **single canonical source of truth for body height**.
 - `body_profiles.stature_cm` is a derived, denormalized read-projection kept synchronized on revision save to avoid repeated joins.
 
-### 4.2 Shared Content-Addressable Blob Safety & Deletion Workflow
-Because storage is content-addressable, multiple avatar configurations or different profiles with identical shapes can produce identical SHA-256 digests. Deleting one avatar must **never delete a physical `.glb` blob that is still referenced by another live asset**:
+### 4.2 Shared Content-Addressable Blob Safety & Atomic Deletion Synchronization
+
+Because avatar mesh storage is content-addressable (`/data/assets/glb/{sha256}.glb`), multiple avatar configurations or different user profiles sharing identical morphology produce identical SHA-256 digests. Deleting one avatar profile must **never delete a physical `.glb` blob that is still referenced by another live asset**.
+
+#### The TOCTOU Race Condition Hazard:
+Without synchronization, a classic Time-of-Check to Time-of-Use race condition exists:
+1. Worker queries `SELECT COUNT(*) ...` and observes 0 live references.
+2. Concurrently, another user process completes mesh generation with the same digest and commits an `INSERT INTO avatar_assets`.
+3. Worker unlinks `/data/assets/glb/{sha256}.glb`.
+4. The newly created avatar is left with a dangling storage URI pointing to a deleted file.
+
+#### The Atomic Synchronization Mechanism:
+To eliminate this race condition deterministically across environments:
+
+1. **Production Standard (PostgreSQL 16+): Transactional Digest-Level Advisory Locks**
+   Both asset registration and blob deletion acquire an exclusive transactional advisory lock keyed by the SHA-256 digest integer hash:
+   ```sql
+   -- Acquired by both Asset Ingestion Service and Outbox Sweep Worker:
+   SELECT pg_advisory_xact_lock(hashtext(:sha256_checksum));
+   ```
+   - **Asset Registration Flow:**
+     ```sql
+     BEGIN;
+     SELECT pg_advisory_xact_lock(hashtext(:sha256_checksum));
+     -- Verify physical file exists in storage; write if missing
+     INSERT INTO avatar_assets (id, config_id, format, size_bytes, sha256_checksum, storage_uri, ...)
+     VALUES (...);
+     COMMIT;
+     ```
+   - **Outbox Worker Cleanup Flow:**
+     ```sql
+     BEGIN;
+     SELECT pg_advisory_xact_lock(hashtext(:sha256_checksum));
+     SELECT COUNT(*) FROM avatar_assets WHERE sha256_checksum = :sha256_checksum;
+     -- If count == 0:
+     -- Physically unlink blob from file system / S3 bucket
+     -- UPDATE asset_deletion_outbox SET status = 'completed'
+     COMMIT;
+     ```
+   - **Mutual Exclusion Guarantee:** If the worker is checking references and deleting the file, any concurrent process registering that exact digest blocks on `pg_advisory_xact_lock` until the cleanup transaction commits. When unblocked, the registration process checks physical storage, detects the file absence, writes the file freshly, and commits cleanly.
+
+2. **Development / Local Environment (SQLite 3 WAL Mode): `BEGIN IMMEDIATE` Serialized Transactions**
+   - SQLite serializes write concurrency using `BEGIN IMMEDIATE`.
+   - The outbox worker and avatar creation services wrap reference verification and file actions within `BEGIN IMMEDIATE` transactions.
+   - SQLite reserves the database write lock immediately upon transaction start, preventing concurrent processes from acquiring write locks or inserting rows into `avatar_assets` until the worker commits or rolls back.
+
+3. **Outbox Idempotency & Retry Semantics:**
+   - **Atomic Claiming:** Concurrent workers poll and claim rows without race conditions:
+     ```sql
+     UPDATE asset_deletion_outbox
+     SET status = 'processing', retry_count = retry_count + 1
+     WHERE id = (
+         SELECT id FROM asset_deletion_outbox 
+         WHERE status = 'pending' AND retry_count < 5 
+         ORDER BY created_at ASC LIMIT 1
+     ) RETURNING *;
+     ```
+   - **Idempotent Unlinking:** Unlinking operations treat `FileNotFoundError` as a successful no-op (idempotent physical state).
+   - **Retry Ceiling:** If an unhandled storage failure occurs, `status` reverts to `'pending'` until `retry_count >= 5`, upon which the row is marked `'failed'` and an alert is raised.
 
 ```mermaid
 sequenceDiagram
@@ -361,9 +418,10 @@ sequenceDiagram
     DB->>Outbox: INSERT INTO asset_deletion_outbox(asset_id, sha256_checksum, storage_uri)
     DB-->>App: Acknowledge Deletion Request
 
-    Worker->>Outbox: Poll pending rows (SELECT WHERE status='pending')
-    Note over Worker: Check remaining live references across all avatar_assets:
-    Worker->>DB: SELECT COUNT(*) FROM avatar_assets WHERE sha256_checksum = :sha256 AND id != :asset_id
+    Worker->>Outbox: Atomically claim pending row (status = 'processing')
+    Worker->>DB: BEGIN TRANSACTION
+    Worker->>DB: Acquire Digest Advisory Lock (pg_advisory_xact_lock)
+    Worker->>DB: SELECT COUNT(*) FROM avatar_assets WHERE sha256_checksum = :sha256
     DB-->>Worker: count = N
 
     alt N > 0 (Blob is still referenced by other avatars)
@@ -371,10 +429,10 @@ sequenceDiagram
         Worker->>Outbox: UPDATE status = 'completed' (reason: "shared blob retained")
     else N == 0 (Zero live references remain)
         Worker->>Storage: Delete file (/data/assets/glb/{sha256}.glb)
-        Storage-->>Worker: File deleted
-        Worker->>Storage: Verify file no longer exists
+        Storage-->>Worker: File unlinked (or already absent)
         Worker->>Outbox: UPDATE status = 'completed' (reason: "blob physically removed")
     end
+    Worker->>DB: COMMIT (Releases Advisory Lock)
 
     Worker->>DB: Purge relational avatar_assets, configurations & profile records
 ```
