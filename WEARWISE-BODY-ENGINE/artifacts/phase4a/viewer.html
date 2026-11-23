@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WearWise 3D Avatar Inspector — Phase 4A</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #1a202c 0%, #0d1117 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #e2e8f0;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #ui-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(26, 32, 44, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            width: 320px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            z-index: 100;
+        }
+        h1 {
+            font-size: 16px;
+            margin: 0 0 4px 0;
+            color: #63b3ed;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        h2 {
+            font-size: 13px;
+            margin: 0 0 16px 0;
+            color: #a0aec0;
+            font-weight: normal;
+        }
+        .control-group {
+            margin-bottom: 14px;
+        }
+        label {
+            display: block;
+            font-size: 12px;
+            color: #cbd5e0;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        select, button {
+            width: 100%;
+            padding: 9px 12px;
+            background: #2d3748;
+            border: 1px solid #4a5568;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+        }
+        select:hover, button:hover {
+            background: #3a475d;
+            border-color: #63b3ed;
+        }
+        .button-row {
+            display: flex;
+            gap: 8px;
+        }
+        .button-row button {
+            flex: 1;
+        }
+        #stats-card {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 11px;
+            color: #a0aec0;
+            line-height: 1.6;
+        }
+        .stat-val {
+            color: #63b3ed;
+            font-weight: 600;
+            float: right;
+        }
+        #loading-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #63b3ed;
+            font-size: 16px;
+            font-weight: 600;
+            background: rgba(13, 17, 23, 0.9);
+            padding: 16px 28px;
+            border-radius: 8px;
+            border: 1px solid #2b6cb0;
+            display: none;
+            z-index: 200;
+        }
+        #badge {
+            display: inline-block;
+            background: #2b6cb0;
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+    </style>
+    <!-- Three.js + OrbitControls + GLTFLoader via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div id="loading-overlay">Loading 3D Avatar Mesh...</div>
+
+    <div id="ui-panel">
+        <span id="badge">Phase 4A Milestone</span>
+        <h1>WearWise Avatar Viewer</h1>
+        <h2>NAVER Anny v0.6.2 Engine Verification</h2>
+
+        <div class="control-group">
+            <label for="avatar-select">Select Avatar Variant:</label>
+            <select id="avatar-select">
+                <option value="combined_athletic_modified.glb" selected>Combined Custom Shopper Avatar</option>
+                <option value="neutral_masculine.glb">Neutral Baseline Masculine (178 cm)</option>
+                <option value="control_shoulder_width.glb">Individual: Shoulder Width (+0.75)</option>
+                <option value="control_belly_fullness.glb">Individual: Belly Fullness (+0.70)</option>
+                <option value="control_thigh_fullness.glb">Individual: Thigh Fullness (+0.50)</option>
+                <option value="neutral_feminine.glb">Neutral Baseline Feminine (165 cm)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Render Style:</label>
+            <div class="button-row">
+                <button id="btn-shaded">Shaded Clay</button>
+                <button id="btn-wireframe">Wireframe</button>
+                <button id="btn-reset">Reset View</button>
+            </div>
+        </div>
+
+        <div id="stats-card">
+            <div>Engine <span class="stat-val">NAVER Anny 0.6.2</span></div>
+            <div>Topology <span class="stat-val">anny_v0.6.2_27420f</span></div>
+            <div>Vertices <span class="stat-val" id="stat-verts">13,718</span></div>
+            <div>Faces <span class="stat-val" id="stat-faces">27,420</span></div>
+            <div>Watertight <span class="stat-val" style="color: #48bb78;">Yes (Verified)</span></div>
+            <div>Skinning <span class="stat-val">Dense LBS (CPU)</span></div>
+            <div>Stature <span class="stat-val" id="stat-stature">180.0 cm</span></div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('canvas-container');
+        const loading = document.getElementById('loading-overlay');
+        const select = document.getElementById('avatar-select');
+        const btnShaded = document.getElementById('btn-shaded');
+        const btnWireframe = document.getElementById('btn-wireframe');
+        const btnReset = document.getElementById('btn-reset');
+
+        // Three.js Scene Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 0.2, 3.2);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.1;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.target.set(0, 0.0, 0);
+
+        // Lighting
+        const ambLight = new THREE.AmbientLight(0xffffff, 0.65);
+        scene.add(ambLight);
+
+        const keyLight = new THREE.DirectionalLight(0xffffff, 0.85);
+        keyLight.position.set(2, 3, 3);
+        scene.add(keyLight);
+
+        const fillLight = new THREE.DirectionalLight(0x90cdf4, 0.45);
+        fillLight.position.set(-3, 1, 2);
+        scene.add(fillLight);
+
+        const rimLight = new THREE.DirectionalLight(0xfbd38d, 0.4);
+        rimLight.position.set(0, -2, -3);
+        scene.add(rimLight);
+
+        // Grid floor
+        const grid = new THREE.GridHelper(3, 30, 0x2b6cb0, 0x1a365d);
+        grid.position.y = -0.9;
+        scene.add(grid);
+
+        let currentMesh = null;
+        const loader = new THREE.GLTFLoader();
+
+        const clayMaterial = new THREE.MeshStandardMaterial({
+            color: 0x90cdf4,
+            roughness: 0.45,
+            metalness: 0.1,
+            wireframe: false,
+        });
+
+        function loadAvatar(filename) {
+            loading.style.display = 'block';
+            if (currentMesh) {
+                scene.remove(currentMesh);
+                currentMesh = null;
+            }
+
+            loader.load('glb/' + filename, (gltf) => {
+                const model = gltf.scene;
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.material = clayMaterial.clone();
+                        child.geometry.computeVertexNormals();
+                    }
+                });
+
+                // Compute bounding box to center vertically
+                const bbox = new THREE.Box3().setFromObject(model);
+                const center = bbox.getCenter(new THREE.Vector3());
+                const size = bbox.getSize(new THREE.Vector3());
+                model.position.y = -center.y; // Center vertically at 0
+
+                scene.add(model);
+                currentMesh = model;
+                loading.style.display = 'none';
+
+                // Update UI stature
+                const statureCm = (size.y * 100).toFixed(1);
+                document.getElementById('stat-stature').innerText = statureCm + ' cm';
+            }, undefined, (err) => {
+                console.error('Error loading GLB:', err);
+                loading.innerText = 'Failed to load: ' + filename;
+            });
+        }
+
+        // Initial Load
+        loadAvatar(select.value);
+
+        select.addEventListener('change', (e) => {
+            loadAvatar(e.target.value);
+        });
+
+        btnShaded.addEventListener('click', () => {
+            if (currentMesh) {
+                currentMesh.traverse((child) => {
+                    if (child.isMesh) child.material.wireframe = false;
+                });
+            }
+        });
+
+        btnWireframe.addEventListener('click', () => {
+            if (currentMesh) {
+                currentMesh.traverse((child) => {
+                    if (child.isMesh) child.material.wireframe = true;
+                });
+            }
+        });
+
+        btnReset.addEventListener('click', () => {
+            camera.position.set(0, 0.2, 3.2);
+            controls.target.set(0, 0, 0);
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>

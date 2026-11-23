@@ -1,0 +1,220 @@
+{
+  "timestamp": "2026-11-23 16:23:56",
+  "platform": "WearWise Body Intelligence Engine (Phase 4A)",
+  "adapter": "AnnyAdapter (NAVER Anny v0.6.2, CPU LBS Skinning)",
+  "initialization_time_seconds": 0.03858890000265092,
+  "avatars_generated": {
+    "neutral_masculine": {
+      "id": "neutral_masculine",
+      "title": "Neutral Masculine Avatar (Baseline)",
+      "description": "Baseline unedited masculine avatar, stature 178.0 cm",
+      "target_stature_cm": 178.0,
+      "achieved_stature_cm": 178.00001525878906,
+      "stature_error_mm": 0.000152587890625,
+      "vertex_count": 13718,
+      "face_count": 27420,
+      "is_watertight": true,
+      "glb_size_bytes": 659308,
+      "glb_path": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\phase4a\\glb\\neutral_masculine.glb",
+      "brain_glb_path": "C:\\Users\\Lenovo\\.gemini\\antigravity\\brain\\c57b9fa6-3e23-4fa2-b534-c1f6bc625ad8\\phase4a\\neutral_masculine.glb",
+      "generation_time_ms": 46.31830001017079,
+      "export_time_ms": 8.424499988905154,
+      "reload_time_ms": 2.9941999964648858,
+      "bbox_min_m": [
+        -0.5546216368675232,
+        -0.36717489361763,
+        -0.9800097346305847
+      ],
+      "bbox_max_m": [
+        0.5546216368675232,
+        0.1131749227643013,
+        0.7999904155731201
+      ]
+    },
+    "neutral_feminine": {
+      "id": "neutral_feminine",
+      "title": "Neutral Feminine Avatar (Baseline)",
+      "description": "Baseline unedited feminine avatar, stature 165.0 cm",
+      "target_stature_cm": 165.0,
+      "achieved_stature_cm": 165.00001525878906,
+      "stature_error_mm": 0.000152587890625,
+      "vertex_count": 13718,
+      "face_count": 27420,
+      "is_watertight": true,
+      "glb_size_bytes": 659316,
+      "glb_path": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\phase4a\\glb\\neutral_feminine.glb",
+      "brain_glb_path": "C:\\Users\\Lenovo\\.gemini\\antigravity\\brain\\c57b9fa6-3e23-4fa2-b534-c1f6bc625ad8\\phase4a\\neutral_feminine.glb",
+      "generation_time_ms": 35.352000006241724,
+      "export_time_ms": 6.237800000235438,
+      "reload_time_ms": 2.760100003797561,
+      "bbox_min_m": [
+        -0.5323562622070312,
+        -0.32096248865127563,
+        -0.8811305165290833
+      ],
+      "bbox_max_m": [
+        0.5323562622070312,
+        0.09693988412618637,
+        0.7688695788383484
+      ]
+    },
+    "control_shoulder_width": {
+      "id": "control_shoulder_width",
+      "title": "Individual Control: Shoulder Width (+0.75)",
+      "description": "Single-parameter variation: shoulder breadth scale_x = +0.75",
+      "target_stature_cm": 178.0,
+      "achieved_stature_cm": 178.00001525878906,
+      "stature_error_mm": 0.000152587890625,
+      "vertex_count": 13718,
+      "face_count": 27420,
+      "is_watertight": true,
+      "glb_size_bytes": 659312,
+      "glb_path": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\phase4a\\glb\\control_shoulder_width.glb",
+      "brain_glb_path": "C:\\Users\\Lenovo\\.gemini\\antigravity\\brain\\c57b9fa6-3e23-4fa2-b534-c1f6bc625ad8\\phase4a\\control_shoulder_width.glb",
+      "generation_time_ms": 36.00639999785926,
+      "export_time_ms": 8.443099999567494,
+      "reload_time_ms": 2.577400009613484,
+      "bbox_min_m": [
+        -0.5702158212661743,
+        -0.36506620049476624,
+        -0.9800097346305847
+      ],
+      "bbox_max_m": [
+        0.5702158212661743,
+        0.1131749227643013,
+        0.7999904155731201
+      ]
+    },
+    "control_belly_fullness": {
+      "id": "control_belly_fullness",
+      "title": "Individual Control: Belly Fullness (+0.70)",
+      "description": "Single-parameter variation: belly sagittal protrusion scale_y = +0.70",
+      "target_stature_cm": 178.0,
+      "achieved_stature_cm": 178.0,
+      "stature_error_mm": 0.0,
+      "vertex_count": 13718,
+      "face_count": 27420,
+      "is_watertight": true,
+      "glb_size_bytes": 659312,
+      "glb_path": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\phase4a\\glb\\control_belly_fullness.glb",
+      "brain_glb_path": "C:\\Users\\Lenovo\\.gemini\\antigravity\\brain\\c57b9fa6-3e23-4fa2-b534-c1f6bc625ad8\\phase4a\\control_belly_fullness.glb",
+      "generation_time_ms": 40.48460000194609,
+      "export_time_ms": 8.198299998184666,
+      "reload_time_ms": 3.00539999443572,
+      "bbox_min_m": [
+        -0.5542888641357422,
+        -0.35681283473968506,
+        -0.9792762398719788
+      ],
+      "bbox_max_m": [
+        0.5542888641357422,
+        0.11230822652578354,
+        0.8007237315177917
+      ]
+    },
+    "control_thigh_fullness": {
+      "id": "control_thigh_fullness",
+      "title": "Individual Control: Thigh Fullness (+0.50)",
+      "description": "Single-parameter variation: upper leg girth scale_x = +0.50",
+      "target_stature_cm": 178.0,
+      "achieved_stature_cm": 178.0,
+      "stature_error_mm": 0.0,
+      "vertex_count": 13718,
+      "face_count": 27420,
+      "is_watertight": true,
+      "glb_size_bytes": 659312,
+      "glb_path": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\phase4a\\glb\\control_thigh_fullness.glb",
+      "brain_glb_path": "C:\\Users\\Lenovo\\.gemini\\antigravity\\brain\\c57b9fa6-3e23-4fa2-b534-c1f6bc625ad8\\phase4a\\control_thigh_fullness.glb",
+      "generation_time_ms": 35.254600006737746,
+      "export_time_ms": 6.462099991040304,
+      "reload_time_ms": 2.341799990972504,
+      "bbox_min_m": [
+        -0.5547314882278442,
+        -0.36725279688835144,
+        -0.9798482060432434
+      ],
+      "bbox_max_m": [
+        0.5547314882278442,
+        0.11312960088253021,
+        0.8001517653465271
+      ]
+    },
+    "combined_athletic_modified": {
+      "id": "combined_athletic_modified",
+      "title": "Combined Modified Avatar (Shopper Profile)",
+      "description": "Multi-region customization: broad shoulders, athletic chest, tapered waist, muscular legs",
+      "target_stature_cm": 180.0,
+      "achieved_stature_cm": 180.0,
+      "stature_error_mm": 0.0,
+      "vertex_count": 13718,
+      "face_count": 27420,
+      "is_watertight": true,
+      "glb_size_bytes": 659312,
+      "glb_path": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\phase4a\\glb\\combined_athletic_modified.glb",
+      "brain_glb_path": "C:\\Users\\Lenovo\\.gemini\\antigravity\\brain\\c57b9fa6-3e23-4fa2-b534-c1f6bc625ad8\\phase4a\\combined_athletic_modified.glb",
+      "generation_time_ms": 29.93060000881087,
+      "export_time_ms": 6.02200000139419,
+      "reload_time_ms": 2.0911000028718263,
+      "bbox_min_m": [
+        -0.5913960337638855,
+        -0.3750985264778137,
+        -0.9927993416786194
+      ],
+      "bbox_max_m": [
+        0.589451014995575,
+        0.1181255578994751,
+        0.8072006106376648
+      ]
+    }
+  },
+  "quantitative_displacements": {
+    "control_shoulder_width": {
+      "max_displacement_cm": 1.796993613243103,
+      "mean_displacement_cm": 0.5205971002578735,
+      "p95_displacement_cm": 1.6318941116333008,
+      "affected_vertices_count": 4476,
+      "peak_vertex_index": 1376,
+      "peak_vertex_location_m": [
+        -0.18479418754577637,
+        -0.07140568643808365,
+        0.4784005284309387
+      ]
+    },
+    "control_belly_fullness": {
+      "max_displacement_cm": 5.965078353881836,
+      "mean_displacement_cm": 0.7994512915611267,
+      "p95_displacement_cm": 1.041878581047058,
+      "affected_vertices_count": 10450,
+      "peak_vertex_index": 4098,
+      "peak_vertex_location_m": [
+        -0.008371791802346706,
+        -0.18140746653079987,
+        0.08803671598434448
+      ]
+    },
+    "control_thigh_fullness": {
+      "max_displacement_cm": 1.5928171873092651,
+      "mean_displacement_cm": 0.088680200278759,
+      "p95_displacement_cm": 0.33746084570884705,
+      "affected_vertices_count": 3266,
+      "peak_vertex_index": 6729,
+      "peak_vertex_location_m": [
+        -0.12676982581615448,
+        0.05385839566588402,
+        -0.24029792845249176
+      ]
+    },
+    "combined_athletic_modified": {
+      "max_displacement_cm": 4.934478759765625,
+      "mean_displacement_cm": 1.8902771472930908,
+      "p95_displacement_cm": 4.5479841232299805,
+      "affected_vertices_count": 13697,
+      "peak_vertex_index": 3460,
+      "peak_vertex_location_m": [
+        -0.4875468313694,
+        -0.1188092976808548,
+        0.11841847002506256
+      ]
+    }
+  }
+}
