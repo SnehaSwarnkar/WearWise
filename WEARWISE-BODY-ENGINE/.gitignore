@@ -1,0 +1,30 @@
+# Virtual environments
+.venv-anny/
+.venv-oxihuman/
+__pycache__/
+*.pyc
+
+# Large model caches
+*.pt
+*.pth
+*.ckpt
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Rust build artifacts
+target/
+
+# Node
+node_modules/
+
+# Env files
+.env
+
+# Cloned candidate repositories
+experiments/oxihuman/oxihuman-repo/

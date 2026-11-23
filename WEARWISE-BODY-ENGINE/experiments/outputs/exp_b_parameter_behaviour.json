@@ -1,0 +1,1402 @@
+[
+  {
+    "parameter_name": "height",
+    "type": "phenotype",
+    "category": "height",
+    "target_region": "global",
+    "range": [
+      0.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": 0.0,
+        "mean_displacement": 0.15330636501312256,
+        "max_displacement": 0.30271247029304504,
+        "regional_means": {
+          "calves": 0.18386580049991608,
+          "thighs": 0.06010263040661812,
+          "hips": 0.1328158676624298,
+          "waist_abdomen": 0.0836024209856987,
+          "torso_chest": 0.09791794419288635,
+          "shoulders": 0.09559305757284164,
+          "arms": 0.1364673376083374,
+          "head_neck": 0.13725170493125916
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.25,
+        "mean_displacement": 0.06760494410991669,
+        "max_displacement": 0.13877826929092407,
+        "regional_means": {
+          "calves": 0.08605075627565384,
+          "thighs": 0.03281601145863533,
+          "hips": 0.05815912410616875,
+          "waist_abdomen": 0.03621774911880493,
+          "torso_chest": 0.03980685770511627,
+          "shoulders": 0.032671328634023666,
+          "arms": 0.05991499498486519,
+          "head_neck": 0.05877285078167915
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.75,
+        "mean_displacement": 0.11573342233896255,
+        "max_displacement": 0.19837094843387604,
+        "regional_means": {
+          "calves": 0.11463842540979385,
+          "thighs": 0.02652263268828392,
+          "hips": 0.10203900188207626,
+          "waist_abdomen": 0.07454430311918259,
+          "torso_chest": 0.09016945958137512,
+          "shoulders": 0.1102689579129219,
+          "arms": 0.10645565390586853,
+          "head_neck": 0.11500426381826401
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_height.glb"
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.20345157384872437,
+        "max_displacement": 0.3643694519996643,
+        "regional_means": {
+          "calves": 0.2132994830608368,
+          "thighs": 0.05345943570137024,
+          "hips": 0.17894886434078217,
+          "waist_abdomen": 0.12470760941505432,
+          "torso_chest": 0.15024840831756592,
+          "shoulders": 0.17646950483322144,
+          "arms": 0.18562205135822296,
+          "head_neck": 0.1959671527147293
+        },
+        "is_valid": true,
+        "sample_glb": null
+      }
+    ],
+    "max_target_displacement": 0.3643694519996643,
+    "max_spillover_displacement": 0.0,
+    "spillover_ratio": 0.0,
+    "lr_independent": false,
+    "valid_geometry": true,
+    "plausibility_notes": "Global phenotypic parameter"
+  },
+  {
+    "parameter_name": "weight",
+    "type": "phenotype",
+    "category": "weight",
+    "target_region": "global",
+    "range": [
+      0.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": 0.0,
+        "mean_displacement": 0.03314713388681412,
+        "max_displacement": 0.050994209945201874,
+        "regional_means": {
+          "calves": 0.02264920063316822,
+          "thighs": 0.011203411035239697,
+          "hips": 0.030880657956004143,
+          "waist_abdomen": 0.02879747375845909,
+          "torso_chest": 0.03240203484892845,
+          "shoulders": 0.04547959193587303,
+          "arms": 0.03358198329806328,
+          "head_neck": 0.03885878995060921
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.25,
+        "mean_displacement": 0.03302990645170212,
+        "max_displacement": 0.051532648503780365,
+        "regional_means": {
+          "calves": 0.02230454608798027,
+          "thighs": 0.01056809164583683,
+          "hips": 0.030408397316932678,
+          "waist_abdomen": 0.028577500954270363,
+          "torso_chest": 0.03279469162225723,
+          "shoulders": 0.045616310089826584,
+          "arms": 0.03307431563735008,
+          "head_neck": 0.039305247366428375
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.75,
+        "mean_displacement": 0.033421266824007034,
+        "max_displacement": 0.05264457315206528,
+        "regional_means": {
+          "calves": 0.023220786824822426,
+          "thighs": 0.011760291643440723,
+          "hips": 0.030255010351538658,
+          "waist_abdomen": 0.02913851849734783,
+          "torso_chest": 0.033414606004953384,
+          "shoulders": 0.04633257910609245,
+          "arms": 0.032510772347450256,
+          "head_neck": 0.03978600725531578
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_weight.glb"
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.03389482572674751,
+        "max_displacement": 0.05301471799612045,
+        "regional_means": {
+          "calves": 0.02439742349088192,
+          "thighs": 0.013403067365288734,
+          "hips": 0.030568663030862808,
+          "waist_abdomen": 0.029913272708654404,
+          "torso_chest": 0.0336134172976017,
+          "shoulders": 0.04676583409309387,
+          "arms": 0.03247556835412979,
+          "head_neck": 0.03980832174420357
+        },
+        "is_valid": true,
+        "sample_glb": null
+      }
+    ],
+    "max_target_displacement": 0.05301471799612045,
+    "max_spillover_displacement": 0.0,
+    "spillover_ratio": 0.0,
+    "lr_independent": false,
+    "valid_geometry": true,
+    "plausibility_notes": "Global phenotypic parameter"
+  },
+  {
+    "parameter_name": "muscle",
+    "type": "phenotype",
+    "category": "muscle",
+    "target_region": "global",
+    "range": [
+      0.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": 0.0,
+        "mean_displacement": 0.0352519191801548,
+        "max_displacement": 0.05377848073840141,
+        "regional_means": {
+          "calves": 0.026014037430286407,
+          "thighs": 0.014306005090475082,
+          "hips": 0.03016429767012596,
+          "waist_abdomen": 0.031501561403274536,
+          "torso_chest": 0.036231353878974915,
+          "shoulders": 0.047820866107940674,
+          "arms": 0.032002437859773636,
+          "head_neck": 0.04271017387509346
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.25,
+        "mean_displacement": 0.03402424976229668,
+        "max_displacement": 0.05263889580965042,
+        "regional_means": {
+          "calves": 0.02400069497525692,
+          "thighs": 0.012098608538508415,
+          "hips": 0.029983285814523697,
+          "waist_abdomen": 0.029885096475481987,
+          "torso_chest": 0.0347130224108696,
+          "shoulders": 0.04684867337346077,
+          "arms": 0.032258376479148865,
+          "head_neck": 0.04111187905073166
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.75,
+        "mean_displacement": 0.0329933762550354,
+        "max_displacement": 0.05177305266261101,
+        "regional_means": {
+          "calves": 0.022999264299869537,
+          "thighs": 0.010773628018796444,
+          "hips": 0.030302569270133972,
+          "waist_abdomen": 0.027806518599390984,
+          "torso_chest": 0.03259407728910446,
+          "shoulders": 0.04597882926464081,
+          "arms": 0.03277335315942764,
+          "head_neck": 0.03933154046535492
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_muscle.glb"
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.033095940947532654,
+        "max_displacement": 0.05127556249499321,
+        "regional_means": {
+          "calves": 0.024176476523280144,
+          "thighs": 0.011215411126613617,
+          "hips": 0.030637027695775032,
+          "waist_abdomen": 0.027265552431344986,
+          "torso_chest": 0.03198041766881943,
+          "shoulders": 0.04608731344342232,
+          "arms": 0.03297550231218338,
+          "head_neck": 0.03894830867648125
+        },
+        "is_valid": true,
+        "sample_glb": null
+      }
+    ],
+    "max_target_displacement": 0.05377848073840141,
+    "max_spillover_displacement": 0.0,
+    "spillover_ratio": 0.0,
+    "lr_independent": false,
+    "valid_geometry": true,
+    "plausibility_notes": "Global phenotypic parameter"
+  },
+  {
+    "parameter_name": "proportions",
+    "type": "phenotype",
+    "category": "proportions",
+    "target_region": "torso_limbs",
+    "range": [
+      0.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": 0.0,
+        "mean_displacement": 0.03320527449250221,
+        "max_displacement": 0.056896138936281204,
+        "regional_means": {
+          "calves": 0.01991903968155384,
+          "thighs": 0.012117941863834858,
+          "hips": 0.0367569737136364,
+          "waist_abdomen": 0.024764729663729668,
+          "torso_chest": 0.025316419079899788,
+          "shoulders": 0.03876408562064171,
+          "arms": 0.038746852427721024,
+          "head_neck": 0.03125927597284317
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.25,
+        "mean_displacement": 0.032501742243766785,
+        "max_displacement": 0.048317477107048035,
+        "regional_means": {
+          "calves": 0.020917624235153198,
+          "thighs": 0.011193846352398396,
+          "hips": 0.0322626568377018,
+          "waist_abdomen": 0.025434186682105064,
+          "torso_chest": 0.028542304411530495,
+          "shoulders": 0.04105527326464653,
+          "arms": 0.03442554548382759,
+          "head_neck": 0.0353650227189064
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.75,
+        "mean_displacement": 0.03507533296942711,
+        "max_displacement": 0.05884808674454689,
+        "regional_means": {
+          "calves": 0.023581841960549355,
+          "thighs": 0.011106928810477257,
+          "hips": 0.03075423464179039,
+          "waist_abdomen": 0.03350362554192543,
+          "torso_chest": 0.03928930684924126,
+          "shoulders": 0.052668869495391846,
+          "arms": 0.03374195098876953,
+          "head_neck": 0.044394657015800476
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_proportions.glb"
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.03845157474279404,
+        "max_displacement": 0.06618653237819672,
+        "regional_means": {
+          "calves": 0.025202998891472816,
+          "thighs": 0.012142433784902096,
+          "hips": 0.034041985869407654,
+          "waist_abdomen": 0.03968480974435806,
+          "torso_chest": 0.045930568128824234,
+          "shoulders": 0.06061970070004463,
+          "arms": 0.037531763315200806,
+          "head_neck": 0.04917048662900925
+        },
+        "is_valid": true,
+        "sample_glb": null
+      }
+    ],
+    "max_target_displacement": 0.06618653237819672,
+    "max_spillover_displacement": 0.0,
+    "spillover_ratio": 0.0,
+    "lr_independent": false,
+    "valid_geometry": true,
+    "plausibility_notes": "Global phenotypic parameter"
+  },
+  {
+    "parameter_name": "l-upperarm-shoulder-muscle-incr",
+    "type": "local_change",
+    "category": "shoulders",
+    "target_region": "shoulders",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.033133748918771744,
+        "max_displacement": 0.052950091660022736,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784344747662544,
+          "hips": 0.030271442607045174,
+          "waist_abdomen": 0.02865007519721985,
+          "torso_chest": 0.03335124999284744,
+          "shoulders": 0.04521603509783745,
+          "arms": 0.032816577702760696,
+          "head_neck": 0.03977302461862564
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.03293423727154732,
+        "max_displacement": 0.053349222987890244,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784344747662544,
+          "hips": 0.02971598319709301,
+          "waist_abdomen": 0.028092103078961372,
+          "torso_chest": 0.03330850973725319,
+          "shoulders": 0.047244101762771606,
+          "arms": 0.03215460106730461,
+          "head_neck": 0.03976356238126755
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_l-upperarm-shoulder-muscle-incr.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.033190276473760605,
+        "max_displacement": 0.05335698276758194,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.03280961886048317,
+        "max_displacement": 0.058822810649871826,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.053349222987890244,
+    "max_spillover_displacement": 0.03976356238126755,
+    "spillover_ratio": 0.8416617626538014,
+    "lr_independent": true,
+    "valid_geometry": true,
+    "plausibility_notes": "Target disp: 0.0472, max non-target: 0.0398 (ratio: 0.84)"
+  },
+  {
+    "parameter_name": "r-upperarm-shoulder-muscle-incr",
+    "type": "local_change",
+    "category": "shoulders",
+    "target_region": "shoulders",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.033133748918771744,
+        "max_displacement": 0.05295003950595856,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784344747662544,
+          "hips": 0.030271435156464577,
+          "waist_abdomen": 0.02865007147192955,
+          "torso_chest": 0.03335124999284744,
+          "shoulders": 0.04521603509783745,
+          "arms": 0.0328165665268898,
+          "head_neck": 0.03977302089333534
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.03293423354625702,
+        "max_displacement": 0.053349271416664124,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784344747662544,
+          "hips": 0.029715992510318756,
+          "waist_abdomen": 0.028092101216316223,
+          "torso_chest": 0.0333084873855114,
+          "shoulders": 0.047244105488061905,
+          "arms": 0.03215460851788521,
+          "head_neck": 0.039763543754816055
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_r-upperarm-shoulder-muscle-incr.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.033190272748470306,
+        "max_displacement": 0.05335695669054985,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.032809607684612274,
+        "max_displacement": 0.05882281810045242,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.053349271416664124,
+    "max_spillover_displacement": 0.039763543754816055,
+    "spillover_ratio": 0.8416613020274215,
+    "lr_independent": true,
+    "valid_geometry": true,
+    "plausibility_notes": "Target disp: 0.0472, max non-target: 0.0398 (ratio: 0.84)"
+  },
+  {
+    "parameter_name": "breast-point-incr",
+    "type": "local_change",
+    "category": "torso_chest",
+    "target_region": "torso_chest",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.03299166262149811,
+        "max_displacement": 0.052358224987983704,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784219950437546,
+          "hips": 0.030230937525629997,
+          "waist_abdomen": 0.02840883657336235,
+          "torso_chest": 0.03309719264507294,
+          "shoulders": 0.045869115740060806,
+          "arms": 0.03273116797208786,
+          "head_neck": 0.03949347510933876
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.033238764852285385,
+        "max_displacement": 0.05282709375023842,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784514248371124,
+          "hips": 0.029936563223600388,
+          "waist_abdomen": 0.028820587322115898,
+          "torso_chest": 0.033936284482479095,
+          "shoulders": 0.04603879153728485,
+          "arms": 0.03250028192996979,
+          "head_neck": 0.04018916189670563
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_breast-point-incr.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.03291856870055199,
+        "max_displacement": 0.05217365920543671,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.03343600779771805,
+        "max_displacement": 0.05311474949121475,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.05282709375023842,
+    "max_spillover_displacement": 0.04603879153728485,
+    "spillover_ratio": 1.356623999153889,
+    "lr_independent": false,
+    "valid_geometry": true,
+    "plausibility_notes": "Target disp: 0.0339, max non-target: 0.0460 (ratio: 1.36)"
+  },
+  {
+    "parameter_name": "breast-dist-incr",
+    "type": "local_change",
+    "category": "torso_chest",
+    "target_region": "torso_chest",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.03314448520541191,
+        "max_displacement": 0.05266167223453522,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.01078435592353344,
+          "hips": 0.03012547269463539,
+          "waist_abdomen": 0.02893521822988987,
+          "torso_chest": 0.03404935449361801,
+          "shoulders": 0.04603322222828865,
+          "arms": 0.03266294300556183,
+          "head_neck": 0.039702389389276505
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.033057358115911484,
+        "max_displacement": 0.05241386964917183,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784272104501724,
+          "hips": 0.030164005234837532,
+          "waist_abdomen": 0.02852666564285755,
+          "torso_chest": 0.03333484008908272,
+          "shoulders": 0.045871008187532425,
+          "arms": 0.03267292678356171,
+          "head_neck": 0.03966478630900383
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_breast-dist-incr.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.033297713845968246,
+        "max_displacement": 0.05277538299560547,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.03308130428195,
+        "max_displacement": 0.05228053033351898,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.05266167223453522,
+    "max_spillover_displacement": 0.045871008187532425,
+    "spillover_ratio": 1.3760676308712527,
+    "lr_independent": false,
+    "valid_geometry": true,
+    "plausibility_notes": "Target disp: 0.0333, max non-target: 0.0459 (ratio: 1.38)"
+  },
+  {
+    "parameter_name": "hip-waist-up",
+    "type": "local_change",
+    "category": "waist_abdomen",
+    "target_region": "waist_abdomen",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.03574749454855919,
+        "max_displacement": 0.058255359530448914,
+        "regional_means": {
+          "calves": 0.01982790231704712,
+          "thighs": 0.014376301318407059,
+          "hips": 0.031391922384500504,
+          "waist_abdomen": 0.032337483018636703,
+          "torso_chest": 0.03932495042681694,
+          "shoulders": 0.05031779408454895,
+          "arms": 0.03451133146882057,
+          "head_neck": 0.04670104384422302
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.0326845608651638,
+        "max_displacement": 0.05089636147022247,
+        "regional_means": {
+          "calves": 0.022785905748605728,
+          "thighs": 0.010869081132113934,
+          "hips": 0.030710410326719284,
+          "waist_abdomen": 0.03054153360426426,
+          "torso_chest": 0.03184845671057701,
+          "shoulders": 0.04490786790847778,
+          "arms": 0.032852426171302795,
+          "head_neck": 0.03773140534758568
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_hip-waist-up.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.040873587131500244,
+        "max_displacement": 0.06712733954191208,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.03261665999889374,
+        "max_displacement": 0.05362753942608833,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.058255359530448914,
+    "max_spillover_displacement": 0.04490786790847778,
+    "spillover_ratio": 1.4703863200354965,
+    "lr_independent": false,
+    "valid_geometry": true,
+    "plausibility_notes": "Target disp: 0.0305, max non-target: 0.0449 (ratio: 1.47)"
+  },
+  {
+    "parameter_name": "stomach-pregnant-incr",
+    "type": "local_change",
+    "category": "waist_abdomen",
+    "target_region": "waist_abdomen",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.03301738575100899,
+        "max_displacement": 0.052445366978645325,
+        "regional_means": {
+          "calves": 0.02215047925710678,
+          "thighs": 0.010775681585073471,
+          "hips": 0.030075160786509514,
+          "waist_abdomen": 0.028473645448684692,
+          "torso_chest": 0.033254947513341904,
+          "shoulders": 0.045865654945373535,
+          "arms": 0.0326244942843914,
+          "head_neck": 0.03964752331376076
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.03506288304924965,
+        "max_displacement": 0.05572705343365669,
+        "regional_means": {
+          "calves": 0.022104525938630104,
+          "thighs": 0.010991424322128296,
+          "hips": 0.03082888573408127,
+          "waist_abdomen": 0.0314711295068264,
+          "torso_chest": 0.03658226504921913,
+          "shoulders": 0.048186227679252625,
+          "arms": 0.03322942182421684,
+          "head_neck": 0.04374806955456734
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_stomach-pregnant-incr.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.03297131508588791,
+        "max_displacement": 0.0523405484855175,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.03737877681851387,
+        "max_displacement": 0.09298737347126007,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.05572705343365669,
+    "max_spillover_displacement": 0.048186227679252625,
+    "spillover_ratio": 1.5311243391361966,
+    "lr_independent": false,
+    "valid_geometry": true,
+    "plausibility_notes": "Target disp: 0.0315, max non-target: 0.0482 (ratio: 1.53)"
+  },
+  {
+    "parameter_name": "l-lowerarm-scale-depth-incr",
+    "type": "local_change",
+    "category": "upper_arm",
+    "target_region": "upper_arm",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.03307909145951271,
+        "max_displacement": 0.052548058331012726,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784344747662544,
+          "hips": 0.03010711260139942,
+          "waist_abdomen": 0.02851991541683674,
+          "torso_chest": 0.0333501473069191,
+          "shoulders": 0.045936182141304016,
+          "arms": 0.03262905403971672,
+          "head_neck": 0.039773087948560715
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.03308028727769852,
+        "max_displacement": 0.05255158245563507,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784344747662544,
+          "hips": 0.030097560957074165,
+          "waist_abdomen": 0.028572972863912582,
+          "torso_chest": 0.033349741250276566,
+          "shoulders": 0.04593540355563164,
+          "arms": 0.032633226364851,
+          "head_neck": 0.039773087948560715
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_l-lowerarm-scale-depth-incr.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.033082421869039536,
+        "max_displacement": 0.052548058331012726,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.033084023743867874,
+        "max_displacement": 0.05255501717329025,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.05255158245563507,
+    "max_spillover_displacement": 0.0,
+    "spillover_ratio": 0.0,
+    "lr_independent": true,
+    "valid_geometry": true,
+    "plausibility_notes": "Global phenotypic parameter"
+  },
+  {
+    "parameter_name": "r-lowerarm-scale-depth-incr",
+    "type": "local_change",
+    "category": "upper_arm",
+    "target_region": "upper_arm",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.033079102635383606,
+        "max_displacement": 0.052548088133335114,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784344747662544,
+          "hips": 0.03010713681578636,
+          "waist_abdomen": 0.028519921004772186,
+          "torso_chest": 0.0333501473069191,
+          "shoulders": 0.045936182141304016,
+          "arms": 0.03262907639145851,
+          "head_neck": 0.039773087948560715
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.033080294728279114,
+        "max_displacement": 0.052551526576280594,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784344747662544,
+          "hips": 0.030097579583525658,
+          "waist_abdomen": 0.02857297472655773,
+          "torso_chest": 0.03334973379969597,
+          "shoulders": 0.04593539610505104,
+          "arms": 0.03263324499130249,
+          "head_neck": 0.039773087948560715
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_r-lowerarm-scale-depth-incr.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.033082425594329834,
+        "max_displacement": 0.052548088133335114,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.03308402746915817,
+        "max_displacement": 0.05255501717329025,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.052551526576280594,
+    "max_spillover_displacement": 0.0,
+    "spillover_ratio": 0.0,
+    "lr_independent": true,
+    "valid_geometry": true,
+    "plausibility_notes": "Global phenotypic parameter"
+  },
+  {
+    "parameter_name": "l-lowerarm-scale-depth-incr",
+    "type": "local_change",
+    "category": "lower_arm",
+    "target_region": "lower_arm",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.03307909145951271,
+        "max_displacement": 0.052548058331012726,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784344747662544,
+          "hips": 0.03010711260139942,
+          "waist_abdomen": 0.02851991541683674,
+          "torso_chest": 0.0333501473069191,
+          "shoulders": 0.045936182141304016,
+          "arms": 0.03262905403971672,
+          "head_neck": 0.039773087948560715
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.03308028727769852,
+        "max_displacement": 0.05255158245563507,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784344747662544,
+          "hips": 0.030097560957074165,
+          "waist_abdomen": 0.028572972863912582,
+          "torso_chest": 0.033349741250276566,
+          "shoulders": 0.04593540355563164,
+          "arms": 0.032633226364851,
+          "head_neck": 0.039773087948560715
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_l-lowerarm-scale-depth-incr.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.033082421869039536,
+        "max_displacement": 0.052548058331012726,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.033084023743867874,
+        "max_displacement": 0.05255501717329025,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.05255158245563507,
+    "max_spillover_displacement": 0.0,
+    "spillover_ratio": 0.0,
+    "lr_independent": true,
+    "valid_geometry": true,
+    "plausibility_notes": "Global phenotypic parameter"
+  },
+  {
+    "parameter_name": "r-lowerarm-scale-depth-incr",
+    "type": "local_change",
+    "category": "lower_arm",
+    "target_region": "lower_arm",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.033079102635383606,
+        "max_displacement": 0.052548088133335114,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784344747662544,
+          "hips": 0.03010713681578636,
+          "waist_abdomen": 0.028519921004772186,
+          "torso_chest": 0.0333501473069191,
+          "shoulders": 0.045936182141304016,
+          "arms": 0.03262907639145851,
+          "head_neck": 0.039773087948560715
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.033080294728279114,
+        "max_displacement": 0.052551526576280594,
+        "regional_means": {
+          "calves": 0.02215060219168663,
+          "thighs": 0.010784344747662544,
+          "hips": 0.030097579583525658,
+          "waist_abdomen": 0.02857297472655773,
+          "torso_chest": 0.03334973379969597,
+          "shoulders": 0.04593539610505104,
+          "arms": 0.03263324499130249,
+          "head_neck": 0.039773087948560715
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_r-lowerarm-scale-depth-incr.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.033082425594329834,
+        "max_displacement": 0.052548088133335114,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.03308402746915817,
+        "max_displacement": 0.05255501717329025,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.052551526576280594,
+    "max_spillover_displacement": 0.0,
+    "spillover_ratio": 0.0,
+    "lr_independent": true,
+    "valid_geometry": true,
+    "plausibility_notes": "Global phenotypic parameter"
+  },
+  {
+    "parameter_name": "buttocks-volume-incr",
+    "type": "local_change",
+    "category": "hips",
+    "target_region": "hips",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.03305395320057869,
+        "max_displacement": 0.052533917129039764,
+        "regional_means": {
+          "calves": 0.022161561995744705,
+          "thighs": 0.011299511417746544,
+          "hips": 0.030183937400579453,
+          "waist_abdomen": 0.028535492718219757,
+          "torso_chest": 0.03333735466003418,
+          "shoulders": 0.045938197523355484,
+          "arms": 0.03264754265546799,
+          "head_neck": 0.03974665701389313
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.033179931342601776,
+        "max_displacement": 0.05259310081601143,
+        "regional_means": {
+          "calves": 0.022057224065065384,
+          "thighs": 0.010999264195561409,
+          "hips": 0.030210280790925026,
+          "waist_abdomen": 0.028559155762195587,
+          "torso_chest": 0.03339190408587456,
+          "shoulders": 0.04596138373017311,
+          "arms": 0.0326206311583519,
+          "head_neck": 0.03983210772275925
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_buttocks-volume-incr.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.0330469012260437,
+        "max_displacement": 0.05251990631222725,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.03335723280906677,
+        "max_displacement": 0.052638161927461624,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.05259310081601143,
+    "max_spillover_displacement": 0.04596138373017311,
+    "spillover_ratio": 1.5213817056001198,
+    "lr_independent": false,
+    "valid_geometry": true,
+    "plausibility_notes": "Target disp: 0.0302, max non-target: 0.0460 (ratio: 1.52)"
+  },
+  {
+    "parameter_name": "hip-trans-out",
+    "type": "local_change",
+    "category": "hips",
+    "target_region": "hips",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.034324824810028076,
+        "max_displacement": 0.055142614990472794,
+        "regional_means": {
+          "calves": 0.022771062329411507,
+          "thighs": 0.011206571944057941,
+          "hips": 0.031041227281093597,
+          "waist_abdomen": 0.030019057914614677,
+          "torso_chest": 0.03519793972373009,
+          "shoulders": 0.04762062430381775,
+          "arms": 0.0336916446685791,
+          "head_neck": 0.04142943397164345
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.03433069959282875,
+        "max_displacement": 0.05514258146286011,
+        "regional_means": {
+          "calves": 0.022774504497647285,
+          "thighs": 0.01120768953114748,
+          "hips": 0.031041253358125687,
+          "waist_abdomen": 0.030019395053386688,
+          "torso_chest": 0.035195376724004745,
+          "shoulders": 0.047620609402656555,
+          "arms": 0.033691637217998505,
+          "head_neck": 0.04144589602947235
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_hip-trans-out.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.0380309633910656,
+        "max_displacement": 0.06041906774044037,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.03804129362106323,
+        "max_displacement": 0.060419123619794846,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.055142614990472794,
+    "max_spillover_displacement": 0.047620609402656555,
+    "spillover_ratio": 1.5341066777229246,
+    "lr_independent": false,
+    "valid_geometry": true,
+    "plausibility_notes": "Target disp: 0.0310, max non-target: 0.0476 (ratio: 1.53)"
+  },
+  {
+    "parameter_name": "l-upperleg-fat-incr",
+    "type": "local_change",
+    "category": "thighs",
+    "target_region": "thighs",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.03305775299668312,
+        "max_displacement": 0.052548110485076904,
+        "regional_means": {
+          "calves": 0.02213539555668831,
+          "thighs": 0.01059272326529026,
+          "hips": 0.030101574957370758,
+          "waist_abdomen": 0.028533518314361572,
+          "torso_chest": 0.03334996849298477,
+          "shoulders": 0.04593580588698387,
+          "arms": 0.032627642154693604,
+          "head_neck": 0.03977314010262489
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.033276792615652084,
+        "max_displacement": 0.052561476826667786,
+        "regional_means": {
+          "calves": 0.022877968847751617,
+          "thighs": 0.011360294185578823,
+          "hips": 0.030114350840449333,
+          "waist_abdomen": 0.0285353846848011,
+          "torso_chest": 0.033350538462400436,
+          "shoulders": 0.04593799635767937,
+          "arms": 0.03263076767325401,
+          "head_neck": 0.03977246955037117
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_l-upperleg-fat-incr.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.03306270018219948,
+        "max_displacement": 0.05254814028739929,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.03357693552970886,
+        "max_displacement": 0.05257484316825867,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.052561476826667786,
+    "max_spillover_displacement": 0.04593799635767937,
+    "spillover_ratio": 4.043729429005493,
+    "lr_independent": true,
+    "valid_geometry": true,
+    "plausibility_notes": "Target disp: 0.0114, max non-target: 0.0459 (ratio: 4.04)"
+  },
+  {
+    "parameter_name": "r-upperleg-fat-incr",
+    "type": "local_change",
+    "category": "thighs",
+    "target_region": "thighs",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.03305775299668312,
+        "max_displacement": 0.052548088133335114,
+        "regional_means": {
+          "calves": 0.02213539555668831,
+          "thighs": 0.010592724196612835,
+          "hips": 0.030101576820015907,
+          "waist_abdomen": 0.02853352017700672,
+          "torso_chest": 0.03334996476769447,
+          "shoulders": 0.04593580961227417,
+          "arms": 0.032627642154693604,
+          "head_neck": 0.03977314010262489
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.03327672556042671,
+        "max_displacement": 0.052561502903699875,
+        "regional_means": {
+          "calves": 0.022877968847751617,
+          "thighs": 0.011360294185578823,
+          "hips": 0.030114350840449333,
+          "waist_abdomen": 0.028535382822155952,
+          "torso_chest": 0.03335057199001312,
+          "shoulders": 0.04593799635767937,
+          "arms": 0.03263077139854431,
+          "head_neck": 0.039772264659404755
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_r-upperleg-fat-incr.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.03306270018219948,
+        "max_displacement": 0.0525481142103672,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.03357679769396782,
+        "max_displacement": 0.052574869245290756,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.052561502903699875,
+    "max_spillover_displacement": 0.04593799635767937,
+    "spillover_ratio": 4.043729429005493,
+    "lr_independent": true,
+    "valid_geometry": true,
+    "plausibility_notes": "Target disp: 0.0114, max non-target: 0.0459 (ratio: 4.04)"
+  },
+  {
+    "parameter_name": "measure-calf-circ-incr",
+    "type": "local_change",
+    "category": "calves",
+    "target_region": "calves",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.03309719264507294,
+        "max_displacement": 0.052548088133335114,
+        "regional_means": {
+          "calves": 0.022240379825234413,
+          "thighs": 0.010743364691734314,
+          "hips": 0.030101900920271873,
+          "waist_abdomen": 0.028533566743135452,
+          "torso_chest": 0.03334994241595268,
+          "shoulders": 0.045935776084661484,
+          "arms": 0.03262760117650032,
+          "head_neck": 0.039773087948560715
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.03308546543121338,
+        "max_displacement": 0.052548088133335114,
+        "regional_means": {
+          "calves": 0.022735578939318657,
+          "thighs": 0.01082613691687584,
+          "hips": 0.030101951211690903,
+          "waist_abdomen": 0.028533563017845154,
+          "torso_chest": 0.03334994241595268,
+          "shoulders": 0.045935776084661484,
+          "arms": 0.03262760117650032,
+          "head_neck": 0.039773087948560715
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_measure-calf-circ-incr.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.03314102813601494,
+        "max_displacement": 0.052548088133335114,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.03311687335371971,
+        "max_displacement": 0.052548088133335114,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.052548088133335114,
+    "max_spillover_displacement": 0.045935776084661484,
+    "spillover_ratio": 2.0204348436833626,
+    "lr_independent": false,
+    "valid_geometry": true,
+    "plausibility_notes": "Target disp: 0.0227, max non-target: 0.0459 (ratio: 2.02)"
+  },
+  {
+    "parameter_name": "measure-lowerleg-height-incr",
+    "type": "local_change",
+    "category": "calves",
+    "target_region": "calves",
+    "range": [
+      -1.0,
+      1.0
+    ],
+    "sweeps_evaluated": [
+      {
+        "val": -0.5,
+        "mean_displacement": 0.030625103041529655,
+        "max_displacement": 0.052548088133335114,
+        "regional_means": {
+          "calves": 0.018554747104644775,
+          "thighs": 0.01078685000538826,
+          "hips": 0.030101926997303963,
+          "waist_abdomen": 0.028533563017845154,
+          "torso_chest": 0.03334994241595268,
+          "shoulders": 0.045935776084661484,
+          "arms": 0.03262760117650032,
+          "head_neck": 0.039773087948560715
+        },
+        "is_valid": true,
+        "sample_glb": null
+      },
+      {
+        "val": 0.5,
+        "mean_displacement": 0.03937077149748802,
+        "max_displacement": 0.07850497961044312,
+        "regional_means": {
+          "calves": 0.02747516892850399,
+          "thighs": 0.010783041827380657,
+          "hips": 0.030101926997303963,
+          "waist_abdomen": 0.028533563017845154,
+          "torso_chest": 0.03334994241595268,
+          "shoulders": 0.045935776084661484,
+          "arms": 0.03262760117650032,
+          "head_neck": 0.039773087948560715
+        },
+        "is_valid": true,
+        "sample_glb": "C:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\glb\\anny_param_measure-lowerleg-height-incr.glb"
+      },
+      {
+        "val": -1.0,
+        "mean_displacement": 0.03335423395037651,
+        "max_displacement": 0.052548088133335114,
+        "is_valid": true,
+        "is_extreme": true
+      },
+      {
+        "val": 1.0,
+        "mean_displacement": 0.0461093969643116,
+        "max_displacement": 0.11777488887310028,
+        "is_valid": true,
+        "is_extreme": true
+      }
+    ],
+    "max_target_displacement": 0.07850497961044312,
+    "max_spillover_displacement": 0.045935776084661484,
+    "spillover_ratio": 1.6719008893152516,
+    "lr_independent": true,
+    "valid_geometry": true,
+    "plausibility_notes": "Target disp: 0.0275, max non-target: 0.0459 (ratio: 1.67)"
+  }
+]

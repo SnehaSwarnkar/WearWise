@@ -1,0 +1,70 @@
+{
+  "candidate": "Anny",
+  "system_ram_initial_mb": 566.375,
+  "cuda_available": true,
+  "gpu_name": "NVIDIA GeForce RTX 3050 Laptop GPU",
+  "devices": {
+    "cpu": {
+      "model_init": {
+        "time_seconds": 0.02886920000310056,
+        "ram_increase_mb": 333.97265625,
+        "peak_vram_mb": 0.0
+      },
+      "first_inference": {
+        "time_seconds": 0.02642280000145547,
+        "peak_vram_mb": 0.0
+      },
+      "warm_50_inferences_ms": {
+        "mean": 20.821882000454934,
+        "median_p50": 20.42415000323672,
+        "p95": 24.071600004390348,
+        "min": 19.50570000190055,
+        "max": 25.855400002910756,
+        "std": 1.2919801715484982
+      },
+      "glb_export": {
+        "export_time_seconds": 0.004138699994655326,
+        "glb_size_bytes": 494424,
+        "glb_size_kb": 482.8359375
+      },
+      "stability_100_runs": {
+        "total_time_seconds": 2.2708745999989333,
+        "crashes": 0,
+        "stable": true,
+        "ram_delta_mb": 0.08203125,
+        "peak_vram_mb": 0.0
+      }
+    },
+    "cuda": {
+      "model_init": {
+        "time_seconds": 0.7479691000044113,
+        "ram_increase_mb": 411.125,
+        "peak_vram_mb": 113.37890625
+      },
+      "first_inference": {
+        "time_seconds": 0.47155420000490267,
+        "peak_vram_mb": 122.95068359375
+      },
+      "warm_50_inferences_ms": {
+        "mean": 74.45461799987243,
+        "median_p50": 73.97175000005518,
+        "p95": 77.06080000207294,
+        "min": 73.02999999956228,
+        "max": 79.46799999626819,
+        "std": 1.3705854131218296
+      },
+      "glb_export": {
+        "export_time_seconds": 0.0031491999980062246,
+        "glb_size_bytes": 494424,
+        "glb_size_kb": 482.8359375
+      },
+      "stability_100_runs": {
+        "total_time_seconds": 7.4300001000010525,
+        "crashes": 0,
+        "stable": true,
+        "ram_delta_mb": 0.0625,
+        "peak_vram_mb": 123.26513671875
+      }
+    }
+  }
+}
