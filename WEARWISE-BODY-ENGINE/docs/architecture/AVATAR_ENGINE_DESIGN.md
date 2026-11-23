@@ -2,7 +2,7 @@
 
 **Project:** WearWise AI Fashion & Honest Fit Platform  
 **Document:** Avatar Engine Interface Specification (AES-001)  
-**Revision:** 1.2 (Engine-Isolated Domain Architecture & Shape Evaluation Port)  
+**Revision:** 1.2.1 (Canonical Shared Protocols, Typed Contracts & Signal Evaluation)  
 **Date:** 2026-11-23  
 **Status:** Approved Technical Architecture  
 
@@ -23,51 +23,89 @@ The **Avatar Engine** subsystem is responsible for converting an engine-independ
 ## 2. Engine-Independent Protocol & Contract Specifications
 
 ```python
-from typing import Protocol, Dict, Any, List, Optional
-from dataclasses import dataclass
-from uuid import UUID
+from typing import Protocol, Dict, Any, List, Optional, Set, Literal
+from dataclasses import dataclass, field
+import numpy as np
+
+@dataclass(frozen=True)
+class RegionalShapeScale:
+    """Normalized relative scaling intent for an anatomical zone [-1.0, 1.0]."""
+    scale_x: float  # Lateral scaling (breadth / width)
+    scale_y: float  # Sagittal scaling (depth / protrusion)
+    scale_z: float  # Vertical scaling (segment length)
+
+@dataclass(frozen=True)
+class AvatarShapeSpec:
+    """
+    Engine-independent specification of avatar shape and stature.
+    Canonical domain input consumed by AvatarEngine implementations (e.g. AnnyAdapter).
+    """
+    spec_version: str                                  # e.g. "1.2.1"
+    presentation: Literal["masculine", "feminine", "neutral"]
+    target_stature_cm: float                           # Target height in cm
+    target_measurements: Dict[str, float]              # Canonical constraints {code: value_cm}
+    regional_scales: Dict[str, RegionalShapeScale]     # Regional scaling intents
+    semantic_controls: Dict[str, float]                # Raw normalized semantic sliders [0.0, 1.0]
 
 @dataclass(frozen=True)
 class MeshData:
     """Engine-independent representation of a 3D surface mesh."""
-    vertices: Any          # numpy.ndarray of shape (N, 3), dtype float32, coordinates strictly in METERS
-    faces: Any             # numpy.ndarray of shape (M, 3), dtype int32
-    normals: Optional[Any] = None # numpy.ndarray of shape (N, 3), dtype float32
-    metadata: Dict[str, Any] = None # Vertex count, face count, topology identifier
+    vertices: np.ndarray           # numpy.ndarray of shape (N, 3), dtype float32, coordinates strictly in METERS
+    faces: np.ndarray              # numpy.ndarray of shape (M, 3), dtype int32
+    normals: Optional[np.ndarray] = None # numpy.ndarray of shape (N, 3), dtype float32
+    metadata: Dict[str, Any] = field(default_factory=dict) # Vertex count, face count, topology identifier
 
 @dataclass(frozen=True)
 class LandmarkData:
     """Anatomical landmark coordinates provided by an adapter."""
-    landmark_code: str     # Canonical landmark code (e.g. "acromion_left", "cervicale_c7")
-    point_3d_m: List[float] # (X, Y, Z) coordinate in METERS in standard reference pose
-    anatomical_region: str # e.g. "shoulders", "waist", "hips"
+    landmark_code: str             # Canonical landmark code (e.g. "acromion_left", "cervicale_c7")
+    point_3d_m: List[float]        # (X, Y, Z) coordinate in METERS in standard reference pose
+    anatomical_region: str         # e.g. "shoulders", "waist", "hips"
 
 class LandmarkProvider(Protocol):
-    """Protocol for querying landmark coordinates without exposing engine topology."""
+    """Supplies 3D landmark points and anatomical vertex masks without exposing engine topology."""
     def get_landmark(self, landmark_code: str) -> Optional[LandmarkData]:
+        """Returns LandmarkData entity containing 3D coordinates in meters."""
         ...
+
+    def get_landmark_point_m(self, landmark_code: str) -> Optional[np.ndarray]:
+        """Returns 3D (X, Y, Z) landmark point as numpy array in METERS in current mesh pose."""
+        ...
+
     def get_all_landmarks(self) -> Dict[str, LandmarkData]:
+        """Returns full dictionary of available anatomical landmarks."""
         ...
-    def get_region_vertex_mask(self, region_code: str) -> Any:
+
+    def get_region_vertex_mask(self, region_code: str) -> Set[int]:
+        """
+        Returns the set of mesh vertex indices belonging to the specified anatomical zone.
+        During cross-sectional slicing, a triangular face (v0, v1, v2) is included in the slicing
+        submesh for region R if at least 2 of its 3 vertices belong to this vertex mask.
+        """
         ...
 
 @dataclass(frozen=True)
 class RegionalDisplacementSummary:
     """Summary of vertex displacements in a specific anatomical zone."""
     region_code: str
-    mean_displacement_m: float
-    max_displacement_m: float
+    mean_displacement_m: float      # Displacement magnitude in METERS
+    max_displacement_m: float       # Peak vertex displacement in METERS
     vertex_count: int
 
 @dataclass(frozen=True)
 class ShapeEvaluationResult:
-    """Geometric feedback returned to BICE for locality regularization."""
-    metric_version: str            # "1.1-rmsr-pvsr"
+    """
+    Geometric feedback returned to BICE for locality regularization.
+    RMSR = Regional Mean Spillover Ratio (dimensionless arithmetic mean ratio).
+    PVSR = Peak Vertex Spillover Ratio (dimensionless maximum vertex displacement ratio).
+    """
+    metric_version: str            # "1.2.1-rmsr-pvsr"
+    evaluation_status: str         # "success", "insufficient_target_signal", "evaluation_failed"
     regional_displacements: Dict[str, RegionalDisplacementSummary]
-    target_region_mean_m: float
-    max_non_target_mean_m: float
-    rmsr: float                    # Regional Mean Spillover Ratio
-    pvsr: Optional[float]          # Peak Vertex Spillover Ratio (when computed)
+    target_region_mean_m: float    # Mean target displacement magnitude in METERS
+    max_non_target_mean_m: float   # Max non-target regional displacement magnitude in METERS
+    rmsr: Optional[float]          # Regional Mean Spillover Ratio (dimensionless ratio); None if insufficient signal
+    pvsr: Optional[float]          # Peak Vertex Spillover Ratio (dimensionless ratio); None if insufficient signal
     is_plausible: bool
     diagnostic_notes: str
 
@@ -75,10 +113,14 @@ class ShapeEvaluationPort(Protocol):
     """Abstract port for evaluating geometric displacements without importing engine internals."""
     def evaluate_shape(
         self, 
-        shape_spec: Any, 
+        shape_spec: AvatarShapeSpec, 
         target_region: str, 
         requested_regions: List[str]
     ) -> ShapeEvaluationResult:
+        """
+        Evaluates regional displacements of candidate shape against reference baseline.
+        Returns explicit 'insufficient_target_signal' if target displacement < 10^-4 m.
+        """
         ...
 
 @dataclass(frozen=True)
@@ -120,7 +162,7 @@ class AvatarEngine(Protocol):
         """Generate unedited neutral baseline mesh for a given presentation."""
         ...
         
-    def generate_avatar(self, shape_spec: Any) -> MeshData:
+    def generate_avatar(self, shape_spec: AvatarShapeSpec) -> MeshData:
         """
         Generate customized 3D human mesh from engine-independent AvatarShapeSpec.
         Consumes AvatarShapeSpec; does not accept raw blendshape dictionaries.
@@ -203,14 +245,26 @@ The adapter never silently changes inputs without traceability:
 ### 3.3 Neutral Landmark Mapping via `AnnyLandmarkProvider`
 To ensure `AnthropometryEngine` does not depend on Anny-specific vertex indices, `AnnyAdapter` implements `AnnyLandmarkProvider`:
 - Translates Anny vertex indices (e.g. index $6721$ for C7 vertebra, index $4129$ for left acromion) into engine-independent `LandmarkData` with coordinates in meters.
-- Exposes anatomical region masks (head, shoulders, torso, arms, hips, thighs, calves) as boolean masks without exposing raw mesh indices to Anthropometry.
+- Implements `get_region_vertex_mask(region_code: str) -> Set[int]`, exposing anatomical region masks (head, shoulders, torso, arms, hips, thighs, calves) as sets of mesh vertex indices.
+- During cross-sectional slicing, Anthropometry uses this mask to filter the submesh: a face is included in the sliced geometry if at least 2 of its 3 vertices belong to the target vertex mask, preventing limb contours (e.g. arms) from bleeding into torso slices.
 
 ### 3.4 Shape Evaluation Port via `AnnyShapeEvaluationPort`
-`AnnyAdapter` implements `ShapeEvaluationPort`:
+`AnnyAdapter` implements `ShapeEvaluationPort` to provide geometric feedback to BICE:
 - Executes forward passes with candidate `AvatarShapeSpec` and reference baseline.
-- Computes vertex displacement vectors $\Delta \mathbf{x} = \mathbf{x}_{\text{cand}} - \mathbf{x}_{\text{ref}}$.
-- Evaluates regional means $\bar{\Delta}_R$ across internal region masks.
-- Returns `ShapeEvaluationResult` containing RMSR and PVSR metrics to BICE, with $\epsilon = 10^{-6}\text{ m}$ safeguard.
+- Computes vertex displacement vectors $\Delta \mathbf{x} = \mathbf{x}_{\text{cand}} - \mathbf{x}_{\text{ref}}$ with magnitudes strictly in **METERS ($m$)**.
+- Evaluates regional mean displacement magnitudes $\bar{\Delta}_R$ across internal region vertex masks.
+- Calculates **Regional Mean Spillover Ratio (RMSR)**, which is a **dimensionless arithmetic ratio**:
+  $$\text{RMSR}_R = \frac{\bar{\Delta}_R}{\bar{\Delta}_{R_{\text{target}}}}$$
+  *(Note: RMSR is Regional Mean Spillover Ratio, an arithmetic mean ratio across vertices; it is NOT Root Mean Square Residual).*
+- Evaluates **Peak Vertex Spillover Ratio (PVSR)**, an extreme-value dimensionless ratio:
+  $$\text{PVSR}_R = \frac{\max_{v \in R} \|\Delta \mathbf{x}_v\|}{\max_{u \in R_{\text{target}}} \|\Delta \mathbf{x}_u\|}$$
+- **Near-Zero Target Signal Evaluation Policy:**
+  When the target region mean displacement is below the numerical evaluation threshold $\epsilon_{\text{threshold}} = 10^{-4}\text{ m}$ ($0.1\text{ mm}$):
+  - The adapter returns `evaluation_status = "insufficient_target_signal"`.
+  - `rmsr` and `pvsr` are returned as `None` (not $0.0$).
+  - `is_plausible` is marked `False`.
+  - `diagnostic_notes` records the exact displacement and warning.
+  - **Inviolable Invariant:** An unavailable locality measurement is **never interpreted as a perfect locality result**. The solver cannot exploit near-zero target displacements to escape locality regularization. BICE treats this explicit status as an uninformative candidate step and rejects it.
 
 ---
 
