@@ -2,14 +2,14 @@
 **Authority:** ChatGPT — Technical Decision Owner  
 **Execution Agent:** Antigravity  
 **Date:** 2026-11-23  
-**Status:** Architecture Specification Complete — Revision 1.2 Closed  
+**Status:** Architecture Specification Complete — Revision 1.2 Record Reconciled  
 **Implementation Authorization:** NOT GRANTED (Design and Specification Only)
 
 ---
 
 ## 1. Executive Summary
 
-This document records the exact architectural corrections made across the WearWise Phase 1 specification package in response to the **Phase 1 Revision 1.2 Execution Directive**. Every defect identified during technical review has been resolved, cross-checked across all dependent design documents, and backed by concrete file section references.
+This document records the exact architectural corrections made across the WearWise Phase 1 specification package in response to the **Phase 1 Revision 1.2 Execution Directive**. Every defect identified during technical review has been resolved, cross-checked across all canonical design documents, and aligned strictly with the authoritative domain schemas.
 
 No production application code, database migrations, or frontend modifications have been made.
 
@@ -21,12 +21,12 @@ No production application code, database migrations, or frontend modifications h
 * **Target File:** `docs/architecture/AVATAR_ENGINE_DESIGN.md` (Commit: `b00492f`)
 * **Problem in Rev 1.1:** `AVATAR_ENGINE_DESIGN.md` was referenced across the architecture package but was missing from the repository.
 * **Correction Implemented:**
-  1. Authored the complete, canonical specification defining the abstract `AvatarEnginePort` interface and its concrete `AnnyAdapter`.
-  2. Defined the engine-neutral `AvatarShapeSpec` input entity and `MeshData` output contract (`vertices`, `faces`, `normals`, `metadata`).
-  3. Specified in-memory GLB byte serialization (`export_glb(mesh, format, target_size_limit_kb) -> bytes`) with direct SHA-256 digest computation, removing mandatory intermediate disk writes.
-  4. Specified the `LandmarkProvider` protocol contract for extracting key anatomical landmark coordinates (`x, y, z`) across standard poses.
-  5. Documented parameter-clamping policies: clamping to $[0.0, 1.0]$ triggers structured `AVATAR_PARAM_CLAMPED` warnings returned in the result metadata, never silent mutations.
-  6. Documented engine metadata reporting (`engine_name`, `engine_version`, `topology_name`, `vertex_count`, `face_count`, `supported_capabilities`).
+  1. Authored the complete, canonical specification defining the abstract `AvatarEngine` interface and its concrete `AnnyAdapter`.
+  2. Defined the typed, engine-neutral `AvatarShapeSpec` input entity and `MeshData` output contract (`vertices`, `faces`, `normals`, `metadata`).
+  3. Specified in-memory GLB byte serialization (`export_glb(mesh_data: MeshData) -> bytes`) with direct SHA-256 digest computation, removing mandatory intermediate disk writes.
+  4. Specified the `LandmarkProvider` protocol contract for extracting key anatomical landmark coordinates (`x, y, z` in meters) and anatomical region vertex masks.
+  5. Documented parameter-clamping policies: clamping to $[0.0, 1.0]$ triggers structured `AVATAR_PARAM_CLAMPED` warnings returned in result metadata, never silent mutations.
+  6. Documented engine metadata reporting (`engine_name`, `engine_version`, `topology_identifier`, `vertex_count`, `face_count`, `supported_capabilities`).
 
 ---
 
@@ -35,76 +35,109 @@ No production application code, database migrations, or frontend modifications h
 * **Problem in Rev 1.1:** BICE attempted to compute a geometric locality regularization loss ($\mathcal{L}_{\text{locality}}$) based on mesh vertex displacements, but importing Anny or PyTorch into BICE violated engine isolation.
 * **Correction Implemented:**
   1. Defined the neutral `ShapeEvaluationPort` protocol in the shared domain layer (`app.domain.interfaces.shape_evaluator`).
-  2. BICE defines only the abstract contract: `evaluate_shape(shape_spec, target_region, requested_regions) -> ShapeEvaluationResult`.
-  3. `AnnyAdapter` implements `ShapeEvaluationPort`, executing the forward pass in its isolated engine infrastructure and returning vertex displacement metrics (`max_displacement_mm`, `pvsr_percentile_99_mm`, `rmsr_mm`).
+  2. BICE defines only the abstract contract: `evaluate_shape(shape_spec: AvatarShapeSpec, target_region: str, requested_regions: List[str]) -> ShapeEvaluationResult`.
+  3. `AnnyAdapter` implements `ShapeEvaluationPort`, executing the forward pass in its isolated engine infrastructure and returning `ShapeEvaluationResult` with fields:
+     - `metric_version: str`
+     - `evaluation_status: str`
+     - `regional_displacements: Dict[str, RegionalDisplacementSummary]` (`mean_displacement_m: float`, `max_displacement_m: float`, `vertex_count: int`)
+     - `target_region_mean_m: float` (displacement magnitude in meters)
+     - `max_non_target_mean_m: float` (displacement magnitude in meters)
+     - `rmsr: Optional[float]` (dimensionless Regional Mean Spillover Ratio)
+     - `pvsr: Optional[float]` (dimensionless Peak Vertex Spillover Ratio)
+     - `is_plausible: bool`
+     - `diagnostic_notes: str`
   4. BICE remains 100% free of PyTorch and Anny imports.
-  5. Defined mathematical near-zero handling: when $\Delta d_{\text{target}} < \epsilon$ ($\epsilon = 10^{-6}\text{ m}$), locality penalty is formally evaluated as $0.0$, preventing division-by-zero or numerical instability.
-  6. Documented fallback and failure behaviour: if shape evaluation fails or times out, BICE records an audit warning and reverts to semantic boundary clamping.
+  5. **Metric Definition & Terminology:** RMSR stands strictly for **Regional Mean Spillover Ratio** (an arithmetic mean ratio across region vertices, strictly **dimensionless**). It is **NOT** Root Mean Square Residual.
+  6. **Near-Zero Signal Handling:** When target displacement is below $\epsilon_{\text{threshold}} = 10^{-4}\text{ m}$ ($0.1\text{ mm}$), the contract returns `evaluation_status: "insufficient_target_signal"` with `rmsr: None`. BICE rejects the candidate step and penalizes it with maximal penalty, never interpreting an unavailable signal as zero locality spillover.
 
 ---
 
 ### Defect C: Exact Mesh-Plane Intersection Robustness
 * **Target File:** `docs/architecture/ANTHROPOMETRY_SPECIFICATION.md` (Commit: `3efc1da`)
-* **Problem in Rev 1.1:** Mesh slicing used simplified line-segment assumptions vulnerable to degenerate planar intersections, coplanar faces, and on-plane vertices. Furthermore, torso loop selection used an arbitrary coordinate threshold ($|X_c| \le 0.20\text{ m}$) that failed on diverse body shapes and lateral shifts.
+* **Problem in Rev 1.1:** Mesh slicing used simplified line-segment assumptions vulnerable to degenerate planar intersections, coplanar faces, and on-plane vertices. Torso loop selection used an arbitrary coordinate threshold ($|X_c| \le 0.20\text{ m}$) that failed on diverse body shapes.
 * **Correction Implemented:**
-  1. Specified the exact triangle-mesh-plane cutting algorithm (§3.1) with explicit signed Euclidean distance classification:
-     $$d_i = \mathbf{n} \cdot (\mathbf{v}_i - \mathbf{p})$$
-     - Vertices with $|d_i| \le \epsilon$ ($\epsilon = 10^{-6}\text{ m}$) are snapped to the slicing plane.
-     - Triangles with all three vertices on the plane are classified as coplanar and discarded to prevent degenerate 2D polygon noise.
-     - Tangential triangle touches (one vertex on plane, two vertices strictly on one side) produce isolated vertices and are rejected.
-     - Single-edge intersections produce exactly one cutting segment.
-     - Standard transversal triangles produce one cutting segment connecting the two edge intersection points.
-  2. Specified spatial graph construction with an adjacency list and topological loop stitching: closed loops must form connected, 2-regular subgraphs.
-  3. Replaced the rigid $|X_c| \le 0.20\text{ m}$ loop selection rule with **Landmark-Guided Centroid Proximity** (§3.3):
-     $$D(\mathcal{L}_k) = \|\mathbf{c}_k - \mathbf{L}_{\text{anchor}}\|_{xy}$$
-     The torso loop is identified by minimizing the horizontal Euclidean distance to anatomical anchor points (`sternum_lower`, `umbilicus`, `sacrum_mid`), guaranteeing robust identification regardless of stance asymmetry or body morphology.
-  4. Defined explicit error states: `ANTHRO_SLICING_PLANE_OUT_OF_BOUNDS`, `ANTHRO_NO_CLOSED_LOOP_FOUND`, and `ANTHRO_SELF_INTERSECTING_CONTOUR`.
+  1. Specified the exact triangle-mesh-plane cutting algorithm (§3.1) with explicit signed distance evaluation ($d_i = \mathbf{n} \cdot (\mathbf{v}_i - \mathbf{p})$):
+     - Numerical tolerance $\epsilon = 10^{-6}\text{ m}$: vertices with $|d_i| \le \epsilon$ are snapped to the plane.
+     - Coplanar triangles (all 3 vertices on-plane) are discarded from 2D slicing segments; outer boundary edges shared with non-coplanar faces are preserved via edge deduplication.
+     - Tangential touches (1 vertex on plane, 2 strictly on same side) produce zero-length segments and are discarded.
+     - Transversal crossing with 1 on-plane vertex and 2 opposite generates a segment connecting the on-plane vertex directly to the edge crossing point $\mathbf{p}_{12} = \mathbf{v}_1 + \frac{d_1}{d_1 - d_2}(\mathbf{v}_2 - \mathbf{v}_1)$.
+     - Standard transversal crossing (1 vertex on one side, 2 on the other) generates a segment connecting edge intersections $\mathbf{p}_{01}$ and $\mathbf{p}_{02}$.
+     - Segments shorter than $10^{-6}\text{ m}$ are discarded; duplicate segments are merged.
+  2. Specified spatial hash quantization ($\epsilon_{\text{snap}} = 10^{-5}\text{ m}$) and undirected graph construction.
+  3. Enforced degree-2 graph validation ($\text{deg}(u) == 2$ for all nodes). Open boundaries ($\text{deg} = 1$) or branching nodes ($\text{deg} > 2$) are rejected with structured errors (`ANTHRO_NON_MANIFOLD_CONTOUR`).
+  4. Specified **Landmark-Guided Centroid Proximity with Ambiguity Rejection** (§3.3):
+     - Evaluates horizontal distance $D(L_j) = \|\mathbf{c}_j - \mathbf{p}_{\text{landmark}}\|_{xy}$.
+     - Ambiguity rejection: if the two closest candidate loops differ in distance by less than $\delta_{\text{ambiguity}} = 2.0\text{ cm}$ ($0.02\text{ m}$), raises `ANTHRO_AMBIGUOUS_CONTOUR_SELECTION`.
+     - Plausibility guard: rejects loops with perimeter outside anatomical limits (`ANTHRO_IMPLAUSIBLE_CONTOUR_PERIMETER`).
+  5. Documented explicit disclaimer: this algorithm is an architectural specification and design contract; implementation, edge-case unit tests, and validation are scheduled for **Phase 4**.
 
 ---
 
 ### Defect D: Database Schema & Storage Safety
 * **Target File:** `docs/architecture/DATABASE_SCHEMA.md` (Commit: `8a36794`)
-* **Problem in Rev 1.1:** The ERD and DDL had table count discrepancies (10 vs 12). `asset_deletion_outbox` had a foreign key on `asset_id` that would fail if the parent row was deleted first. Content-addressable SHA-256 storage risked deleting active `.glb` files if shared across profiles. Garment measurement procedures and negative tolerance guards were missing.
+* **Problem in Rev 1.1:** Discrepancies between ERD and DDL table counts; foreign key on `asset_deletion_outbox.asset_id` broke cascade workflows; missing blob concurrency protection; missing garment tolerance checks.
 * **Correction Implemented:**
-  1. Synchronized the ERD and DDL to exactly **12 tables**: `user_profiles`, `body_measurements`, `shape_controls`, `avatar_assets`, `shape_evaluation_logs`, `asset_deletion_outbox`, `garment_brands`, `garment_products`, `garment_sku_variants`, `garment_measurements`, `honest_fit_feedback`, and `fit_rule_weights`.
-  2. Removed foreign key constraint on `asset_deletion_outbox.asset_id`, defining it as an unconstrained UUID reference to prevent cascade conflicts when cleaning up deleted asset records.
-  3. Specified content-addressable storage reference counting (§7.2): before the outbox background worker physically removes `/data/assets/glb/{sha256}.glb`, it must verify `SELECT COUNT(*) FROM avatar_assets WHERE file_hash = :hash` equals 0.
-  4. Added explicit check constraints ensuring non-negative garment tolerances: `tolerance_min_cm >= 0.0` and `tolerance_plus_cm >= 0.0`.
-  5. Added `measurement_procedure` and `provenance_source` columns to `garment_measurements` to record measurement methodology (flat tape, 3D scan, manufacturer grade rule).
-  6. Fully decoupled body measurement lifecycle statuses (`active`, `superseded`, `draft`, `purged`) from validation/assessment states (`eligible`, `provisional`, `unassessed`, `rejected`).
+  1. Synchronized the ERD and DDL to exactly **12 authoritative tables**:
+     1. `body_profiles`
+     2. `profile_revisions`
+     3. `body_measurements`
+     4. `body_shape_controls`
+     5. `avatar_configurations`
+     6. `avatar_assets`
+     7. `garment_profiles`
+     8. `garment_revisions`
+     9. `garment_sizes`
+     10. `garment_measurements`
+     11. `fit_recommendations`
+     12. `asset_deletion_outbox`
+  2. Defined `asset_deletion_outbox.asset_id` as an unconstrained UUID reference (no foreign key) so outbox rows survive parent asset deletions.
+  3. Specified atomic blob deletion synchronization:
+     - **PostgreSQL:** Uses transactional digest-level advisory locks (`SELECT pg_advisory_xact_lock(hashtext(:sha256_checksum));`) to serialize asset registration and blob deletion, eliminating the TOCTOU race condition.
+     - **SQLite:** Uses `BEGIN IMMEDIATE` write transactions.
+  4. Added explicit check constraints ensuring non-negative garment tolerances: `tolerance_cm >= 0.0`.
+  5. Added `measurement_procedure` and `provenance` metadata columns to `garment_measurements`.
+  6. Fully decoupled body measurement lifecycle statuses (`active`, `superseded`, `draft`, `purged`) from validation states (`unvalidated`, `internally_consistent`, `externally_validated`, `disputed`) and assessment states (`eligible`, `provisional`, `unassessed`, `rejected`).
 
 ---
 
-### Defect E: API Security & Complete Endpoint Catalogue
+### Defect E: API Security & Explicit Ownership Enforcement
 * **Target File:** `docs/architecture/API_CONTRACTS.md` (Commit: `05fcc77`)
-* **Problem in Rev 1.1:** Missing profile and control retrieval/update endpoints; GLB delivery lacked a strict private caching policy; client payloads contained vulnerable `user_id` / `brand_id` parameters.
+* **Problem in Rev 1.1:** Missing profile ownership enforcement; client payloads contained vulnerable `user_id` / `brand_id` fields; missing private caching policy on GLBs.
 * **Correction Implemented:**
-  1. Enforced default `Cache-Control: private, no-store` header on all 3D avatar GLB binary delivery endpoints (`GET /api/v1/avatars/{avatar_id}/glb`). Conditional `If-None-Match` evaluation requires prior authenticated ownership verification.
-  2. Documented Three.js / @react-three/fiber integration requiring `GLTFLoader.setCrossOrigin('use-credentials')` and `withCredentials = true`.
-  3. Stripped client-supplied `user_id` from profile/avatar creation endpoints; ownership is derived exclusively from validated JWT/session principals.
-  4. Enforced merchant principal authorization for garment brand operations (`POST /api/v1/garments/brands/{brand_id}/products`), preventing cross-tenant injection.
-  5. Added complete endpoint definitions for:
-     - `GET /api/v1/users/{user_id}/profile` & `PUT /api/v1/users/{user_id}/profile`
-     - `GET /api/v1/users/{user_id}/controls` & `PUT /api/v1/users/{user_id}/controls`
-     - `GET /api/v1/garments/products/{product_id}`
-     - `GET /api/v1/fit/evaluations/{evaluation_id}`
+  1. Enforced default `Cache-Control: private, no-store` header with SHA-256 ETag on all GLB delivery routes (`GET /api/v1/avatar/assets/{avatar_id}.glb`). User authorization is evaluated **before** checking conditional headers.
+  2. Documented Three.js / React Three Fiber `GLTFLoader` integration with `withCredentials = true`.
+  3. Stripped client-supplied `user_id` and `brand_id` from all request bodies; ownership is derived strictly from validated JWT/session principals (`request.state.current_user_id`).
+  4. Specified explicit ownership verification rules across all routes:
+     - Profile access: `GET /api/v1/profiles/{id}`, `PATCH /api/v1/profiles/{id}`
+     - Measurements access: `GET /api/v1/profiles/{id}/measurements`, `GET /api/v1/profiles/{id}/measurements/history`
+     - Avatar access: `GET /api/v1/avatar/{id}/status`, `GET /api/v1/avatar/assets/{id}.glb`
+     - Fit recommendations: `POST /api/v1/fit/recommend`, `GET /api/v1/fit/recommendations/{id}`
+  5. Specified atomic creation of canonical `stature` in `body_measurements` during `POST /api/v1/profiles`.
+  6. Accurately labeled merchant garment modification and deletion (`PUT /api/v1/garments/{id}`, `DELETE /api/v1/garments/{id}`) as **[Deferred to Phase 5: Merchant Portal]**, avoiding inaccurate claims of complete CRUD.
 
 ---
 
-### Defect F: Honest Fit Scoring Mathematics
+### Defect F: Honest Fit Scoring Mathematics & Category Registry
 * **Target File:** `docs/architecture/HONEST_FIT_ENGINE_SPEC.md` (Commit: `c7d84b8`)
-* **Problem in Rev 1.1:** Fit scoring denominator failed to normalize weights over evaluated dimensions; handling of missing/provisional measurements was informal; score bounds were unconstrained; stretch categories had inconsistent thresholds.
+* **Problem in Rev 1.1:** Fit scoring denominator failed to normalize weights over evaluated dimensions; handling of missing/provisional measurements was informal; incorrect fabric testing standards cited.
 * **Correction Implemented:**
-  1. Defined the mathematically rigorous composite fit score formula (§3.2):
-     $$S(s) = \max\left(0.0, \; 100.0 - \sum_{k \in \mathcal{K}_{\text{assessed}}} \frac{w_k}{\sum_{j \in \mathcal{K}_{\text{assessed}}} w_j} \cdot \text{Penalty}_k(e_k)\right)$$
-     The denominator strictly normalizes the weights over only the assessed dimensions $\mathcal{K}_{\text{assessed}}$.
-  2. Enforced the Evidence Coverage Gate (§3.3):
-     $$C = \frac{|\mathcal{K}_{\text{assessed}} \cap \mathcal{K}_{\text{required}}|}{|\mathcal{K}_{\text{required}}|} \ge 0.70$$
-     If coverage is below 70%, the engine issues `INSUFFICIENT_EVIDENCE` and suppresses scoring.
-  3. Formally specified weighting adjustments: provisional measurements receive a $0.5\times$ weight factor; disputed measurements are excluded from scoring; missing dimensions are omitted and flagged in the breakdown.
-  4. Defined required measurement dimension sets across supported garment categories: `tops_shirt`, `bottoms_trousers`, `bottoms_skirt`, `dress`, and `outerwear`.
-  5. Specified shoulder seam delta mapping: conventional set-in seams evaluate standard biacromial breadth, while drop-shoulder garments evaluate total garment shoulder breadth.
-  6. Harmonized fabric stretch classification across all docs: `rigid_zero` ($< 2\%$), `rigid_low` ($2\% - 5\%$), `stretch_moderate` ($5\% - 15\%$), and `stretch_high` ($> 15\%$).
+  1. Formulated the composite fit score with normalized effective weights:
+     $$S(s) = \max\left(0.0, \; 100.0 - \sum_{k \in \mathcal{K}_{\text{eval}}} \frac{w_k'}{\sum_{j \in \mathcal{K}_{\text{eval}}} w_j'} \cdot \text{Penalty}_k(\text{Ease}_{s, k}, \text{Silhouette})\right)$$
+     Where effective weights are discounted for provisional measurements:
+     $$w_k' = \begin{cases} 1.0 \times w_k & \text{if } \text{assessment\_state} = \text{'eligible'} \\ 0.5 \times w_k & \text{if } \text{assessment\_state} = \text{'provisional'} \\ 0.0 & \text{if disputed, rejected, or missing} \end{cases}$$
+  2. Enforced the Evidence Coverage Gate:
+     $$C(s) = \frac{\sum_{k \in \mathcal{K}_{\text{eval}}} w_k'}{\sum_{k \in \mathcal{K}_{\text{required}}} w_k} \ge 0.70$$
+     If coverage is below $70\%$, the engine returns `status: "insufficient_data"` and requests missing key dimensions.
+  3. Aligned supported garment categories with available anthropometric measurements:
+     - `t_shirt` / `polo`: Fully Supported Core Category (`garment_chest_circumference`, `garment_shoulder_seam_width`, `garment_back_length`).
+     - `casual_shirt` / `dress_shirt`: Partially Supported (`garment_neck_circumference` labeled as **Deferred to Phase 5**).
+     - `trousers` / `jeans`: Partially Supported (`garment_inseam_length`, `garment_front_rise`, `garment_leg_opening` labeled as **Deferred to Phase 5**).
+  4. Specified conventional vs drop-shoulder seam offset mapping.
+  5. Corrected physical fabric testing standards:
+     - Woven stretch fabrics: **BS 4952 / ASTM D3107 / ISO 20932-1**.
+     - Knitted fabrics: **ASTM D2594 / ISO 20932-2**.
+     - Standard test conditions: $15\text{ N}$ (knits) / $30\text{ N}$ (wovens), ISO 139 atmosphere ($20^\circ\text{C} \pm 2^\circ\text{C}$, $65\% \pm 4\%\text{ RH}$), measuring extension under load $E_{\text{load}}\%$, immediate recovery $R_{\text{imm}}\%$, and delayed recovery $R_{\text{del}}\%$.
+     - Thresholds (`rigid_zero` $< 2\%$, `rigid_low` $2\%-5\%$, `stretch_moderate` $5\%-15\%$, `stretch_high` $> 15\%$) are explicitly labeled as provisional engineering ranges.
 
 ---
 
@@ -114,7 +147,7 @@ No production application code, database migrations, or frontend modifications h
 * **Correction Implemented:**
   1. Defined clean package boundaries for Phase 2 implementation:
      - `app/domain/entities/`: Pure Python dataclasses / Domain Models (zero framework dependencies).
-     - `app/domain/interfaces/`: Abstract protocols and ports (`AvatarEnginePort`, `ShapeEvaluationPort`, `MeshSlicerPort`).
+     - `app/domain/interfaces/`: Abstract protocols and ports (`AvatarEngine`, `ShapeEvaluationPort`, `LandmarkProvider`).
      - `app/schemas/`: Pydantic V2 models for HTTP API request/response transport validation.
      - `app/infrastructure/models/`: SQLAlchemy 2.0 ORM persistence mappings.
   2. Replaced blanket 100% test claims with concrete property-based testing and invariant coverage targets:
@@ -127,12 +160,12 @@ No production application code, database migrations, or frontend modifications h
 ---
 
 ### Defect H: Evidence-Backed Acceptance Matrix & Git Audit
-* **Target Files:** `docs/architecture/PHASE_1_ARCHITECTURE_DECISION.md` (Commit: `081a5e2`), `docs/architecture/PHASE_0_OPEN_ITEMS.md` (Commit: `da4596e`)
-* **Problem in Rev 1.1:** Acceptance matrix lacked exact line/section evidence; RMSR was conflated with PVSR in open items.
+* **Target Files:** `docs/architecture/PHASE_1_ARCHITECTURE_DECISION.md` (Commit: `081a5e2`), `docs/architecture/PHASE_0_OPEN_ITEMS.md` (Commit: `da4596e`), `docs/architecture/SYSTEM_ARCHITECTURE.md` (Commit: `7afb296`)
+* **Problem in Rev 1.1:** Acceptance matrix lacked exact line/section evidence; RMSR was conflated with PVSR in open items; `SYSTEM_ARCHITECTURE.md` needed synchronization.
 * **Correction Implemented:**
-  1. Completed the Phase 1 Acceptance Matrix in `PHASE_1_ARCHITECTURE_DECISION.md` (§7), with every single requirement linked to verified document sections.
-  2. Updated `PHASE_0_OPEN_ITEMS.md` to rigorously separate RMSR (Root Mean Square Residual, an $L_2$ average) from PVSR (Peak Vertex Spillover Ratio, an $L_\infty$ extreme).
-  3. Documented anatomical vertex masks and confirmed that all parameter bounds are provisional engineering bounds pending Phase 8 human validation.
+  1. Completed the Phase 1 Acceptance Matrix in `PHASE_1_ARCHITECTURE_DECISION.md` with every single requirement linked to verified document sections.
+  2. Updated `PHASE_0_OPEN_ITEMS.md` to rigorously define RMSR as **Regional Mean Spillover Ratio** (dimensionless arithmetic ratio) and PVSR as Peak Vertex Spillover Ratio.
+  3. Synchronized `SYSTEM_ARCHITECTURE.md` with `AvatarOrchestrationService`, C4 component diagrams, downward dependency hierarchy, and ADR-01 through ADR-05.
   4. Executed workspace Git audit confirming zero application code written.
 
 ---
@@ -156,4 +189,4 @@ No production application code, database migrations, or frontend modifications h
 
 ## 4. Verification & Conclusion
 
-Every item in the Phase 1 Revision 1.2 Execution Directive has been addressed and incorporated into the canonical architecture documentation. The architecture package is now coherent, mathematically sound, decoupled from proprietary engines, and ready to serve as the baseline for implementation upon Phase 2 authorization.
+Every item in the Phase 1 Revision 1.2 Execution Directive has been addressed and incorporated into the canonical architecture documentation. The architecture package is coherent, mathematically sound, decoupled from proprietary engines, and ready to serve as the baseline for implementation upon Phase 2 authorization.
