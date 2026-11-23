@@ -1,0 +1,256 @@
+{
+  "milestone": "Phase 5A Honest Fit Demonstration",
+  "avatar_id": "neutral_masculine",
+  "garment_type": "t_shirt",
+  "recommended_size": "S",
+  "evaluations": [
+    {
+      "report_id": "16b55bf6-0357-4d28-9fc3-832a6fde9cba",
+      "garment_title": "Everyday Heavyweight Crewneck Tee",
+      "garment_category": "t_shirt",
+      "size_label": "S",
+      "silhouette_preference": "regular",
+      "composite_score": 100.0,
+      "coverage_ratio": 0.875,
+      "coverage_percentage": "87.5%",
+      "is_coverage_gate_passed": true,
+      "status": "recommended",
+      "evaluated_dimensions": [
+        "chest_circumference",
+        "shoulder_biacromial_breadth"
+      ],
+      "missing_required_dimensions": [
+        "torso_length"
+      ],
+      "unsupported_dimensions": [
+        "torso_length"
+      ],
+      "regional_evaluations": {
+        "chest_circumference": {
+          "region_code": "chest_circumference",
+          "body_measurement_cm": 77.85,
+          "garment_dimension_cm": 88.0,
+          "ease_cm": 10.15,
+          "classification": "regular",
+          "target_interval": [
+            6.0,
+            12.0
+          ],
+          "deviation_cm": 0.0,
+          "penalty": 0.0,
+          "baseline_weight": 0.4,
+          "effective_weight": 0.4,
+          "assessment_state": "eligible",
+          "explanation": "Chest girth has +10.15 cm ease (garment 88.0 cm vs body 77.8 cm), resulting in a regular fit."
+        },
+        "shoulder_biacromial_breadth": {
+          "region_code": "shoulder_biacromial_breadth",
+          "body_measurement_cm": 37.2,
+          "garment_dimension_cm": 39.0,
+          "ease_cm": 1.8,
+          "classification": "regular",
+          "target_interval": [
+            1.5,
+            3.5
+          ],
+          "deviation_cm": 0.0,
+          "penalty": 0.0,
+          "baseline_weight": 0.3,
+          "effective_weight": 0.3,
+          "assessment_state": "eligible",
+          "explanation": "Shoulder seams sit +1.80 cm past acromion bone (garment 39.0 cm vs body 37.2 cm), offering standard relaxed shoulder drape."
+        }
+      },
+      "summary_explanation": "Size S is recommended for your preferred Regular fit (Provisional Fit Score: 100.0 / 100).",
+      "disclaimer": "Provisional engineering fit estimation per Rev 1.2.1. Thresholds subject to Phase 5 physical wear trial calibration.",
+      "rulebook_version": "1.2.1-provisional",
+      "evaluated_at": "2026-11-23T15:52:48.040071+00:00"
+    },
+    {
+      "report_id": "2446d601-2abe-471a-b866-af4ae034b424",
+      "garment_title": "Everyday Heavyweight Crewneck Tee",
+      "garment_category": "t_shirt",
+      "size_label": "XS",
+      "silhouette_preference": "regular",
+      "composite_score": 91.8,
+      "coverage_ratio": 0.875,
+      "coverage_percentage": "87.5%",
+      "is_coverage_gate_passed": true,
+      "status": "recommended",
+      "evaluated_dimensions": [
+        "chest_circumference",
+        "shoulder_biacromial_breadth"
+      ],
+      "missing_required_dimensions": [
+        "torso_length"
+      ],
+      "unsupported_dimensions": [
+        "torso_length"
+      ],
+      "regional_evaluations": {
+        "chest_circumference": {
+          "region_code": "chest_circumference",
+          "body_measurement_cm": 77.85,
+          "garment_dimension_cm": 83.0,
+          "ease_cm": 5.15,
+          "classification": "fitted",
+          "target_interval": [
+            6.0,
+            12.0
+          ],
+          "deviation_cm": 0.85,
+          "penalty": 1.44,
+          "baseline_weight": 0.4,
+          "effective_weight": 0.4,
+          "assessment_state": "eligible",
+          "explanation": "Chest girth has +5.15 cm ease (garment 83.0 cm vs body 77.8 cm), resulting in a fitted fit."
+        },
+        "shoulder_biacromial_breadth": {
+          "region_code": "shoulder_biacromial_breadth",
+          "body_measurement_cm": 37.2,
+          "garment_dimension_cm": 37.5,
+          "ease_cm": 0.3,
+          "classification": "fitted",
+          "target_interval": [
+            1.5,
+            3.5
+          ],
+          "deviation_cm": 1.2,
+          "penalty": 17.28,
+          "baseline_weight": 0.3,
+          "effective_weight": 0.3,
+          "assessment_state": "eligible",
+          "explanation": "Shoulder seams sit +0.30 cm relative to acromion bone (garment 37.5 cm vs body 37.2 cm), providing tailored set-in shoulder alignment."
+        }
+      },
+      "summary_explanation": "Size XS is recommended for your preferred Regular fit (Provisional Fit Score: 91.8 / 100).",
+      "disclaimer": "Provisional engineering fit estimation per Rev 1.2.1. Thresholds subject to Phase 5 physical wear trial calibration.",
+      "rulebook_version": "1.2.1-provisional",
+      "evaluated_at": "2026-11-23T15:52:48.040071+00:00"
+    },
+    {
+      "report_id": "af95aa09-b748-4f98-815f-661168f9c879",
+      "garment_title": "Everyday Heavyweight Crewneck Tee",
+      "garment_category": "t_shirt",
+      "size_label": "M",
+      "silhouette_preference": "regular",
+      "composite_score": 77.0,
+      "coverage_ratio": 0.875,
+      "coverage_percentage": "87.5%",
+      "is_coverage_gate_passed": true,
+      "status": "alternative",
+      "evaluated_dimensions": [
+        "chest_circumference",
+        "shoulder_biacromial_breadth"
+      ],
+      "missing_required_dimensions": [
+        "torso_length"
+      ],
+      "unsupported_dimensions": [
+        "torso_length"
+      ],
+      "regional_evaluations": {
+        "chest_circumference": {
+          "region_code": "chest_circumference",
+          "body_measurement_cm": 77.85,
+          "garment_dimension_cm": 94.0,
+          "ease_cm": 16.15,
+          "classification": "relaxed",
+          "target_interval": [
+            6.0,
+            12.0
+          ],
+          "deviation_cm": 4.15,
+          "penalty": 34.45,
+          "baseline_weight": 0.4,
+          "effective_weight": 0.4,
+          "assessment_state": "eligible",
+          "explanation": "Chest girth has +16.15 cm ease (garment 94.0 cm vs body 77.8 cm), resulting in a relaxed fit."
+        },
+        "shoulder_biacromial_breadth": {
+          "region_code": "shoulder_biacromial_breadth",
+          "body_measurement_cm": 37.2,
+          "garment_dimension_cm": 41.5,
+          "ease_cm": 4.3,
+          "classification": "relaxed",
+          "target_interval": [
+            1.5,
+            3.5
+          ],
+          "deviation_cm": 0.8,
+          "penalty": 7.68,
+          "baseline_weight": 0.3,
+          "effective_weight": 0.3,
+          "assessment_state": "eligible",
+          "explanation": "Shoulder seams sit +4.30 cm past acromion bone (garment 41.5 cm vs body 37.2 cm), giving an intentional drop-shoulder silhouette."
+        }
+      },
+      "summary_explanation": "Size M is a wearable alternative (Provisional Fit Score: 77.0 / 100) with minor regional silhouette deviations.",
+      "disclaimer": "Provisional engineering fit estimation per Rev 1.2.1. Thresholds subject to Phase 5 physical wear trial calibration.",
+      "rulebook_version": "1.2.1-provisional",
+      "evaluated_at": "2026-11-23T15:52:48.040071+00:00"
+    },
+    {
+      "report_id": "a9b1c62c-9ed4-4794-b284-6272c39f5e35",
+      "garment_title": "Everyday Heavyweight Crewneck Tee",
+      "garment_category": "t_shirt",
+      "size_label": "L",
+      "silhouette_preference": "regular",
+      "composite_score": 0.0,
+      "coverage_ratio": 0.875,
+      "coverage_percentage": "87.5%",
+      "is_coverage_gate_passed": true,
+      "status": "poor_fit",
+      "evaluated_dimensions": [
+        "chest_circumference",
+        "shoulder_biacromial_breadth"
+      ],
+      "missing_required_dimensions": [
+        "torso_length"
+      ],
+      "unsupported_dimensions": [
+        "torso_length"
+      ],
+      "regional_evaluations": {
+        "chest_circumference": {
+          "region_code": "chest_circumference",
+          "body_measurement_cm": 77.85,
+          "garment_dimension_cm": 101.0,
+          "ease_cm": 23.15,
+          "classification": "oversized",
+          "target_interval": [
+            6.0,
+            12.0
+          ],
+          "deviation_cm": 11.15,
+          "penalty": 100.0,
+          "baseline_weight": 0.4,
+          "effective_weight": 0.4,
+          "assessment_state": "eligible",
+          "explanation": "Chest girth has +23.15 cm ease (garment 101.0 cm vs body 77.8 cm), resulting in a oversized fit."
+        },
+        "shoulder_biacromial_breadth": {
+          "region_code": "shoulder_biacromial_breadth",
+          "body_measurement_cm": 37.2,
+          "garment_dimension_cm": 44.0,
+          "ease_cm": 6.8,
+          "classification": "oversized",
+          "target_interval": [
+            1.5,
+            3.5
+          ],
+          "deviation_cm": 3.3,
+          "penalty": 100.0,
+          "baseline_weight": 0.3,
+          "effective_weight": 0.3,
+          "assessment_state": "eligible",
+          "explanation": "Shoulder seams sit +6.80 cm past acromion bone (garment 44.0 cm vs body 37.2 cm), giving an intentional drop-shoulder silhouette."
+        }
+      },
+      "summary_explanation": "Size L has significant silhouette mismatch (Provisional Fit Score: 0.0 / 100) relative to your regular preference.",
+      "disclaimer": "Provisional engineering fit estimation per Rev 1.2.1. Thresholds subject to Phase 5 physical wear trial calibration.",
+      "rulebook_version": "1.2.1-provisional",
+      "evaluated_at": "2026-11-23T15:52:48.040071+00:00"
+    }
+  ]
+}
