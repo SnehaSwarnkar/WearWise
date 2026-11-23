@@ -5,7 +5,12 @@ Decoupled from HTTP status codes and external framework layers.
 """
 
 from typing import Optional, Dict, Any
-from app.domain.exceptions.base import DomainError
+from app.domain.exceptions.base import (
+    DomainError,
+    InvalidControlValueError,
+    InvalidMeasurementError,
+    InvalidShapeSpecError,
+)
 
 
 class BICEError(DomainError):
@@ -13,7 +18,7 @@ class BICEError(DomainError):
     pass
 
 
-class BICEValidationError(BICEError):
+class BICEValidationError(BICEError, InvalidControlValueError):
     """Raised when consumer semantic controls or physical measurements fail validation."""
     pass
 
