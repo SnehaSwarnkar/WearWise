@@ -4,6 +4,13 @@ Canonical geometric intersection, contour stitching, and anthropometric measurem
 """
 
 from app.anthropometry.models import ContourLoop, ExtractionDiagnostic
+from app.anthropometry.engine import (
+    AnthropometryEngine,
+    ExtractedMeasurementRecord,
+    AnthropometryExtractionResult,
+    SUPPORTED_CORE_MEASUREMENTS,
+)
+from app.anthropometry.port import DefaultAnthropometryEvaluationPort
 from app.anthropometry.exceptions import (
     AnthropometryError,
     NonManifoldContourError,
@@ -42,4 +49,9 @@ __all__ = [
     "EPSILON_SNAP_M",
     "EPSILON_LEN_M",
     "AMBIGUITY_MARGIN_M",
+    "AnthropometryEngine",
+    "ExtractedMeasurementRecord",
+    "AnthropometryExtractionResult",
+    "DefaultAnthropometryEvaluationPort",
+    "SUPPORTED_CORE_MEASUREMENTS",
 ]
