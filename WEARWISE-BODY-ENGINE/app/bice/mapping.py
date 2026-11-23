@@ -12,6 +12,7 @@ from app.domain.entities.avatar import RegionalShapeScale
 from app.domain.entities.body import BodyShapeControls
 from app.bice.config import MAPPING_VERSION
 from app.bice.normalizer import normalize_controls
+from app.bice.bounds import get_regional_axis_bounds
 from app.bice.exceptions import BICEValidationError
 
 
@@ -116,10 +117,23 @@ def map_normalized_to_regional_scales(
         for region in ALL_TARGET_REGIONS
     }
 
-    # Apply mapping rules
+    # Apply mapping rules scaled to respective regional bounds
     for control_name, rule in SEMANTIC_MAPPING_RULES.items():
         norm_val = normalized_controls.get(control_name, 0.0)
-        target_scale = norm_val * rule.direction
+        b_min, b_max, _ = get_regional_axis_bounds(rule.target_region, rule.primary_axis)
+
+        if rule.direction > 0:
+            if norm_val >= 0.0:
+                target_scale = norm_val * b_max
+            else:
+                target_scale = norm_val * abs(b_min)
+        else:
+            # Inverse direction (e.g. waist_definition)
+            if norm_val >= 0.0:
+                target_scale = -norm_val * abs(b_min)
+            else:
+                target_scale = -norm_val * b_max
+
         region_axes[rule.target_region][rule.primary_axis] = target_scale
 
     return {
@@ -148,7 +162,21 @@ def map_regional_scales_to_normalized(
             rule.target_region, RegionalShapeScale(0.0, 0.0, 0.0)
         )
         axis_val = getattr(scale_obj, rule.primary_axis)
-        normalized[control_name] = axis_val * rule.direction
+        b_min, b_max, _ = get_regional_axis_bounds(rule.target_region, rule.primary_axis)
+
+        if rule.direction > 0:
+            if axis_val >= 0.0:
+                norm_val = axis_val / b_max if b_max != 0.0 else 0.0
+            else:
+                norm_val = axis_val / abs(b_min) if b_min != 0.0 else 0.0
+        else:
+            # Inverse direction
+            if axis_val <= 0.0:
+                norm_val = -axis_val / abs(b_min) if b_min != 0.0 else 0.0
+            else:
+                norm_val = -axis_val / b_max if b_max != 0.0 else 0.0
+
+        normalized[control_name] = norm_val
 
     return normalized
 
