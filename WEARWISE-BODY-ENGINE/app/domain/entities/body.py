@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from decimal import Decimal
 import math
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, Tuple
 from uuid import UUID, uuid4
 
 from app.domain.taxonomies.measurement import (
@@ -24,10 +24,22 @@ from app.domain.exceptions.base import (
 )
 
 
+CONTROL_SAFE_RANGES: Dict[str, Tuple[float, float]] = {
+    "shoulder_width": (0.10, 0.90),
+    "chest_fullness": (0.10, 0.90),
+    "belly_fullness": (0.10, 0.85),
+    "waist_definition": (0.15, 0.85),
+    "arm_fullness": (0.10, 0.90),
+    "hip_fullness": (0.15, 0.85),
+    "thigh_fullness": (0.20, 0.80),
+    "calf_fullness": (0.15, 0.85),
+}
+
+
 @dataclass(frozen=True)
 class BodyShapeControls:
     """
-    Normalized consumer-facing semantic sliders [0.0, 1.0].
+    Normalized consumer-facing semantic sliders within control-specific safe ranges.
     Neutral baseline is 0.50 across all controls.
     """
     shoulder_width: float = 0.50
@@ -61,10 +73,11 @@ class BodyShapeControls:
                     f"Control '{name}' must be finite, got {val}",
                     {"control": name, "value": val},
                 )
-            if not (0.0 <= float(val) <= 1.0):
+            min_val, max_val = CONTROL_SAFE_RANGES[name]
+            if not (min_val <= float(val) <= max_val):
                 raise InvalidControlValueError(
-                    f"Control '{name}' must be between 0.0 and 1.0, got {val}",
-                    {"control": name, "value": val},
+                    f"Control '{name}' must be within safe range [{min_val}, {max_val}], got {val}",
+                    {"control": name, "value": val, "safe_range": (min_val, max_val)},
                 )
 
     def to_dict(self) -> Dict[str, float]:
