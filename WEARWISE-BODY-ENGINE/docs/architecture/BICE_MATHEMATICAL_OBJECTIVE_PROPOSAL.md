@@ -99,12 +99,32 @@ Let $\mathcal{M}$ denote the set of active physical measurements provided for th
 
 The measurement loss is defined as a normalized, dimensionless squared residual:
 
-$$\mathcal{L}_{\text{meas}}(\mathbf{s}; \mathbf{m}^*) = \frac{1}{|\mathcal{M}|} \sum_{k \in \mathcal{M}} w_k \cdot \left( \frac{\hat{m}_k(\mathbf{s}) - m_k^*}{\sigma_k} \right)^2$$
+$$\mathcal{L}_{\text{meas}}(\mathbf{s}; \mathbf{m}^*) = \begin{cases} 
+\frac{1}{|\mathcal{M}|} \sum_{k \in \mathcal{M}} w_k \cdot \left( \frac{\hat{m}_k(\mathbf{s}) - m_k^*}{\sigma_k} \right)^2 & \text{if } |\mathcal{M}| > 0 \\
+0.0 & \text{if } |\mathcal{M}| = 0
+\end{cases}$$
 
 **Justification & Tolerances Rationale:**
-- Dividing the residual by tolerance $\sigma_k$ ensures that measurements captured with high precision (e.g. professional tailor tape with $\sigma = \pm 0.5\text{ cm}$) exert four-fold higher gradient pull than loose self-estimates (e.g. user-reported with $\sigma = \pm 2.0\text{ cm}$).
+- In the dimensionless squared residual, the effective weight on measurement $k$ is $w_k / \sigma_k^2$. Consequently, dividing the residual by tolerance $\sigma_k$ ensures that measurements captured with high precision (e.g. professional tailor tape with $\sigma = \pm 0.5\text{ cm}$) exert a **16-fold higher squared-residual weight** than loose self-estimates (e.g. user-reported with $\sigma = \pm 2.0\text{ cm}$), since $(2.0 / 0.5)^2 = 16.0$.
 - Measurement codes strictly follow canonical definitions: `stature`, `chest_circumference`, `waist_circumference`, `hip_circumference`, `shoulder_breadth`, etc. (all in $cm$).
-- If `AnthropometryEvaluationPort` is unavailable or measurement extraction fails for a candidate, $\mathcal{L}_{\text{meas}}$ cannot be computed. Under such conditions, the solver records status `measurement_signal_unavailable`, assigns maximal penalty $\mathcal{L}_{\text{meas}} = 10.0$, and aborts the update step.
+- **Empty Measurement Set ($\mathcal{M} = \emptyset$):** If no physical measurements are provided for the profile (pure visual styling session), $\mathcal{L}_{\text{meas}} = 0.0$. In this scenario, the solver is driven entirely by visual semantic control preservation and prior regularization ($\mathbf{s} \to \mathbf{s}^{\text{init}}$).
+- **Extraction Signal Failure vs Empty Set:** If physical measurements are requested ($|\mathcal{M}| > 0$) but `AnthropometryEvaluationPort` is unavailable or measurement extraction fails for a candidate, $\mathcal{L}_{\text{meas}}$ cannot be computed. Under such failure conditions, the solver records status `measurement_signal_unavailable`, assigns maximal penalty $\mathcal{L}_{\text{meas}} = 10.0$, and rejects the candidate update step.
+
+#### Uncertainty & Reliability Assignment Policy
+
+The values of tolerance $\sigma_k$ and reliability weight $w_k$ are assigned deterministically according to the measurement's acquisition method and validation state:
+
+| Acquisition Method | Validation State | Default $\sigma_k$ (cm) | Reliability Weight $w_k$ | Description / Rationale |
+|---|---|---|---|---|
+| `PROFESSIONAL_SCAN` | `VERIFIED` | $0.25$ | $1.00$ | Millimeter-accurate 3D hardware scan; highest confidence. |
+| `TAILOR_TAPE` | `VERIFIED` | $0.50$ | $1.00$ | Verified manual physical tailoring tape measurement. |
+| `TAILOR_TAPE` | `PLAUSIBLE_UNVERIFIED` | $1.00$ | $0.90$ | Manual tape measurement entered without third-party verification. |
+| `USER_SELF_REPORT` | `VERIFIED` | $1.50$ | $0.80$ | Self-measured by consumer using guided instructions. |
+| `USER_SELF_REPORT` | `PLAUSIBLE_UNVERIFIED` | $2.00$ | $0.70$ | Approximate consumer self-estimate within anatomical bounds. |
+| `ESTIMATED_AI` | `PLAUSIBLE_UNVERIFIED` | $2.50$ | $0.50$ | Computer-vision or statistically inferred dimension. |
+| *Any Method* | `OUTLIER_FLAGGED` | $5.00$ | $0.10$ | Flagged as anthropometrically suspect; heavily downweighted. |
+
+*(Note: All tolerances and weights in this table represent provisional engineering baselines, subject to empirical calibration during Phase 4 integration).*
 
 ### 4.2 Semantic Control Preservation Loss ($\mathcal{L}_{\text{ctrl}}$)
 
@@ -120,13 +140,21 @@ Where $\mathcal{C}$ indexes the active mapped regional scale axes.
 
 ### 4.3 Geometric Locality Penalty ($\mathcal{L}_{\text{locality}}$)
 
-Locality is evaluated via `ShapeEvaluationPort`. For a target modification in region $R_{\text{target}}$:
+Locality is evaluated via `ShapeEvaluationPort`. In a general deformation scenario where a subset of regions $\mathcal{R}_{\text{target}} \subseteq \mathcal{R}$ are intentionally modulated:
 
-$$\text{RMSR}_R(\mathbf{s}) = \frac{\bar{\Delta}_R(\mathbf{s})}{\bar{\Delta}_{R_{\text{target}}}(\mathbf{s})}$$
+For each non-target region $R \in \mathcal{R} \setminus \mathcal{R}_{\text{target}}$, the relative mean surface displacement ratio (RMSR) is evaluated against the peak target displacement:
 
-The locality loss aggregates the maximal spillover across all non-target anatomical zones:
+$$\text{RMSR}_R(\mathbf{s}) = \frac{\bar{\Delta}_R(\mathbf{s})}{\max_{T \in \mathcal{R}_{\text{target}}} \bar{\Delta}_T(\mathbf{s})}$$
 
-$$\mathcal{L}_{\text{locality}}(\mathbf{s}) = \max_{R \ne R_{\text{target}}} \text{RMSR}_R(\mathbf{s})$$
+The locality loss aggregates the maximal spillover across all un-targeted anatomical zones:
+
+$$\mathcal{L}_{\text{locality}}(\mathbf{s}) = \begin{cases}
+\max_{R \in \mathcal{R} \setminus \mathcal{R}_{\text{target}}} \text{RMSR}_R(\mathbf{s}) & \text{if } \mathcal{R} \setminus \mathcal{R}_{\text{target}} \ne \emptyset \text{ and } \mathcal{R}_{\text{target}} \ne \emptyset \\
+0.0 & \text{if } \mathcal{R}_{\text{target}} = \mathcal{R} \text{ (all regions modulated)} \\
+0.0 & \text{if } \mathcal{R}_{\text{target}} = \emptyset \text{ (no intentional deformation)}
+\end{cases}$$
+
+When evaluating single-region test impulses ($|\mathcal{R}_{\text{target}}| = 1$), this reduces to the canonical Phase 1 Revision 1.2.1 formula: $\text{RMSR}_R(\mathbf{s}) = \bar{\Delta}_R(\mathbf{s}) / \bar{\Delta}_{R_{\text{target}}}(\mathbf{s})$.
 
 ### 4.4 Prior Regularization ($\mathcal{L}_{\text{prior}}$)
 
@@ -147,13 +175,16 @@ The following hyperparameters are proposed as initial engineering baselines, sub
 | $\lambda_{\text{loc}}$ | `0.70` | Suppresses unwanted secondary deformations in distant anatomical regions. |
 | $\lambda_{\text{reg}}$ | `0.05` | Weak shrinkage prior; penalizes gratuitous departures from baseline mesh. |
 
+> [!NOTE]
+> All loss weights ($\lambda_{\text{meas}}, \lambda_{\text{ctrl}}, \lambda_{\text{loc}}, \lambda_{\text{reg}}$), tolerances ($\sigma_k$), and penalty values are **provisional engineering baselines**. They are explicitly isolated in configuration structures to permit empirical tuning during Phase 4 physical avatar calibration.
+
 ---
 
 ## 6. Near-Zero Target Signal Evaluation Policy
 
 In accordance with Phase 1 Revision 1.2.1:
 - Numerical signal threshold: $\epsilon_{\text{threshold}} = 10^{-4}\text{ m}$ ($0.1\text{ mm}$).
-- When $\bar{\Delta}_{R_{\text{target}}} < \epsilon_{\text{threshold}}$:
+- When $\max_{T \in \mathcal{R}_{\text{target}}} \bar{\Delta}_T < \epsilon_{\text{threshold}}$:
   1. `ShapeEvaluationPort` returns `evaluation_status = "insufficient_target_signal"` and `rmsr = None`.
   2. The evaluator assigns the **maximal penalty** $\mathcal{L}_{\text{locality}} = 10.0$.
   3. Under no circumstances is an unavailable RMSR evaluated as $0.0$ or treated as zero leakage.
@@ -175,14 +206,27 @@ If rejected, the candidate is discarded, a `SolverCandidateDiagnostic` record is
 
 ---
 
-## 8. Convergence & Maximum-Iteration Policy
+## 8. Optimization Algorithm, Gradient Strategy & Termination Policy
 
 To guarantee deterministic low latency suitable for real-time fitting requests:
-- **Optimization Algorithm:** Bound-constrained Quasi-Newton (L-BFGS-B or SLSQP) operating on $\mathbf{s} \in \mathbb{R}^{3K}$ within box bounds.
+
+### 8.1 Algorithm & Gradient Approximation
+- **Optimization Algorithm:** Bound-constrained Limited-memory Broyden–Fletcher–Goldfarb–Shanno with Box constraints (**L-BFGS-B**), operating on regional parameter vector $\mathbf{s} \in \mathbb{R}^{3K}$ constrained strictly within $[\mathbf{b}_{\min}, \mathbf{b}_{\max}]$.
+- **Gradient Strategy:** Because the `AnthropometryEvaluationPort` and `ShapeEvaluationPort` rely on 3D mesh surface extraction and slicing, analytical derivatives $\nabla_{\mathbf{s}} \mathcal{J}(\mathbf{s})$ are unavailable in closed form. Gradients are computed numerically using **central finite differences**:
+  $$\frac{\partial \mathcal{J}}{\partial s_j} \approx \frac{\mathcal{J}(\mathbf{s} + h \mathbf{e}_j) - \mathcal{J}(\mathbf{s} - h \mathbf{e}_j)}{2h}$$
+  with perturbation step $h = 10^{-4}$.
+
+### 8.2 Convergence & Termination Policy
 - **Maximum Iterations ($N_{\max}$):** $25$ steps.
-- **Relative Objective Tolerance ($\epsilon_{\text{obj}}$):** $\frac{|\mathcal{J}^{(i)} - \mathcal{J}^{(i-1)}|}{\mathcal{J}^{(i-1)}} < 10^{-4}$.
+- **Zero-Safe Relative Objective Convergence ($\epsilon_{\text{obj}}$):**
+  $$\Delta_{\text{rel}} = \frac{|\mathcal{J}^{(i)} - \mathcal{J}^{(i-1)}|}{\max(|\mathcal{J}^{(i-1)}|, 10^{-9})} < 10^{-4}$$
 - **Parameter Step Norm ($\epsilon_{\text{step}}$):** $\|\mathbf{s}^{(i)} - \mathbf{s}^{(i-1)}\|_2 < 10^{-3}$.
-- **Timeout Limit:** $500\text{ ms}$ wall-clock limit. If timeout occurs, return the best admissible candidate iterate evaluated so far with diagnostic status `"suboptimal_converged"`.
+- **Wall-Clock Timeout Limit:** $500\text{ ms}$ hard limit.
+- **Diagnostic Status Distinction:**
+  - If $\Delta_{\text{rel}} < 10^{-4}$ or $\|\Delta \mathbf{s}\|_2 < 10^{-3}$: Returns status `"converged"`.
+  - If the $500\text{ ms}$ wall-clock budget expires before convergence: Returns status `"timeout_suboptimal"`.
+  - If $N_{\max} = 25$ is reached without meeting tolerance: Returns status `"iteration_limit_exceeded"`.
+  *(Under no circumstances is a timed-out or iteration-truncated solve reported as `"suboptimal_converged"` or masked as an optimal solution).*
 
 ---
 
