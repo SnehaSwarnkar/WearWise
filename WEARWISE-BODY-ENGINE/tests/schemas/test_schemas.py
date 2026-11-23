@@ -22,6 +22,18 @@ from app.schemas.fit import FitRecommendRequest, FitRecommendResponse, RegionalC
 from app.schemas.error import StandardErrorEnvelope, ErrorBody, ErrorDetail
 
 
+CONTROLS_SAFE_RANGES = [
+    ("shoulder_width", 0.10, 0.90),
+    ("chest_fullness", 0.10, 0.90),
+    ("belly_fullness", 0.10, 0.85),
+    ("waist_definition", 0.15, 0.85),
+    ("arm_fullness", 0.10, 0.90),
+    ("hip_fullness", 0.15, 0.85),
+    ("thigh_fullness", 0.20, 0.80),
+    ("calf_fullness", 0.15, 0.85),
+]
+
+
 def test_profile_create_request_validation():
     """Verify ProfileCreateRequest validates stature bounds [100.0, 230.0]."""
     req = ProfileCreateRequest(
@@ -40,6 +52,53 @@ def test_profile_create_request_validation():
 
     with pytest.raises(ValidationError):
         ProfileCreateRequest(presentation_gender="masculine", stature_cm=231.0)
+
+
+def test_profile_create_request_initial_controls_validation():
+    """Verify ProfileCreateRequest rejects invalid initial controls."""
+    with pytest.raises(ValidationError):
+        ProfileCreateRequest(
+            presentation_gender="masculine",
+            stature_cm=178.50,
+            reported_weight_kg=74.0,
+            initial_controls=ControlsUpdateRequest(thigh_fullness=0.85),  # thigh max is 0.80
+        )
+
+
+@pytest.mark.parametrize("control_name,min_val,max_val", CONTROLS_SAFE_RANGES)
+def test_schema_control_minimum_accepted(control_name, min_val, max_val):
+    """Verify exact minimum boundary value is accepted in schema."""
+    req = ControlsUpdateRequest(**{control_name: min_val})
+    assert getattr(req, control_name) == min_val
+
+
+@pytest.mark.parametrize("control_name,min_val,max_val", CONTROLS_SAFE_RANGES)
+def test_schema_control_maximum_accepted(control_name, min_val, max_val):
+    """Verify exact maximum boundary value is accepted in schema."""
+    req = ControlsUpdateRequest(**{control_name: max_val})
+    assert getattr(req, control_name) == max_val
+
+
+@pytest.mark.parametrize("control_name,min_val,max_val", CONTROLS_SAFE_RANGES)
+def test_schema_control_just_below_minimum_rejected(control_name, min_val, max_val):
+    """Verify value just below minimum is rejected in schema."""
+    with pytest.raises(ValidationError):
+        ControlsUpdateRequest(**{control_name: round(min_val - 0.01, 4)})
+
+
+@pytest.mark.parametrize("control_name,min_val,max_val", CONTROLS_SAFE_RANGES)
+def test_schema_control_just_above_maximum_rejected(control_name, min_val, max_val):
+    """Verify value just above maximum is rejected in schema."""
+    with pytest.raises(ValidationError):
+        ControlsUpdateRequest(**{control_name: round(max_val + 0.01, 4)})
+
+
+@pytest.mark.parametrize("control_name,min_val,max_val", CONTROLS_SAFE_RANGES)
+@pytest.mark.parametrize("non_finite", [float("nan"), float("inf"), float("-inf")])
+def test_schema_control_non_finite_rejected(control_name, min_val, max_val, non_finite):
+    """Verify NaN and Inf are strictly rejected across all controls in schema."""
+    with pytest.raises(ValidationError):
+        ControlsUpdateRequest(**{control_name: non_finite})
 
 
 def test_measurement_record_request():
