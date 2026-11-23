@@ -2,7 +2,7 @@
 
 **Project:** WearWise AI Fashion & Honest Fit Platform  
 **Document:** Technical Roadmap & Testing Gates (ROA-001)  
-**Revision:** 1.2 (Explicit Package Boundaries & Measurable Validation Targets)  
+**Revision:** 1.2.1 (Phase 2 Authorization Baseline & Explicit Package Boundaries)  
 **Date:** 2026-11-23  
 **Status:** Approved Technical Architecture  
 
@@ -13,10 +13,10 @@
 ```mermaid
 flowchart TD
     P0["Phase 0: Feasibility, Licensing & Hardware Gate<br>(COMPLETE - Anny v0.6.2 Selected)"] --> P1
-    P1["Phase 1: Architecture, Schemas & API Contracts<br>(CURRENT - Revision 1.2 In Review)"] --> P2
+    P1["Phase 1: Architecture, Schemas & API Contracts<br>(COMPLETE - Revision 1.2.1 Baseline)"] --> P2
     
     subgraph FoundationTier["Domain Foundation & Engine Interfaces"]
-        P2["Phase 2: Domain Foundation & Typed Contracts<br>(Domain Entities, Enums, Transport Schemas)"] --> P3
+        P2["Phase 2: Domain Foundation & Typed Contracts<br>(CURRENT - In Progress: Entities, Taxonomies, Protocols, Schemas)"] --> P3
         P2 --> P4
         P3["Phase 3: BICE Implementation & Regularization<br>(Normalization, Bounds, Locality Loss via ShapeEvaluationPort)"] --> P4
         P4["Phase 4: Avatar Engine & Anthropometry Integration<br>(AnnyAdapter, Mesh-Plane Graph Slicer, GLB Pipeline)"]
@@ -40,17 +40,20 @@ flowchart TD
 ## 2. Phase-by-Phase Breakdown, Package Boundaries & Exit Gates
 
 ### Phase 2: Domain Foundation, Schemas & Core Interfaces
-- **Objective:** Translate approved Revision 1.2 Markdown designs into executable domain entities, transport schemas, and abstract interfaces.
+- **Status:** **IN PROGRESS (Authorized by Technical Decision Owner)**
+- **Objective:** Translate approved Revision 1.2.1 designs into executable domain entities, transport schemas, taxonomies, and abstract interfaces.
 - **Strict Package Boundaries:**
-  - `app/domain/entities/`: Pure framework-independent domain models and value objects (`BodyProfile`, `BodyMeasurement`, `AvatarShapeSpec`, `GarmentProfile`). Zero framework dependencies.
+  - `app/domain/entities/`: Pure framework-independent domain models and value objects (`BodyProfile`, `ProfileRevision`, `BodyMeasurement`, `BodyShapeControls`, `RegionalShapeScale`, `AvatarShapeSpec`, `MeshData`, `LandmarkData`, `RegionalDisplacementSummary`, `ShapeEvaluationResult`, and garment entities). Zero framework dependencies.
+  - `app/domain/taxonomies/`: Orthogonal enum definitions (`MeasurementAcquisitionMethod`, `MeasurementValidationState`, `MeasurementLifecycleStatus`, `MeasurementAssessmentState`, presentation, and stretch enums).
   - `app/domain/interfaces/`: Abstract protocols (`AvatarEngine`, `ShapeEvaluationPort`, `LandmarkProvider`, `StorageProvider`).
-  - `app/domain/taxonomies/`: Orthogonal enum definitions (`MeasurementAcquisitionMethod`, `MeasurementValidationState`, `MeasurementLifecycleStatus`, `MeasurementAssessmentState`).
-  - `app/schemas/`: Separate Pydantic v2 transport models for HTTP validation (`ProfileCreateRequest`, `AvatarGenerationResponse`). Transport concerns are strictly barred from domain entities.
+  - `app/domain/exceptions/`: Structured domain exceptions for invariant violations.
+  - `app/schemas/`: Separate Pydantic v2 transport models for HTTP validation (`ProfileCreateRequest`, `MeasurementRecordRequest`, `AvatarGenerateRequest`, `FitRecommendRequest`, `StandardErrorEnvelope`).
   - `app/infrastructure/models/`: SQLAlchemy persistence models are **deferred to Phase 6**.
 - **Measurable Exit Gate:**
-  - 100% test coverage over domain invariant rules (e.g. rejection of invalid units, stature bounds $[100, 230]\text{ cm}$, semantic control ranges $[0, 1]$).
-  - Round-trip serialization determinism tests for all domain models.
-  - Zero imports of FastAPI, SQLAlchemy, Anny, or PyTorch in domain packages.
+  - Test coverage over all domain entity invariant rules (rejection of non-finite floats, invalid dimensions, negative tolerances, invalid reliability weights $[0, 1]$, and slider ranges $[0, 1]$).
+  - Round-trip serialization determinism tests for domain models and transport schemas.
+  - Rejection of forbidden client-assigned ownership fields (`user_id`, `brand_id`).
+  - Architectural dependency tests proving zero imports of FastAPI, SQLAlchemy, Anny, or PyTorch in domain packages.
 
 ### Phase 3: BICE Implementation & Parameter Regularization
 - **Objective:** Implement `BICE` semantic normalization, parameter solver, and locality regularization consuming `ShapeEvaluationPort`.
