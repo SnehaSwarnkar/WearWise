@@ -5,7 +5,7 @@
   "recommended_size": "S",
   "evaluations": [
     {
-      "report_id": "16b55bf6-0357-4d28-9fc3-832a6fde9cba",
+      "report_id": "a044b67d-2418-4217-9525-aa33604ddb2e",
       "garment_title": "Everyday Heavyweight Crewneck Tee",
       "garment_category": "t_shirt",
       "size_label": "S",
@@ -25,6 +25,27 @@
       "unsupported_dimensions": [
         "torso_length"
       ],
+      "garment_provenance": {
+        "sample_id": "WW-FIXTURE-TSHIRT-2026-001",
+        "data_origin": "demonstration_fixture",
+        "measuring_instrument": "calibrated_rigid_steel_tape_iso_standard",
+        "measurement_procedure": "flat_relaxed_tabletop_bs_4952",
+        "measurement_date": "2026-11-23",
+        "operator_id": "wearwise_qa_lab_1",
+        "validation_claim": "demonstration_fixture_provisional_not_certified",
+        "notes": "Standard reference finished dimensions for Phase 5A test reproducibility"
+      },
+      "fabric_properties": {
+        "fibre_composition": {
+          "cotton": 1.0
+        },
+        "mechanical_stretch_pct": 0.015,
+        "mechanical_stretch_percentage": "1.5%",
+        "stretch_recovery_pct": 0.9,
+        "stretch_recovery_percentage": "90.0%",
+        "stretch_direction": "rigid_zero",
+        "testing_standard": "BS 4952 / ASTM D3107 (15.0 N load)"
+      },
       "regional_evaluations": {
         "chest_circumference": {
           "region_code": "chest_circumference",
@@ -64,10 +85,10 @@
       "summary_explanation": "Size S is recommended for your preferred Regular fit (Provisional Fit Score: 100.0 / 100).",
       "disclaimer": "Provisional engineering fit estimation per Rev 1.2.1. Thresholds subject to Phase 5 physical wear trial calibration.",
       "rulebook_version": "1.2.1-provisional",
-      "evaluated_at": "2026-11-23T15:52:48.040071+00:00"
+      "evaluated_at": "2026-11-23T17:45:39.477567+00:00"
     },
     {
-      "report_id": "2446d601-2abe-471a-b866-af4ae034b424",
+      "report_id": "1e06d001-d5d1-4fd6-82be-df9c40aa94a7",
       "garment_title": "Everyday Heavyweight Crewneck Tee",
       "garment_category": "t_shirt",
       "size_label": "XS",
@@ -76,7 +97,7 @@
       "coverage_ratio": 0.875,
       "coverage_percentage": "87.5%",
       "is_coverage_gate_passed": true,
-      "status": "recommended",
+      "status": "alternative",
       "evaluated_dimensions": [
         "chest_circumference",
         "shoulder_biacromial_breadth"
@@ -87,6 +108,27 @@
       "unsupported_dimensions": [
         "torso_length"
       ],
+      "garment_provenance": {
+        "sample_id": "WW-FIXTURE-TSHIRT-2026-001",
+        "data_origin": "demonstration_fixture",
+        "measuring_instrument": "calibrated_rigid_steel_tape_iso_standard",
+        "measurement_procedure": "flat_relaxed_tabletop_bs_4952",
+        "measurement_date": "2026-11-23",
+        "operator_id": "wearwise_qa_lab_1",
+        "validation_claim": "demonstration_fixture_provisional_not_certified",
+        "notes": "Standard reference finished dimensions for Phase 5A test reproducibility"
+      },
+      "fabric_properties": {
+        "fibre_composition": {
+          "cotton": 1.0
+        },
+        "mechanical_stretch_pct": 0.015,
+        "mechanical_stretch_percentage": "1.5%",
+        "stretch_recovery_pct": 0.9,
+        "stretch_recovery_percentage": "90.0%",
+        "stretch_direction": "rigid_zero",
+        "testing_standard": "BS 4952 / ASTM D3107 (15.0 N load)"
+      },
       "regional_evaluations": {
         "chest_circumference": {
           "region_code": "chest_circumference",
@@ -123,13 +165,13 @@
           "explanation": "Shoulder seams sit +0.30 cm relative to acromion bone (garment 37.5 cm vs body 37.2 cm), providing tailored set-in shoulder alignment."
         }
       },
-      "summary_explanation": "Size XS is recommended for your preferred Regular fit (Provisional Fit Score: 91.8 / 100).",
+      "summary_explanation": "Size XS is a wearable alternative (fitted) (Provisional Fit Score: 91.8 / 100) with regional silhouette deviations from your regular preference.",
       "disclaimer": "Provisional engineering fit estimation per Rev 1.2.1. Thresholds subject to Phase 5 physical wear trial calibration.",
       "rulebook_version": "1.2.1-provisional",
-      "evaluated_at": "2026-11-23T15:52:48.040071+00:00"
+      "evaluated_at": "2026-11-23T17:45:39.477567+00:00"
     },
     {
-      "report_id": "af95aa09-b748-4f98-815f-661168f9c879",
+      "report_id": "f197b75c-a461-41e0-8933-02ffcaa8a30a",
       "garment_title": "Everyday Heavyweight Crewneck Tee",
       "garment_category": "t_shirt",
       "size_label": "M",
@@ -149,6 +191,27 @@
       "unsupported_dimensions": [
         "torso_length"
       ],
+      "garment_provenance": {
+        "sample_id": "WW-FIXTURE-TSHIRT-2026-001",
+        "data_origin": "demonstration_fixture",
+        "measuring_instrument": "calibrated_rigid_steel_tape_iso_standard",
+        "measurement_procedure": "flat_relaxed_tabletop_bs_4952",
+        "measurement_date": "2026-11-23",
+        "operator_id": "wearwise_qa_lab_1",
+        "validation_claim": "demonstration_fixture_provisional_not_certified",
+        "notes": "Standard reference finished dimensions for Phase 5A test reproducibility"
+      },
+      "fabric_properties": {
+        "fibre_composition": {
+          "cotton": 1.0
+        },
+        "mechanical_stretch_pct": 0.015,
+        "mechanical_stretch_percentage": "1.5%",
+        "stretch_recovery_pct": 0.9,
+        "stretch_recovery_percentage": "90.0%",
+        "stretch_direction": "rigid_zero",
+        "testing_standard": "BS 4952 / ASTM D3107 (15.0 N load)"
+      },
       "regional_evaluations": {
         "chest_circumference": {
           "region_code": "chest_circumference",
@@ -185,13 +248,13 @@
           "explanation": "Shoulder seams sit +4.30 cm past acromion bone (garment 41.5 cm vs body 37.2 cm), giving an intentional drop-shoulder silhouette."
         }
       },
-      "summary_explanation": "Size M is a wearable alternative (Provisional Fit Score: 77.0 / 100) with minor regional silhouette deviations.",
+      "summary_explanation": "Size M is a wearable alternative (relaxed) (Provisional Fit Score: 77.0 / 100) with regional silhouette deviations from your regular preference.",
       "disclaimer": "Provisional engineering fit estimation per Rev 1.2.1. Thresholds subject to Phase 5 physical wear trial calibration.",
       "rulebook_version": "1.2.1-provisional",
-      "evaluated_at": "2026-11-23T15:52:48.040071+00:00"
+      "evaluated_at": "2026-11-23T17:45:39.477567+00:00"
     },
     {
-      "report_id": "a9b1c62c-9ed4-4794-b284-6272c39f5e35",
+      "report_id": "73581760-2113-4bff-8541-6058d35830f1",
       "garment_title": "Everyday Heavyweight Crewneck Tee",
       "garment_category": "t_shirt",
       "size_label": "L",
@@ -211,6 +274,27 @@
       "unsupported_dimensions": [
         "torso_length"
       ],
+      "garment_provenance": {
+        "sample_id": "WW-FIXTURE-TSHIRT-2026-001",
+        "data_origin": "demonstration_fixture",
+        "measuring_instrument": "calibrated_rigid_steel_tape_iso_standard",
+        "measurement_procedure": "flat_relaxed_tabletop_bs_4952",
+        "measurement_date": "2026-11-23",
+        "operator_id": "wearwise_qa_lab_1",
+        "validation_claim": "demonstration_fixture_provisional_not_certified",
+        "notes": "Standard reference finished dimensions for Phase 5A test reproducibility"
+      },
+      "fabric_properties": {
+        "fibre_composition": {
+          "cotton": 1.0
+        },
+        "mechanical_stretch_pct": 0.015,
+        "mechanical_stretch_percentage": "1.5%",
+        "stretch_recovery_pct": 0.9,
+        "stretch_recovery_percentage": "90.0%",
+        "stretch_direction": "rigid_zero",
+        "testing_standard": "BS 4952 / ASTM D3107 (15.0 N load)"
+      },
       "regional_evaluations": {
         "chest_circumference": {
           "region_code": "chest_circumference",
@@ -250,7 +334,7 @@
       "summary_explanation": "Size L has significant silhouette mismatch (Provisional Fit Score: 0.0 / 100) relative to your regular preference.",
       "disclaimer": "Provisional engineering fit estimation per Rev 1.2.1. Thresholds subject to Phase 5 physical wear trial calibration.",
       "rulebook_version": "1.2.1-provisional",
-      "evaluated_at": "2026-11-23T15:52:48.040071+00:00"
+      "evaluated_at": "2026-11-23T17:45:39.477567+00:00"
     }
   ]
 }

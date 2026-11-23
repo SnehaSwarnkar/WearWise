@@ -18,6 +18,7 @@ from app.fit.models import (
     RegionalFitResult,
     FitEvaluationReport,
     GarmentInputSpec,
+    GarmentMeasurementProvenance,
 )
 from app.fit.engine import HonestFitEngine
 from app.fit.port import HonestFitEvaluationPort
@@ -33,6 +34,7 @@ __all__ = [
     "RegionalFitResult",
     "FitEvaluationReport",
     "GarmentInputSpec",
+    "GarmentMeasurementProvenance",
     "HonestFitEngine",
     "HonestFitEvaluationPort",
 ]

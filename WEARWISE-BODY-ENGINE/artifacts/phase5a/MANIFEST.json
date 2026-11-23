@@ -1,0 +1,82 @@
+{
+  "manifest_version": "1.0.0",
+  "phase": "5A",
+  "git_branch": "noTouch",
+  "base_commit": "d3f3619ff53d3f61fa9c34bf00284e74eff4c4ed",
+  "review_criteria_verifications": {
+    "1_recommendation_status_consistency": {
+      "passed": true,
+      "detail": "Size S is 'recommended', Size XS is 'alternative', exactly 1 recommended size"
+    },
+    "2_hip_weighting_policy": {
+      "passed": true,
+      "detail": "Authoritative policy established: bottoms baseline 0.40, provisional discount 0.5x yields effective weight 0.20"
+    },
+    "3_sensitivity_table_denominator_reconciliation": {
+      "passed": true,
+      "detail": "Proposal reconciles raw penalty with normalized multi-zone composite scores across T-shirt and casual shirt denominators"
+    },
+    "4_garment_measurement_provenance": {
+      "passed": true,
+      "detail": "GarmentMeasurementProvenance implemented; disclaimer claim recorded; mechanical stretch separated from fibre composition"
+    }
+  },
+  "files": {
+    "app/domain/taxonomies/garment.py": {
+      "sha256": "15e6afdf8bd2b725945d2e7613334958c6a88e194f41e9af7b20797d2b4f515a",
+      "size_bytes": 1195
+    },
+    "app/domain/entities/garment.py": {
+      "sha256": "74aa0e8ea99141248cb4175716b86d07c9e6241b0474a5ea1cdda7c69ae941cf",
+      "size_bytes": 6551
+    },
+    "app/fit/__init__.py": {
+      "sha256": "a0db3f53a856bfd1365472b0d872b605a356f2a25edce739c5e72052552dcf24",
+      "size_bytes": 984
+    },
+    "app/fit/engine.py": {
+      "sha256": "438d2be1a7ab40929b597bb603c051fe6767db33d3e89a394df2c3937a7ae783",
+      "size_bytes": 20896
+    },
+    "app/fit/models.py": {
+      "sha256": "1bc76240675ec3b32c33ec3f54937cdcb3388db6f78b272e7667de73ae71e212",
+      "size_bytes": 6426
+    },
+    "app/fit/port.py": {
+      "sha256": "771d6e9f596a45aee6bcad18703005fc00b937cf338534d3d54d61448635b8cf",
+      "size_bytes": 6812
+    },
+    "app/fit/registry.py": {
+      "sha256": "7f98979cb4433204a7eca31e7a0f9a4caa76b40893a37fa9663bc2b55cbc5f3b",
+      "size_bytes": 8891
+    },
+    "app/fit/rulebook.py": {
+      "sha256": "a763a9cb11fdcec7ea0a79682e3601b9ebd26e9eeb8b303c7befe59a2f68d7db",
+      "size_bytes": 4649
+    },
+    "tests/fit/test_honest_fit.py": {
+      "sha256": "a4294db06c113adc2e452506fa2dd90023e4d140243451dcd4c4215bf37fc9c3",
+      "size_bytes": 18786
+    },
+    "tests/fit/test_boundary_cases.py": {
+      "sha256": "21d2f5398ae67d42c1a61b92ea548f97474adc55fdc47f2f467b369a05202bd3",
+      "size_bytes": 8393
+    },
+    "scripts/demo_honest_fit.py": {
+      "sha256": "75f5680a45110f5fa92105890c1d8d56afde3d58b6c331bc6970c861b26edb68",
+      "size_bytes": 16445
+    },
+    "docs/architecture/HONEST_FIT_PENALTY_COEFFICIENT_PROPOSAL.md": {
+      "sha256": "74311faccae73c5ca4f743305765fb755d54533e7376bfcfa7fe2ba1e189c6fd",
+      "size_bytes": 14917
+    },
+    "artifacts/phase5a/phase5a_tshirt_fit_report.json": {
+      "sha256": "eda0b278764d03f31ddf163cad85ba1602f6d4034f4dee4304a99ae3624889fb",
+      "size_bytes": 13630
+    },
+    "artifacts/phase5a/phase5a_casual_shirt_fit_report.json": {
+      "sha256": "702fc21aaada9fa4b925235d4a8f4de4b5b53bf68bc20f6dab11fcaf9f79a5d3",
+      "size_bytes": 12238
+    }
+  }
+}

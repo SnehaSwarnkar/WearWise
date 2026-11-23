@@ -373,6 +373,20 @@ class HonestFitEngine:
                 explanation=explanation,
             )
 
+        # Build provenance and fabric property dictionaries
+        garment_prov_dict = garment.provenance.to_dict() if garment.provenance else None
+        fabric_dict = None
+        if garment.fabric_properties:
+            fabric_dict = {
+                "fibre_composition": garment.fabric_properties.fibre_composition,
+                "mechanical_stretch_pct": garment.fabric_properties.mechanical_stretch_pct,
+                "mechanical_stretch_percentage": f"{garment.fabric_properties.mechanical_stretch_pct * 100:.1f}%",
+                "stretch_recovery_pct": garment.fabric_properties.stretch_recovery_pct,
+                "stretch_recovery_percentage": f"{garment.fabric_properties.stretch_recovery_pct * 100:.1f}%",
+                "stretch_direction": garment.fabric_properties.stretch_direction.value,
+                "testing_standard": "BS 4952 / ASTM D3107 (15.0 N load)",
+            }
+
         # Evidence coverage ratio C(s)
         coverage_ratio = self.calculate_evidence_coverage(
             effective_weights, required_body_codes, cat_baseline_weights
@@ -402,6 +416,8 @@ class HonestFitEngine:
                 missing_required_dimensions=missing_required,
                 unsupported_dimensions=unsupported,
                 summary_explanation=summary_explanation,
+                garment_provenance=garment_prov_dict,
+                fabric_properties=fabric_dict,
             )
 
         # Compute normalized composite fit score
@@ -415,14 +431,18 @@ class HonestFitEngine:
                 weighted_penalties += w_norm * res.penalty
             composite_score = max(0.0, min(100.0, 100.0 - weighted_penalties))
 
-        # Determine recommendation status
+        # Determine recommendation status:
+        # A size is only 'recommended' if it directly matches the requested silhouette (no tier deviations)
+        # and achieves score >= 85.0. Wearable sizes with deviations into adjacent tiers are 'alternative'.
+        has_silhouette_mismatch = any(res.deviation_cm > 0.0 for res in regional_results.values())
+
         if unwearable_detected:
             status = "rejected_unwearable"
             summary_explanation = (
                 f"Size {garment.size_label} is rejected as unwearable: one or more regions have insufficient ease "
                 f"for non-stretch fabric, causing severe constriction."
             )
-        elif composite_score >= 85.0:
+        elif not has_silhouette_mismatch and composite_score >= 85.0:
             status = "recommended"
             summary_explanation = (
                 f"Size {garment.size_label} is recommended for your preferred {user_preference.title()} fit "
@@ -430,9 +450,11 @@ class HonestFitEngine:
             )
         elif composite_score >= 60.0:
             status = "alternative"
+            alt_tiers = [res.classification.value for res in regional_results.values() if res.deviation_cm > 0.0]
+            tier_desc = f" ({'/'.join(sorted(set(alt_tiers)))})" if alt_tiers else ""
             summary_explanation = (
-                f"Size {garment.size_label} is a wearable alternative "
-                f"(Provisional Fit Score: {composite_score:.1f} / 100) with minor regional silhouette deviations."
+                f"Size {garment.size_label} is a wearable alternative{tier_desc} "
+                f"(Provisional Fit Score: {composite_score:.1f} / 100) with regional silhouette deviations from your {user_preference} preference."
             )
         else:
             status = "poor_fit"
@@ -455,4 +477,6 @@ class HonestFitEngine:
             missing_required_dimensions=missing_required,
             unsupported_dimensions=unsupported,
             summary_explanation=summary_explanation,
+            garment_provenance=garment_prov_dict,
+            fabric_properties=fabric_dict,
         )

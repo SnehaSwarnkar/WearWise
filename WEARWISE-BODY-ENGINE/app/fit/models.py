@@ -14,6 +14,35 @@ from app.fit.rulebook import RULEBOOK_VERSION
 
 
 @dataclass(frozen=True)
+class GarmentMeasurementProvenance:
+    """
+    Source metadata and audit provenance for physical garment finished dimensions.
+    Distinguishes physical lab measurements from demonstration fixtures and brand specs,
+    disclaiming certified physical measurement validation without verified empirical evidence.
+    """
+    sample_id: str                      # Unique physical garment or fixture ID, e.g. "WW-FIXTURE-TSHIRT-2026-001"
+    data_origin: str                    # "demonstration_fixture", "physical_sample_measured", "brand_size_specification"
+    measuring_instrument: str           # e.g. "calibrated_rigid_steel_tape_iso_standard", "flexible_fiberglass_tailoring_tape", "synthetic_fixture_generator"
+    measurement_procedure: str          # e.g. "flat_relaxed_tabletop_bs_4952", "brand_tech_pack_specification"
+    measurement_date: str               # ISO 8601 date, e.g. "2026-11-23"
+    operator_id: str                    # e.g. "wearwise_qa_inspection_lab"
+    validation_claim: str = "demonstration_fixture_provisional_not_certified"  # Disclaims certified physical calibration
+    notes: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "sample_id": self.sample_id,
+            "data_origin": self.data_origin,
+            "measuring_instrument": self.measuring_instrument,
+            "measurement_procedure": self.measurement_procedure,
+            "measurement_date": self.measurement_date,
+            "operator_id": self.operator_id,
+            "validation_claim": self.validation_claim,
+            "notes": self.notes,
+        }
+
+
+@dataclass(frozen=True)
 class GarmentInputSpec:
     """Finished physical garment specifications measured directly or provided by brand."""
     title: str
@@ -22,7 +51,7 @@ class GarmentInputSpec:
     dimensions_cm: Dict[str, float]
     silhouette: str = "regular"
     fabric_properties: Optional[FabricProperties] = None
-    provenance: str = "physical_manual_measurement"
+    provenance: Optional[GarmentMeasurementProvenance] = None
     garment_id: UUID = field(default_factory=uuid4)
 
 
@@ -78,6 +107,8 @@ class FitEvaluationReport:
     missing_required_dimensions: List[str]
     unsupported_dimensions: List[str]
     summary_explanation: str
+    garment_provenance: Optional[Dict[str, Any]] = None
+    fabric_properties: Optional[Dict[str, Any]] = None
     disclaimer: str = (
         "Provisional engineering fit estimation per Rev 1.2.1. "
         "Thresholds subject to Phase 5 physical wear trial calibration."
@@ -101,6 +132,8 @@ class FitEvaluationReport:
             "evaluated_dimensions": self.evaluated_dimensions,
             "missing_required_dimensions": self.missing_required_dimensions,
             "unsupported_dimensions": self.unsupported_dimensions,
+            "garment_provenance": self.garment_provenance,
+            "fabric_properties": self.fabric_properties,
             "regional_evaluations": {
                 k: v.to_dict() for k, v in self.regional_results.items()
             },

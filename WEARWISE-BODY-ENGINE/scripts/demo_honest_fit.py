@@ -35,7 +35,11 @@ from app.fit.rulebook import (
     RULEBOOK_VERSION,
 )
 from app.fit.registry import MeasurementCompatibilityRegistry
-from app.fit.models import GarmentInputSpec, FitEvaluationReport
+from app.fit.models import (
+    GarmentInputSpec,
+    FitEvaluationReport,
+    GarmentMeasurementProvenance,
+)
 from app.fit.engine import HonestFitEngine
 from app.fit.port import HonestFitEvaluationPort
 
@@ -112,10 +116,21 @@ def run_demo():
     # Scenario 1: Heavyweight Crewneck T-Shirt (Sizes XS, S, M, L)
     # -------------------------------------------------------------------------
     print("\n" + "=" * 80)
-    print("SCENARIO 1: Heavyweight Crewneck Cotton T-Shirt (Real Measured Finished Dimensions)")
+    print("SCENARIO 1: Heavyweight Crewneck Cotton T-Shirt (Reference Demonstration Fixtures)")
     print("=" * 80)
 
-    # Real manually measured finished garment dimensions (laid flat, pit-to-pit doubled)
+    # Reference garment finished dimensions with strict provenance metadata
+    tshirt_provenance = GarmentMeasurementProvenance(
+        sample_id="WW-FIXTURE-TSHIRT-2026-001",
+        data_origin="demonstration_fixture",
+        measuring_instrument="calibrated_rigid_steel_tape_iso_standard",
+        measurement_procedure="flat_relaxed_tabletop_bs_4952",
+        measurement_date="2026-11-23",
+        operator_id="wearwise_qa_lab_1",
+        validation_claim="demonstration_fixture_provisional_not_certified",
+        notes="Standard reference finished dimensions for Phase 5A test reproducibility",
+    )
+
     tshirt_sizes = [
         GarmentInputSpec(
             title="Everyday Heavyweight Crewneck Tee",
@@ -127,6 +142,7 @@ def run_demo():
                 "garment_back_length": 64.0,
             },
             fabric_properties=rigid_cotton,
+            provenance=tshirt_provenance,
         ),
         GarmentInputSpec(
             title="Everyday Heavyweight Crewneck Tee",
@@ -138,6 +154,7 @@ def run_demo():
                 "garment_back_length": 66.5,
             },
             fabric_properties=rigid_cotton,
+            provenance=tshirt_provenance,
         ),
         GarmentInputSpec(
             title="Everyday Heavyweight Crewneck Tee",
@@ -149,6 +166,7 @@ def run_demo():
                 "garment_back_length": 69.0,
             },
             fabric_properties=rigid_cotton,
+            provenance=tshirt_provenance,
         ),
         GarmentInputSpec(
             title="Everyday Heavyweight Crewneck Tee",
@@ -160,6 +178,7 @@ def run_demo():
                 "garment_back_length": 72.0,
             },
             fabric_properties=rigid_cotton,
+            provenance=tshirt_provenance,
         ),
     ]
 
@@ -185,6 +204,17 @@ def run_demo():
     print("SCENARIO 2: Classic Oxford Casual Shirt (Chest, Waist & Shoulders Supplied)")
     print("=" * 80)
 
+    shirt_provenance = GarmentMeasurementProvenance(
+        sample_id="WW-FIXTURE-SHIRT-2026-002",
+        data_origin="demonstration_fixture",
+        measuring_instrument="calibrated_rigid_steel_tape_iso_standard",
+        measurement_procedure="flat_relaxed_tabletop_bs_4952",
+        measurement_date="2026-11-23",
+        operator_id="wearwise_qa_lab_1",
+        validation_claim="demonstration_fixture_provisional_not_certified",
+        notes="Tailored woven button-down reference dimensions",
+    )
+
     shirt_sizes = [
         GarmentInputSpec(
             title="Classic Oxford Button-Down Shirt",
@@ -197,6 +227,7 @@ def run_demo():
                 "garment_back_length": 71.0,
             },
             fabric_properties=rigid_cotton,
+            provenance=shirt_provenance,
         ),
         GarmentInputSpec(
             title="Classic Oxford Button-Down Shirt",
@@ -209,6 +240,7 @@ def run_demo():
                 "garment_back_length": 74.0,
             },
             fabric_properties=rigid_cotton,
+            provenance=shirt_provenance,
         ),
         GarmentInputSpec(
             title="Classic Oxford Button-Down Shirt",
@@ -221,6 +253,7 @@ def run_demo():
                 "garment_back_length": 77.0,
             },
             fabric_properties=rigid_cotton,
+            provenance=shirt_provenance,
         ),
     ]
 

@@ -5,7 +5,7 @@
   "recommended_size": "S",
   "evaluations": [
     {
-      "report_id": "ef8fd574-4a2b-4c98-ac43-3b9624e3ea7b",
+      "report_id": "2712c238-b2d1-4a7a-9050-2144b9c6190c",
       "garment_title": "Classic Oxford Button-Down Shirt",
       "garment_category": "casual_shirt",
       "size_label": "S",
@@ -26,6 +26,27 @@
       "unsupported_dimensions": [
         "torso_length"
       ],
+      "garment_provenance": {
+        "sample_id": "WW-FIXTURE-SHIRT-2026-002",
+        "data_origin": "demonstration_fixture",
+        "measuring_instrument": "calibrated_rigid_steel_tape_iso_standard",
+        "measurement_procedure": "flat_relaxed_tabletop_bs_4952",
+        "measurement_date": "2026-11-23",
+        "operator_id": "wearwise_qa_lab_1",
+        "validation_claim": "demonstration_fixture_provisional_not_certified",
+        "notes": "Tailored woven button-down reference dimensions"
+      },
+      "fabric_properties": {
+        "fibre_composition": {
+          "cotton": 1.0
+        },
+        "mechanical_stretch_pct": 0.015,
+        "mechanical_stretch_percentage": "1.5%",
+        "stretch_recovery_pct": 0.9,
+        "stretch_recovery_percentage": "90.0%",
+        "stretch_direction": "rigid_zero",
+        "testing_standard": "BS 4952 / ASTM D3107 (15.0 N load)"
+      },
       "regional_evaluations": {
         "chest_circumference": {
           "region_code": "chest_circumference",
@@ -82,10 +103,10 @@
       "summary_explanation": "Size S is recommended for your preferred Regular fit (Provisional Fit Score: 100.0 / 100).",
       "disclaimer": "Provisional engineering fit estimation per Rev 1.2.1. Thresholds subject to Phase 5 physical wear trial calibration.",
       "rulebook_version": "1.2.1-provisional",
-      "evaluated_at": "2026-11-23T15:52:48.040071+00:00"
+      "evaluated_at": "2026-11-23T17:45:39.477567+00:00"
     },
     {
-      "report_id": "297bdf46-ae1d-4164-ad94-3c8f6a140067",
+      "report_id": "71c8b1a2-45b5-43cd-a410-beaad1360e66",
       "garment_title": "Classic Oxford Button-Down Shirt",
       "garment_category": "casual_shirt",
       "size_label": "M",
@@ -106,6 +127,27 @@
       "unsupported_dimensions": [
         "torso_length"
       ],
+      "garment_provenance": {
+        "sample_id": "WW-FIXTURE-SHIRT-2026-002",
+        "data_origin": "demonstration_fixture",
+        "measuring_instrument": "calibrated_rigid_steel_tape_iso_standard",
+        "measurement_procedure": "flat_relaxed_tabletop_bs_4952",
+        "measurement_date": "2026-11-23",
+        "operator_id": "wearwise_qa_lab_1",
+        "validation_claim": "demonstration_fixture_provisional_not_certified",
+        "notes": "Tailored woven button-down reference dimensions"
+      },
+      "fabric_properties": {
+        "fibre_composition": {
+          "cotton": 1.0
+        },
+        "mechanical_stretch_pct": 0.015,
+        "mechanical_stretch_percentage": "1.5%",
+        "stretch_recovery_pct": 0.9,
+        "stretch_recovery_percentage": "90.0%",
+        "stretch_direction": "rigid_zero",
+        "testing_standard": "BS 4952 / ASTM D3107 (15.0 N load)"
+      },
       "regional_evaluations": {
         "chest_circumference": {
           "region_code": "chest_circumference",
@@ -159,13 +201,13 @@
           "explanation": "Shoulder seams sit +4.80 cm past acromion bone (garment 42.0 cm vs body 37.2 cm), giving an intentional drop-shoulder silhouette."
         }
       },
-      "summary_explanation": "Size M is a wearable alternative (Provisional Fit Score: 76.1 / 100) with minor regional silhouette deviations.",
+      "summary_explanation": "Size M is a wearable alternative (relaxed) (Provisional Fit Score: 76.1 / 100) with regional silhouette deviations from your regular preference.",
       "disclaimer": "Provisional engineering fit estimation per Rev 1.2.1. Thresholds subject to Phase 5 physical wear trial calibration.",
       "rulebook_version": "1.2.1-provisional",
-      "evaluated_at": "2026-11-23T15:52:48.040071+00:00"
+      "evaluated_at": "2026-11-23T17:45:39.477567+00:00"
     },
     {
-      "report_id": "413580ae-c750-4a15-b6af-ac9ae96c9694",
+      "report_id": "b0e0da93-34ab-4a79-a87b-c3b117e0b493",
       "garment_title": "Classic Oxford Button-Down Shirt",
       "garment_category": "casual_shirt",
       "size_label": "L",
@@ -186,6 +228,27 @@
       "unsupported_dimensions": [
         "torso_length"
       ],
+      "garment_provenance": {
+        "sample_id": "WW-FIXTURE-SHIRT-2026-002",
+        "data_origin": "demonstration_fixture",
+        "measuring_instrument": "calibrated_rigid_steel_tape_iso_standard",
+        "measurement_procedure": "flat_relaxed_tabletop_bs_4952",
+        "measurement_date": "2026-11-23",
+        "operator_id": "wearwise_qa_lab_1",
+        "validation_claim": "demonstration_fixture_provisional_not_certified",
+        "notes": "Tailored woven button-down reference dimensions"
+      },
+      "fabric_properties": {
+        "fibre_composition": {
+          "cotton": 1.0
+        },
+        "mechanical_stretch_pct": 0.015,
+        "mechanical_stretch_percentage": "1.5%",
+        "stretch_recovery_pct": 0.9,
+        "stretch_recovery_percentage": "90.0%",
+        "stretch_direction": "rigid_zero",
+        "testing_standard": "BS 4952 / ASTM D3107 (15.0 N load)"
+      },
       "regional_evaluations": {
         "chest_circumference": {
           "region_code": "chest_circumference",
@@ -242,7 +305,7 @@
       "summary_explanation": "Size L has significant silhouette mismatch (Provisional Fit Score: 0.0 / 100) relative to your regular preference.",
       "disclaimer": "Provisional engineering fit estimation per Rev 1.2.1. Thresholds subject to Phase 5 physical wear trial calibration.",
       "rulebook_version": "1.2.1-provisional",
-      "evaluated_at": "2026-11-23T15:52:48.040071+00:00"
+      "evaluated_at": "2026-11-23T17:45:39.477567+00:00"
     }
   ]
 }

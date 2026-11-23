@@ -70,7 +70,64 @@ class HonestFitEvaluationPort:
                 priority = 4
             return (priority, -r.composite_score)
 
-        return sorted(reports, key=sort_key)
+        sorted_reports = sorted(reports, key=sort_key)
+
+        # Enforce single top recommendation invariant:
+        # In a multi-size evaluation, exactly one size is designated 'recommended' (the top-ranked
+        # wearable size), while other wearable sizes are consistently designated 'alternative'.
+        final_reports: List[FitEvaluationReport] = []
+        found_top_recommended = False
+
+        for r in sorted_reports:
+            if not found_top_recommended and r.status in ("recommended", "alternative") and r.is_coverage_gate_passed:
+                found_top_recommended = True
+                if r.status != "recommended":
+                    r = FitEvaluationReport(
+                        garment_title=r.garment_title,
+                        garment_category=r.garment_category,
+                        size_label=r.size_label,
+                        silhouette_preference=r.silhouette_preference,
+                        composite_score=r.composite_score,
+                        coverage_ratio=r.coverage_ratio,
+                        is_coverage_gate_passed=r.is_coverage_gate_passed,
+                        status="recommended",
+                        regional_results=r.regional_results,
+                        evaluated_dimensions=r.evaluated_dimensions,
+                        missing_required_dimensions=r.missing_required_dimensions,
+                        unsupported_dimensions=r.unsupported_dimensions,
+                        summary_explanation=f"Size {r.size_label} is recommended for your preferred {r.silhouette_preference.title()} fit (Provisional Fit Score: {r.composite_score:.1f} / 100).",
+                        garment_provenance=r.garment_provenance,
+                        fabric_properties=r.fabric_properties,
+                        disclaimer=r.disclaimer,
+                        rulebook_version=r.rulebook_version,
+                        report_id=r.report_id,
+                        evaluated_at=r.evaluated_at,
+                    )
+            elif found_top_recommended and r.status == "recommended":
+                r = FitEvaluationReport(
+                    garment_title=r.garment_title,
+                    garment_category=r.garment_category,
+                    size_label=r.size_label,
+                    silhouette_preference=r.silhouette_preference,
+                    composite_score=r.composite_score,
+                    coverage_ratio=r.coverage_ratio,
+                    is_coverage_gate_passed=r.is_coverage_gate_passed,
+                    status="alternative",
+                    regional_results=r.regional_results,
+                    evaluated_dimensions=r.evaluated_dimensions,
+                    missing_required_dimensions=r.missing_required_dimensions,
+                    unsupported_dimensions=r.unsupported_dimensions,
+                    summary_explanation=f"Size {r.size_label} is a wearable alternative (Provisional Fit Score: {r.composite_score:.1f} / 100) relative to your {r.silhouette_preference} preference.",
+                    garment_provenance=r.garment_provenance,
+                    fabric_properties=r.fabric_properties,
+                    disclaimer=r.disclaimer,
+                    rulebook_version=r.rulebook_version,
+                    report_id=r.report_id,
+                    evaluated_at=r.evaluated_at,
+                )
+            final_reports.append(r)
+
+        return final_reports
 
     def recommend_best_size(
         self,
