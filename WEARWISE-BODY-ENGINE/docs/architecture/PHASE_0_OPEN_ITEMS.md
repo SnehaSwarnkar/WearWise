@@ -2,7 +2,7 @@
 
 **Project:** WearWise AI Fashion & Honest Fit Platform  
 **Document:** Architectural Evidence Audit & Boundary Definition  
-**Revision:** 1.1 (Empirical Evidence Rigor & Provisional Boundary Labeling)  
+**Revision:** 1.2 (Empirical Evidence Rigor, RMSR/PVSR Separation & Provisional Bounds)  
 **Date:** 2026-11-23  
 **Status:** Approved Technical Reconciliation Record  
 
@@ -40,8 +40,8 @@ Rather than silently averaging conflicting figures or carrying ambiguity into ca
   - Measurement Code: `hip_circumference`
   - Canonical Baseline Value: **$88.43\text{ cm}$** (on baseline male template, stature $156.83\text{ cm}$).
   - Extraction Method: `planar_convex_hull_bounded` at $51\%$ stature, $|X| \le 0.22\text{ m}$.
-  - Quality Status: `provisional` (pending Phase 4 3D geodesic surface loop validation, analogous to Anny's 46-vertex waist chain).
-- **Architectural Consequence:** The domain schema must not mark hip circumference as `validated`. It is typed with `status: provisional` and acquisition method `geometry_extracted`.
+  - Assessment State: `provisional` (pending Phase 4 exact mesh-plane loop stitching and geodesic surface loop validation).
+- **Architectural Consequence:** The domain schema must not mark hip circumference as `eligible` without qualification. It is typed with `assessment_state: provisional` and acquisition method `geometry_extracted`.
 
 ---
 
@@ -102,7 +102,7 @@ Rather than silently averaging conflicting figures or carrying ambiguity into ca
 
 | Metric Name | Mathematical Definition | Historical Status in Phase 0 | Architectural Role in Phase 1 |
 |---|---|---|---|
-| **Regional Mean Spillover Ratio (RMSR)** | $\text{RMSR}_R(p) = \frac{\bar{\Delta}_R(p)}{\bar{\Delta}_{R_{\text{target}}}(p) + \epsilon}$ | **Empirically Measured** in `exp_b_parameter_behaviour.py` across 20 parameters. | Primary metric in BICE loss function $\mathcal{L}_{\text{locality}}$. |
+| **Regional Mean Spillover Ratio (RMSR)** | $\text{RMSR}_R(p) = \frac{\bar{\Delta}_R(p)}{\bar{\Delta}_{R_{\text{target}}}(p) + \epsilon}$ | **Empirically Measured** in `exp_b_parameter_behaviour.py` across 20 parameters. | Primary metric in `ShapeEvaluationPort` and BICE loss $\mathcal{L}_{\text{locality}}$. |
 | **Peak Vertex Spillover Ratio (PVSR)** | $\text{PVSR}(p) = \frac{\max_{v \notin \mathcal{R}_{\text{target}}} \|\Delta \mathbf{x}_v\|}{\max_{v \in \mathcal{R}_{\text{target}}} \|\Delta \mathbf{x}_v\| + \epsilon}$ | Formulated mathematically in reports; **NOT empirically logged for all vertices** in Phase 0 JSON. | Secondary metric reserved for vertex-level boundary testing in Phase 3. |
 
 #### Investigation & Clarifications:
@@ -136,8 +136,8 @@ Rather than silently averaging conflicting figures or carrying ambiguity into ca
 1. **Model-Derived Estimates vs. Validated Human Truth:**
    - Any measurement extracted from Anny mesh geometry is a **geometric model estimate**.
    - It must never be represented as an externally validated human dimension until Phase 8 volunteer trials.
-2. **Provenance and Validation Separation:**
-   - Acquisition method (`user_reported`, `tape_measured`, `geometry_extracted`, `model_estimated`) is strictly separated from validation state (`unvalidated`, `internally_consistent`, `externally_validated`, `disputed`).
+2. **Provenance, Validation, Lifecycle & Assessment Separation:**
+   - Acquisition method (`user_reported`, `tape_measured`, `geometry_extracted`, `model_estimated`), validation state (`unvalidated`, `internally_consistent`, `externally_validated`, `disputed`), lifecycle status (`active`, `superseded`, `draft`, `purged`), and assessment state (`eligible`, `provisional`, `unassessed`, `rejected`) are four orthogonal classifications.
 3. **Strict Exclusion of Mass & BMI from Sizing:**
    - Model-derived mass and BMI must never enter garment sizing or personal health claims.
 4. **Latency SLAs as Benchmark Targets:**
