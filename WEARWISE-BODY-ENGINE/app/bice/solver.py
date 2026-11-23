@@ -132,9 +132,12 @@ class BICEShapeSolver:
         measurements: Union[Dict[str, BodyMeasurement], Dict[str, Union[float, Decimal]]],
         controls: Union[BodyShapeControls, Dict[str, float]],
         target_region: Optional[str] = None,
+        candidate_regional_scales: Optional[Dict[str, RegionalShapeScale]] = None,
     ) -> SolverCandidateDiagnostic:
         """
-        Generates an initial candidate AvatarShapeSpec and evaluates its admissibility.
+        Generates a candidate AvatarShapeSpec and evaluates its admissibility.
+        If candidate_regional_scales is provided (e.g. from an optimizer step), it is evaluated directly;
+        otherwise, regional scales are deterministically mapped from controls.
         """
         candidate_id = str(uuid4())
 
@@ -148,10 +151,13 @@ class BICEShapeSolver:
             valid_meas["stature"] = valid_stat
 
         # 2. Semantic normalization & regional mapping
-        norm_ctrl = normalize_controls(valid_ctrl)
-        reg_scales = map_normalized_to_regional_scales(
-            norm_ctrl, mapping_version=self.mapping_version
-        )
+        if candidate_regional_scales is not None:
+            reg_scales = candidate_regional_scales
+        else:
+            norm_ctrl = normalize_controls(valid_ctrl)
+            reg_scales = map_normalized_to_regional_scales(
+                norm_ctrl, mapping_version=self.mapping_version
+            )
 
         # 3. Regional bounds check
         bounds_report = evaluate_regional_bounds(reg_scales)
