@@ -2,7 +2,7 @@
 
 **Project:** WearWise AI Fashion & Honest Fit Platform  
 **Document:** BICE & Domain Entities Specification (BICE-001)  
-**Revision:** 1.1 (Engine-Isolated Domain Architecture)  
+**Revision:** 1.2 (Engine-Isolated Domain Architecture & Geometric Evaluation Port)  
 **Date:** 2026-11-23  
 **Status:** Approved Technical Architecture  
 
@@ -18,6 +18,7 @@ The **Body Intelligence & Calibration Engine (BICE)** is the mathematical mediat
    - **Body Measurements:** Real-world physical dimensions in centimeters (`BodyMeasurement`), grounded in standard anatomical tailoring landmarks.
    - **Semantic Body-Shape Controls:** Intuitive, normalized consumer sliders (`BodyShapeControls`, $[0.0, 1.0]$) representing visible human form variation.
    - **Engine-Independent Shape Intent:** The output of BICE is an abstract, neutral **`AvatarShapeSpec`** describing target stature, presentation morphology, and normalized regional dimensional scaling factors.
+   - **Geometric Evaluation via `ShapeEvaluationPort`:** When BICE requires feedback on geometric mesh displacements or regional spillover during iterative optimization, it queries an injected domain interface (`ShapeEvaluationPort`). It never interacts with 3D mesh vertices directly.
    - **Avatar Engine Parameters:** Low-level blendshape displacement vectors ($\mathbf{\theta}$) exist solely inside the concrete engine adapter (`AnnyAdapter`) and are strictly forbidden from leaking into BICE, domain entities, or public REST contracts.
 
 ```mermaid
@@ -30,23 +31,23 @@ flowchart LR
     subgraph BICELayer["BICE Mediation Layer (Engine-Neutral)"]
         Norm["1. Semantic Normalizer<br>Maps [0.0, 1.0] to Centered Offsets [-1.0, 1.0]"]
         Validator["2. Semantic Invariant & Safety Validator<br>Rejects Impossible Combinations"]
-        Solver["3. Abstract Shape Spec Generator<br>Synthesizes AvatarShapeSpec"]
+        Solver["3. Regularized Parameter Solver<br>Optimizes AvatarShapeSpec"]
     end
 
-    subgraph EngineContract["Engine Boundary Contract"]
-        ShapeSpec["AvatarShapeSpec<br>(Presentation, Stature, Regional Scales)"]
+    subgraph EvaluationPort["Shared Domain Interface"]
+        EvalPort["ShapeEvaluationPort<br>(Abstract feedback on regional displacement & RMSR)"]
     end
 
-    subgraph AdapterDomain["Concrete Adapter Domain (Isolated)"]
-        Adapter["AnnyAdapter<br>(Maps AvatarShapeSpec -> Anny θ Tensors)"]
+    subgraph EngineDomain["Concrete Adapter Domain (Isolated)"]
+        Adapter["AnnyAdapter<br>(Implements ShapeEvaluationPort; maps to θ)"]
     end
 
     TapeInput --> Norm
     Sliders --> Norm
     Norm --> Validator
     Validator --> Solver
-    Solver --> ShapeSpec
-    ShapeSpec --> Adapter
+    Solver <-->|Evaluates displacement & RMSR| EvalPort
+    EvalPort -.->|Implemented by| Adapter
 ```
 
 ---
@@ -54,18 +55,18 @@ flowchart LR
 ## 2. Canonical Domain Models
 
 ### 2.1 Model Classification Discipline
-WearWise strictly separates three model representations:
-- **Domain Entities:** In-memory domain objects encapsulating business invariants and domain methods.
-- **Transport Contracts (Pydantic):** Schemas for HTTP request/response serialization (defined in `API_CONTRACTS.md`).
-- **Persistence Records (SQLAlchemy):** Relational tables and database entities (defined in `DATABASE_SCHEMA.md`).
+WearWise strictly separates three model representations across distinct layers:
+- **Domain Entities & Value Objects (`app.domain.entities`):** Pure in-memory domain objects encapsulating business invariants and domain methods. Framework-independent.
+- **Transport Contracts (`app.schemas`):** Pydantic models for HTTP request/response serialization across API boundaries (defined in `API_CONTRACTS.md`).
+- **Persistence Records (`app.infrastructure.models`):** SQLAlchemy ORM models mapped to physical database tables (defined in `DATABASE_SCHEMA.md`).
 
-### 2.2 Decoupled Measurement Provenance and Validation State
-To eliminate the conflation of data origin with data credibility, WearWise separates **Acquisition Method** from **Validation State**:
+### 2.2 Orthogonal Measurement Taxonomies
+To eliminate the conflation of data origin, scientific verification, database persistence lifecycle, and apparel fit eligibility, WearWise separates these concepts into four orthogonal enums:
 
 ```python
 from enum import Enum
 from decimal import Decimal
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from datetime import datetime
 from uuid import UUID
 
@@ -77,24 +78,31 @@ class MeasurementAcquisitionMethod(str, Enum):
     MODEL_ESTIMATED = "model_estimated"      # Statistically derived from demographic/height priors
 
 class MeasurementValidationState(str, Enum):
-    """The formal verification status of the measurement value."""
-    UNVALIDATED = "unvalidated"              # No verification check performed
+    """The formal scientific verification status of the measurement value."""
+    UNVALIDATED = "unvalidated"              # No external verification performed
     INTERNALLY_CONSISTENT = "internally_consistent" # Passes anatomical consistency checks
     EXTERNALLY_VALIDATED = "externally_validated"   # Validated in controlled ground-truth study (Phase 8)
     DISPUTED = "disputed"                    # Conflicts with other authoritative measurements
 
-class MeasurementStatus(str, Enum):
-    """Lifecycle status of the measurement record."""
-    ACTIVE = "active"             # Current active measurement used in sizing
+class MeasurementLifecycleStatus(str, Enum):
+    """Database persistence and active lifecycle state."""
+    ACTIVE = "active"             # Current active measurement in profile revision
     SUPERSEDED = "superseded"     # Historical record superseded by newer revision
-    PROVISIONAL = "provisional"   # Metric from provisional landmark (e.g. hip planar slice)
-    REJECTED = "rejected"         # Rejected due to anatomical impossibility
+    DRAFT = "draft"               # In-progress entry not yet finalized
+    PURGED = "purged"             # Soft-deleted / flagged for purge
+
+class MeasurementAssessmentState(str, Enum):
+    """Apparel sizing eligibility state for Honest Fit evaluation."""
+    ELIGIBLE = "eligible"         # Fully assessed and valid for sizing calculations
+    PROVISIONAL = "provisional"   # Geometry-extracted from provisional landmark (e.g. hip planar slice)
+    UNASSESSED = "unassessed"     # Landmark not measured or evaluated
+    REJECTED = "rejected"         # Rejected due to anatomical impossibility or extraction failure
 ```
 
 ### 2.3 Quality and Uncertainty Representation
 Automatic assignment of `confidence_score = 1.00` to tape measurements is strictly prohibited. Quality is represented through:
-1. **`tolerance_cm`:** Physical measurement uncertainty based on capture protocol (e.g. $\pm 0.5\text{ cm}$ for professional tape, $\pm 1.5\text{ cm}$ for self-tape, $\pm 3.0\text{ cm}$ for user-reported).
-2. **`reliability_weight`:** An explicit, versioned engineering policy weight ($w_k \in [0.1, 1.0]$) used by BICE when resolving conflicting constraints.
+1. **`tolerance_cm`:** Physical measurement uncertainty based on capture protocol (e.g. $\pm 0.5\text{ cm}$ for professional tape, $\pm 1.5\text{ cm}$ for self-tape, $\pm 3.0\text{ cm}$ for user-reported). Must be non-negative ($\ge 0.0\text{ cm}$).
+2. **`reliability_weight`:** An explicit, versioned engineering policy weight ($w_k \in [0.0, 1.0]$, default $1.00$) used by BICE when resolving conflicting constraints, matching the database constraint `CHECK (reliability_weight BETWEEN 0.0 AND 1.0)`.
 
 ---
 
@@ -107,16 +115,17 @@ Represents the persistent identity and anthropometric profile of an individual s
 - **`user_id`:** `UUID` (Derived strictly from authenticated principal; never from client payload).
 - **`current_revision`:** `int` (Monotonically increasing sequence number).
 - **`presentation_gender`:** `Literal["masculine", "feminine", "neutral"]` (Visual presentation style; strictly decoupled from gender identity).
-- **`stature_cm`:** `Decimal` (Derived convenience projection of active `stature` measurement).
+- **`stature_cm`:** `Decimal` (Derived convenience projection of active canonical `stature` measurement in `body_measurements`).
 - **`reported_weight_kg`:** `Optional[Decimal]` (Self-reported weight; stored strictly as non-apparel metadata; never enters ease calculations or mass estimation).
 - **`measurements`:** `Dict[str, BodyMeasurement]` (Keyed by canonical measurement code).
 - **`shape_controls`:** `BodyShapeControls` (Active semantic slider state).
 - **`current_avatar_id`:** `Optional[UUID]` (Reference to current active avatar artifact).
+- **`is_deleted`:** `bool` (Soft-delete flag).
 - **`created_at`:** `datetime` (UTC).
 - **`updated_at`:** `datetime` (UTC).
 
 ### 3.2 `BodyMeasurement`
-Represents a single body dimension.
+Represents a single body dimension. Single canonical source of truth for body height (code: `"stature"`).
 
 - **`measurement_id`:** `UUID`.
 - **`profile_id`:** `UUID`.
@@ -126,10 +135,11 @@ Represents a single body dimension.
 - **`unit`:** `Literal["cm"]`.
 - **`acquisition_method`:** `MeasurementAcquisitionMethod`.
 - **`validation_state`:** `MeasurementValidationState`.
-- **`status`:** `MeasurementStatus`.
+- **`lifecycle_status`:** `MeasurementLifecycleStatus`.
+- **`assessment_state`:** `MeasurementAssessmentState`.
 - **`landmark_convention`:** `str`.
-- **`tolerance_cm`:** `Decimal` (Measurement uncertainty).
-- **`reliability_weight`:** `Decimal` (BICE optimization weight).
+- **`tolerance_cm`:** `Decimal` ($\ge 0.0\text{ cm}$).
+- **`reliability_weight`:** `Decimal` ($0.00$ to $1.00$, default $1.00$).
 - **`captured_at`:** `datetime`.
 
 ### 3.3 `BodyShapeControls`
@@ -169,7 +179,7 @@ class AvatarShapeSpec:
     Engine-independent specification of avatar shape and stature.
     Consumed by AvatarEngine implementations (e.g. AnnyAdapter).
     """
-    spec_version: str                                  # e.g. "1.1"
+    spec_version: str                                  # e.g. "1.2"
     presentation: Literal["masculine", "feminine", "neutral"]
     target_stature_cm: float                           # Target height in cm
     target_measurements: Dict[str, float]              # Canonical constraints {code: value_cm}
@@ -179,14 +189,51 @@ class AvatarShapeSpec:
 
 ---
 
-## 5. BICE Regularization & Constraint Formulation
+## 5. Geometric Feedback Contract: `ShapeEvaluationPort`
 
-### 5.1 Semantic Normalization
-A semantic slider $c_i \in [0.0, 1.0]$ is converted into an engine-neutral regional intent offset:
-$$\Delta c_i = 2.0 \cdot (c_i - 0.5) \in [-1.0, 1.0]$$
+To enable BICE to calculate a locality loss without importing or depending on Anny, the shared domain layer defines the abstract `ShapeEvaluationPort`:
 
-### 5.2 Locality Regularization & Spillover Penalty
-To prevent localized slider adjustments from inducing unwanted collateral deformation in distant body regions, BICE evaluates the **Regional Mean Spillover Ratio (RMSR)** across defined anatomical zones ($R \in \mathcal{R}$):
+```python
+from typing import Protocol, List, Dict
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class RegionalDisplacementSummary:
+    """Regional summary of vertex displacements in meters."""
+    region_code: str
+    mean_displacement_m: float
+    max_displacement_m: float
+    vertex_count: int
+
+@dataclass(frozen=True)
+class ShapeEvaluationResult:
+    """Geometric feedback returned to BICE for regularized solving."""
+    metric_version: str            # "1.1-rmsr-pvsr"
+    regional_displacements: Dict[str, RegionalDisplacementSummary]
+    target_region_mean_m: float
+    max_non_target_mean_m: float
+    rmsr: float                    # Regional Mean Spillover Ratio
+    pvsr: Optional[float]          # Peak Vertex Spillover Ratio
+    is_plausible: bool
+    diagnostic_notes: str
+
+class ShapeEvaluationPort(Protocol):
+    """Abstract interface for evaluating candidate shapes against reference baselines."""
+    def evaluate_shape(
+        self, 
+        shape_spec: AvatarShapeSpec, 
+        target_region: str, 
+        requested_regions: List[str]
+    ) -> ShapeEvaluationResult:
+        """
+        Evaluates regional displacements of candidate shape against baseline.
+        Implemented by engine adapter; injected into BICE by orchestration service.
+        """
+        ...
+```
+
+### 5.1 Locality Regularization & Spillover Penalty
+Using feedback from `ShapeEvaluationPort`, BICE evaluates the **Regional Mean Spillover Ratio (RMSR)** across defined anatomical zones ($R \in \mathcal{R}$):
 
 $$\text{RMSR}_R(\mathbf{s}) = \frac{\bar{\Delta}_R(\mathbf{s})}{\bar{\Delta}_{R_{\text{target}}}(\mathbf{s}) + \epsilon}$$
 
@@ -195,7 +242,7 @@ Where $\epsilon = 10^{-6}\text{ m}$ protects against division-by-zero when targe
 The BICE locality loss function $\mathcal{L}_{\text{locality}}$ aggregates the maximum regional leakage across non-target zones:
 $$\mathcal{L}_{\text{locality}}(\mathbf{s}) = \max_{R \neq R_{\text{target}}} \text{RMSR}_R(\mathbf{s})$$
 
-### 5.3 Provisional Engineering Bounds
+### 5.2 Provisional Engineering Bounds
 Pending Phase 3 empirical solver tests and Phase 4 mesh validity integration, the regional shape scales are constrained to **provisional engineering safe bounds**:
 - `thigh_scale`: Restricted to $[-0.50, +0.50]$ (protects pelvic/groin geometry from severe RMSR leakage of $4.04$ observed at extreme values in Phase 0).
 - `belly_scale`: Restricted to $[-0.50, +0.70]$ (protects lower ribs from excessive anterior flare).
