@@ -2,7 +2,7 @@
   "manifest_version": "1.0.0",
   "phase": "5A",
   "git_branch": "noTouch",
-  "base_commit": "d3f3619ff53d3f61fa9c34bf00284e74eff4c4ed",
+  "base_commit": "57fa895163c983e2253e31e67e2dad26fa99268d",
   "review_criteria_verifications": {
     "1_recommendation_status_consistency": {
       "passed": true,
