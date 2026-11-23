@@ -44,7 +44,9 @@ def validate_presentation(presentation: Union[str, PresentationGender]) -> Prese
 
 def validate_stature(stature_cm: Union[float, Decimal, int]) -> float:
     """
-    Validates stature measurement in centimeters against standard anthropometric bounds.
+    Validates stature measurement in centimeters.
+    Bounds [100.0, 230.0] cm are provisional engineering limits reflecting
+    ISO 7250-1:2017 adult stature envelopes while bounding avatar deformation.
     """
     if not isinstance(stature_cm, (int, float, Decimal)) or isinstance(stature_cm, bool):
         raise BICEValidationError(
@@ -115,8 +117,6 @@ def validate_measurements_input(
     for code, m in measurements.items():
         if isinstance(m, BodyMeasurement):
             val = float(m.value_cm)
-            if m.unit != "cm":
-                raise BICEValidationError(f"Measurement '{code}' unit must be 'cm', got '{m.unit}'")
         elif isinstance(m, (int, float, Decimal)) and not isinstance(m, bool):
             val = float(m)
         else:
