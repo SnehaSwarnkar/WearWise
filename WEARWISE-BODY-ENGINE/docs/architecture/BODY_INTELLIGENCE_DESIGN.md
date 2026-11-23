@@ -2,7 +2,7 @@
 
 **Project:** WearWise AI Fashion & Honest Fit Platform  
 **Document:** BICE & Domain Entities Specification (BICE-001)  
-**Revision:** 1.2 (Engine-Isolated Domain Architecture & Geometric Evaluation Port)  
+**Revision:** 1.2.1 (Canonical Shared Protocols, Decoupled Taxonomies & Signal Evaluation)  
 **Date:** 2026-11-23  
 **Status:** Approved Technical Architecture  
 
@@ -191,29 +191,34 @@ class AvatarShapeSpec:
 
 ## 5. Geometric Feedback Contract: `ShapeEvaluationPort`
 
-To enable BICE to calculate a locality loss without importing or depending on Anny, the shared domain layer defines the abstract `ShapeEvaluationPort`:
+To enable BICE to calculate a locality loss without importing or depending on Anny or PyTorch, the shared domain layer defines the abstract `ShapeEvaluationPort`:
 
 ```python
-from typing import Protocol, List, Dict
+from typing import Protocol, List, Dict, Optional
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class RegionalDisplacementSummary:
-    """Regional summary of vertex displacements in meters."""
+    """Summary of vertex displacements in a specific anatomical zone in METERS."""
     region_code: str
-    mean_displacement_m: float
-    max_displacement_m: float
+    mean_displacement_m: float      # Displacement magnitude in METERS
+    max_displacement_m: float       # Peak vertex displacement in METERS
     vertex_count: int
 
 @dataclass(frozen=True)
 class ShapeEvaluationResult:
-    """Geometric feedback returned to BICE for regularized solving."""
-    metric_version: str            # "1.1-rmsr-pvsr"
+    """
+    Geometric feedback returned to BICE for regularized solving.
+    RMSR = Regional Mean Spillover Ratio (dimensionless arithmetic ratio).
+    PVSR = Peak Vertex Spillover Ratio (dimensionless maximum vertex displacement ratio).
+    """
+    metric_version: str            # "1.2.1-rmsr-pvsr"
+    evaluation_status: str         # "success", "insufficient_target_signal", "evaluation_failed"
     regional_displacements: Dict[str, RegionalDisplacementSummary]
-    target_region_mean_m: float
-    max_non_target_mean_m: float
-    rmsr: float                    # Regional Mean Spillover Ratio
-    pvsr: Optional[float]          # Peak Vertex Spillover Ratio
+    target_region_mean_m: float    # Mean target displacement magnitude in METERS
+    max_non_target_mean_m: float   # Max non-target regional displacement magnitude in METERS
+    rmsr: Optional[float]          # Regional Mean Spillover Ratio (dimensionless ratio); None if insufficient signal
+    pvsr: Optional[float]          # Peak Vertex Spillover Ratio (dimensionless ratio); None if insufficient signal
     is_plausible: bool
     diagnostic_notes: str
 
@@ -232,14 +237,29 @@ class ShapeEvaluationPort(Protocol):
         ...
 ```
 
-### 5.1 Locality Regularization & Spillover Penalty
+### 5.1 Locality Regularization, Spillover Metrics & Near-Zero Signal Handling
+
 Using feedback from `ShapeEvaluationPort`, BICE evaluates the **Regional Mean Spillover Ratio (RMSR)** across defined anatomical zones ($R \in \mathcal{R}$):
 
-$$\text{RMSR}_R(\mathbf{s}) = \frac{\bar{\Delta}_R(\mathbf{s})}{\bar{\Delta}_{R_{\text{target}}}(\mathbf{s}) + \epsilon}$$
+$$\text{RMSR}_R(\mathbf{s}) = \frac{\bar{\Delta}_R(\mathbf{s})}{\bar{\Delta}_{R_{\text{target}}}(\mathbf{s})}$$
 
-Where $\epsilon = 10^{-6}\text{ m}$ protects against division-by-zero when target displacement is near zero.
+#### Mathematical Invariants & Unit Definitions:
+1. **Displacement Magnitudes ($\bar{\Delta}_R, \bar{\Delta}_{R_{\text{target}}}$):** Regional arithmetic mean displacements are measured strictly in **METERS ($m$)**.
+2. **Dimensionless Ratio:** $\text{RMSR}_R$ is an arithmetic ratio of means and is strictly **DIMENSIONLESS** ($[0.0, \infty)$).
+3. **Terminology Rule:** RMSR stands for **Regional Mean Spillover Ratio**. It is **NOT** Root Mean Square Residual ($L_2$ error). It measures cross-regional geometric spillover.
+4. **Extreme-Value Ratio (PVSR):** Peak Vertex Spillover Ratio is an $L_\infty$ ratio comparing the single maximal displaced vertex in region $R$ to that in the target zone:
+   $$\text{PVSR}_R(\mathbf{s}) = \frac{\max_{v \in R} \|\Delta \mathbf{x}_v\|}{\max_{u \in R_{\text{target}}} \|\Delta \mathbf{x}_u\|}$$
 
-The BICE locality loss function $\mathcal{L}_{\text{locality}}$ aggregates the maximum regional leakage across non-target zones:
+#### Near-Zero Target Signal Evaluation Policy:
+When the target region mean displacement is below the numerical evaluation threshold $\epsilon_{\text{threshold}} = 10^{-4}\text{ m}$ ($0.1\text{ mm}$):
+- `ShapeEvaluationPort` returns `evaluation_status = "insufficient_target_signal"`, with `rmsr = None` and `is_plausible = False`.
+- **Inviolable Solver Rule:** BICE does **NOT** interpret an unavailable locality measurement as a perfect locality result ($0.0$). Zero target movement cannot be exploited to report zero spillover.
+- **Solver Handling:**
+  - The solver **rejects the candidate step** as an uninformative gradient direction.
+  - The candidate is assigned a maximal penalty ($\mathcal{L}_{\text{locality}} = \mathcal{L}_{\text{penalty\_max}} = 10.0$).
+  - The optimization routine contracts the search step size or reverts to prior valid iterates.
+
+When signal is sufficient ($\bar{\Delta}_{R_{\text{target}}} \ge 10^{-4}\text{ m}$), the BICE locality loss function aggregates the maximum regional leakage across non-target zones:
 $$\mathcal{L}_{\text{locality}}(\mathbf{s}) = \max_{R \neq R_{\text{target}}} \text{RMSR}_R(\mathbf{s})$$
 
 ### 5.2 Provisional Engineering Bounds
