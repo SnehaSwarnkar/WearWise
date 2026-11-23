@@ -129,7 +129,7 @@ def test_near_zero_signal_policy_and_maximal_penalty():
     assert eval_result.status == "insufficient_target_signal"
     assert eval_result.locality_loss == MAXIMAL_LOCALITY_PENALTY
     assert eval_result.locality_loss != 0.0
-    assert "Insufficient target signal" in eval_result.diagnostic_notes
+    assert "below evaluation threshold" in eval_result.diagnostic_notes
 
 
 def test_successful_locality_evaluation_and_max_spillover():
