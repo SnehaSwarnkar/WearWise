@@ -34,3 +34,9 @@ experiments/oxihuman/oxihuman-repo/
 .coverage.*
 .pytest_cache/
 htmlcov/
+
+# Local databases and binary assets
+data/
+*.db
+*.db-wal
+*.db-shm

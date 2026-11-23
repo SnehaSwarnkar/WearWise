@@ -1,0 +1,2062 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "WearWise Backend API",
+    "description": "WearWise AI Fashion & Honest Fit Platform API \u2014 Phase 6A Vertical Slice",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Health Check",
+        "operationId": "health_check_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Health Check",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles": {
+      "post": {
+        "tags": [
+          "Profiles & Measurements"
+        ],
+        "summary": "Create Profile",
+        "description": "Creates a new body profile anchor for the authenticated user,\ninitializing revision 1, canonical stature, and shape controls.",
+        "operationId": "create_profile_api_v1_profiles_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProfileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profile_id}": {
+      "get": {
+        "tags": [
+          "Profiles & Measurements"
+        ],
+        "summary": "Get Profile",
+        "description": "Retrieves profile summary and active measurements for authenticated owner.",
+        "operationId": "get_profile_api_v1_profiles__profile_id__get",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Profiles & Measurements"
+        ],
+        "summary": "Update Profile",
+        "description": "Updates non-anthropometric profile metadata.",
+        "operationId": "update_profile_api_v1_profiles__profile_id__patch",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profile_id}/revisions": {
+      "get": {
+        "tags": [
+          "Profiles & Measurements"
+        ],
+        "summary": "Get Revisions",
+        "description": "Returns revision history for profile.",
+        "operationId": "get_revisions_api_v1_profiles__profile_id__revisions_get",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profile_id}/measurements": {
+      "post": {
+        "tags": [
+          "Profiles & Measurements"
+        ],
+        "summary": "Record Measurements",
+        "description": "Appends a new revision with recorded measurements.\nEnforces optimistic locking on expected_revision.",
+        "operationId": "record_measurements_api_v1_profiles__profile_id__measurements_post",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordMeasurementsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Profiles & Measurements"
+        ],
+        "summary": "Get Measurements",
+        "description": "Retrieves active measurements for the profile.",
+        "operationId": "get_measurements_api_v1_profiles__profile_id__measurements_get",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profile_id}/measurements/history": {
+      "get": {
+        "tags": [
+          "Profiles & Measurements"
+        ],
+        "summary": "Get Measurement History",
+        "description": "Retrieves timeline of measurements across revisions.",
+        "operationId": "get_measurement_history_api_v1_profiles__profile_id__measurements_history_get",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/controls/definitions": {
+      "get": {
+        "tags": [
+          "Profiles & Measurements"
+        ],
+        "summary": "Get Control Definitions",
+        "description": "Returns supported semantic controls catalog and safe bounds.",
+        "operationId": "get_control_definitions_api_v1_controls_definitions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profile_id}/controls": {
+      "put": {
+        "tags": [
+          "Profiles & Measurements"
+        ],
+        "summary": "Update Controls",
+        "description": "Updates semantic body controls by creating a new revision.",
+        "operationId": "update_controls_api_v1_profiles__profile_id__controls_put",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateControlsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/avatar/generate": {
+      "post": {
+        "tags": [
+          "3D Avatar Engine"
+        ],
+        "summary": "Generate Avatar",
+        "description": "Generates a 3D avatar mesh from profile revision using NAVER Anny adapter,\nsaves the GLB into content-addressable storage, extracts anthropometry,\nand updates active measurements.",
+        "operationId": "generate_avatar_api_v1_avatar_generate_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateAvatarRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvatarGenerationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/avatar/{avatar_id}/status": {
+      "get": {
+        "tags": [
+          "3D Avatar Engine"
+        ],
+        "summary": "Get Avatar Status",
+        "description": "Retrieves avatar asset generation status and mesh validation metrics.",
+        "operationId": "get_avatar_status_api_v1_avatar__avatar_id__status_get",
+        "parameters": [
+          {
+            "name": "avatar_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Avatar Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvatarStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/avatar/assets/{avatar_id}.glb": {
+      "get": {
+        "tags": [
+          "3D Avatar Engine"
+        ],
+        "summary": "Get Avatar Glb",
+        "description": "Streams private binary glTF 2.0 payload.\nOwnership is evaluated before checking conditional caching headers.",
+        "operationId": "get_avatar_glb_api_v1_avatar_assets__avatar_id__glb_get",
+        "parameters": [
+          {
+            "name": "avatar_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Avatar Id"
+            }
+          },
+          {
+            "name": "if-none-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "If-None-Match"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/garments": {
+      "post": {
+        "tags": [
+          "Merchant Garment Catalog"
+        ],
+        "summary": "Create Garment",
+        "description": "Creates a new garment profile and initial revision for the authenticated brand.",
+        "operationId": "create_garment_api_v1_garments_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-brand-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Brand-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGarmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GarmentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/garments/{garment_id}/sizes": {
+      "post": {
+        "tags": [
+          "Merchant Garment Catalog"
+        ],
+        "summary": "Add Garment Size",
+        "description": "Adds or updates a size specification on the active garment revision.",
+        "operationId": "add_garment_size_api_v1_garments__garment_id__sizes_post",
+        "parameters": [
+          {
+            "name": "garment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Garment Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-brand-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Brand-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddGarmentSizeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/garments/{garment_id}": {
+      "get": {
+        "tags": [
+          "Merchant Garment Catalog"
+        ],
+        "summary": "Get Garment",
+        "description": "Retrieves garment specification and complete size table.",
+        "operationId": "get_garment_api_v1_garments__garment_id__get",
+        "parameters": [
+          {
+            "name": "garment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Garment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GarmentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/garments/{garment_id}/revisions": {
+      "get": {
+        "tags": [
+          "Merchant Garment Catalog"
+        ],
+        "summary": "Get Garment Revisions",
+        "description": "Retrieves specification revisions for a garment.",
+        "operationId": "get_garment_revisions_api_v1_garments__garment_id__revisions_get",
+        "parameters": [
+          {
+            "name": "garment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Garment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fit/recommend": {
+      "post": {
+        "tags": [
+          "Honest Fit Recommendation"
+        ],
+        "summary": "Evaluate Fit",
+        "description": "Evaluates active profile measurements against garment size dimensions\nusing the approved Phase 5A Honest Fit Engine and persists recommendation.",
+        "operationId": "evaluate_fit_api_v1_fit_recommend_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FitRecommendationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FitRecommendationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fit/recommendations/{recommendation_id}": {
+      "get": {
+        "tags": [
+          "Honest Fit Recommendation"
+        ],
+        "summary": "Get Recommendation",
+        "description": "Retrieves persisted fit recommendation result after verifying ownership.",
+        "operationId": "get_recommendation_api_v1_fit_recommendations__recommendation_id__get",
+        "parameters": [
+          {
+            "name": "recommendation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recommendation Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AddGarmentSizeRequest": {
+        "properties": {
+          "size_label": {
+            "type": "string",
+            "title": "Size Label"
+          },
+          "sort_order": {
+            "type": "integer",
+            "title": "Sort Order",
+            "default": 0
+          },
+          "measurements": {
+            "items": {
+              "$ref": "#/components/schemas/GarmentMeasurementItem"
+            },
+            "type": "array",
+            "title": "Measurements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "size_label",
+          "measurements"
+        ],
+        "title": "AddGarmentSizeRequest"
+      },
+      "AvatarGenerationResponse": {
+        "properties": {
+          "avatar_id": {
+            "type": "string",
+            "title": "Avatar Id"
+          },
+          "profile_id": {
+            "type": "string",
+            "title": "Profile Id"
+          },
+          "profile_revision": {
+            "type": "integer",
+            "title": "Profile Revision"
+          },
+          "asset_url": {
+            "type": "string",
+            "title": "Asset Url"
+          },
+          "format": {
+            "type": "string",
+            "title": "Format",
+            "default": "glb"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "sha256_checksum": {
+            "type": "string",
+            "title": "Sha256 Checksum"
+          },
+          "generation_duration_ms": {
+            "type": "number",
+            "title": "Generation Duration Ms"
+          },
+          "vertex_count": {
+            "type": "integer",
+            "title": "Vertex Count"
+          },
+          "is_valid_manifold": {
+            "type": "boolean",
+            "title": "Is Valid Manifold"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "completed"
+          },
+          "extracted_measurements": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Extracted Measurements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "avatar_id",
+          "profile_id",
+          "profile_revision",
+          "asset_url",
+          "size_bytes",
+          "sha256_checksum",
+          "generation_duration_ms",
+          "vertex_count",
+          "is_valid_manifold",
+          "extracted_measurements"
+        ],
+        "title": "AvatarGenerationResponse"
+      },
+      "AvatarStatusResponse": {
+        "properties": {
+          "avatar_id": {
+            "type": "string",
+            "title": "Avatar Id"
+          },
+          "profile_id": {
+            "type": "string",
+            "title": "Profile Id"
+          },
+          "format": {
+            "type": "string",
+            "title": "Format"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "sha256_checksum": {
+            "type": "string",
+            "title": "Sha256 Checksum"
+          },
+          "generation_duration_ms": {
+            "type": "number",
+            "title": "Generation Duration Ms"
+          },
+          "vertex_count": {
+            "type": "integer",
+            "title": "Vertex Count"
+          },
+          "is_valid_manifold": {
+            "type": "boolean",
+            "title": "Is Valid Manifold"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "engine_metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Engine Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "avatar_id",
+          "profile_id",
+          "format",
+          "size_bytes",
+          "sha256_checksum",
+          "generation_duration_ms",
+          "vertex_count",
+          "is_valid_manifold",
+          "status",
+          "engine_metadata"
+        ],
+        "title": "AvatarStatusResponse"
+      },
+      "CreateGarmentRequest": {
+        "properties": {
+          "sku": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Sku"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "category": {
+            "type": "string",
+            "pattern": "^(t_shirt|casual_shirt|trousers|jeans)$",
+            "title": "Category"
+          },
+          "fabric_properties": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Fabric Properties"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sku",
+          "title",
+          "category",
+          "fabric_properties"
+        ],
+        "title": "CreateGarmentRequest"
+      },
+      "CreateProfileRequest": {
+        "properties": {
+          "presentation_gender": {
+            "type": "string",
+            "pattern": "^(masculine|feminine|neutral)$",
+            "title": "Presentation Gender"
+          },
+          "stature_cm": {
+            "type": "number",
+            "maximum": 230.0,
+            "minimum": 100.0,
+            "title": "Stature Cm"
+          },
+          "reported_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 300.0,
+                "minimum": 30.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reported Weight Kg"
+          },
+          "initial_controls": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Initial Controls"
+          }
+        },
+        "type": "object",
+        "required": [
+          "presentation_gender",
+          "stature_cm"
+        ],
+        "title": "CreateProfileRequest"
+      },
+      "FitRecommendationRequest": {
+        "properties": {
+          "profile_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Profile Id"
+          },
+          "garment_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Garment Id"
+          },
+          "user_fit_preference": {
+            "type": "string",
+            "pattern": "^(fitted|regular|loose|relaxed)$",
+            "title": "User Fit Preference",
+            "default": "regular"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profile_id",
+          "garment_id"
+        ],
+        "title": "FitRecommendationRequest"
+      },
+      "FitRecommendationResponse": {
+        "properties": {
+          "recommendation_id": {
+            "type": "string",
+            "title": "Recommendation Id"
+          },
+          "garment_id": {
+            "type": "string",
+            "title": "Garment Id"
+          },
+          "recommended_size": {
+            "type": "string",
+            "title": "Recommended Size"
+          },
+          "composite_fit_score": {
+            "type": "number",
+            "title": "Composite Fit Score"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "alternative_size": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alternative Size"
+          },
+          "regional_comparisons": {
+            "items": {
+              "$ref": "#/components/schemas/RegionalComparisonItem"
+            },
+            "type": "array",
+            "title": "Regional Comparisons"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "recommendation_id",
+          "garment_id",
+          "recommended_size",
+          "composite_fit_score",
+          "status",
+          "regional_comparisons",
+          "disclaimer"
+        ],
+        "title": "FitRecommendationResponse"
+      },
+      "GarmentMeasurementItem": {
+        "properties": {
+          "dimension_code": {
+            "type": "string",
+            "title": "Dimension Code"
+          },
+          "value_cm": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Value Cm"
+          },
+          "tolerance_cm": {
+            "type": "number",
+            "title": "Tolerance Cm",
+            "default": 1.0
+          },
+          "measurement_procedure": {
+            "type": "string",
+            "title": "Measurement Procedure",
+            "default": "straight_across_relaxed"
+          },
+          "provenance": {
+            "type": "string",
+            "title": "Provenance",
+            "default": "brand_size_chart"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dimension_code",
+          "value_cm"
+        ],
+        "title": "GarmentMeasurementItem"
+      },
+      "GarmentResponse": {
+        "properties": {
+          "garment_id": {
+            "type": "string",
+            "title": "Garment Id"
+          },
+          "brand_id": {
+            "type": "string",
+            "title": "Brand Id"
+          },
+          "sku": {
+            "type": "string",
+            "title": "Sku"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "current_revision": {
+            "type": "integer",
+            "title": "Current Revision"
+          },
+          "fabric_properties": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Fabric Properties"
+          },
+          "sizes": {
+            "items": {
+              "$ref": "#/components/schemas/GarmentSizeResponse"
+            },
+            "type": "array",
+            "title": "Sizes"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "garment_id",
+          "brand_id",
+          "sku",
+          "title",
+          "category",
+          "current_revision",
+          "fabric_properties",
+          "sizes",
+          "created_at"
+        ],
+        "title": "GarmentResponse"
+      },
+      "GarmentSizeResponse": {
+        "properties": {
+          "size_label": {
+            "type": "string",
+            "title": "Size Label"
+          },
+          "sort_order": {
+            "type": "integer",
+            "title": "Sort Order"
+          },
+          "measurements": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Measurements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "size_label",
+          "sort_order",
+          "measurements"
+        ],
+        "title": "GarmentSizeResponse"
+      },
+      "GenerateAvatarRequest": {
+        "properties": {
+          "profile_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Profile Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profile_id"
+        ],
+        "title": "GenerateAvatarRequest"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "MeasurementItem": {
+        "properties": {
+          "measurement_code": {
+            "type": "string",
+            "title": "Measurement Code"
+          },
+          "value_cm": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Value Cm"
+          },
+          "unit": {
+            "type": "string",
+            "pattern": "^cm$",
+            "title": "Unit",
+            "default": "cm"
+          },
+          "acquisition_method": {
+            "type": "string",
+            "title": "Acquisition Method",
+            "default": "tape_measured"
+          },
+          "tolerance_cm": {
+            "type": "number",
+            "title": "Tolerance Cm",
+            "default": 1.0
+          },
+          "landmark_convention": {
+            "type": "string",
+            "title": "Landmark Convention",
+            "default": "standard_landmark"
+          }
+        },
+        "type": "object",
+        "required": [
+          "measurement_code",
+          "value_cm"
+        ],
+        "title": "MeasurementItem"
+      },
+      "ProfileResponse": {
+        "properties": {
+          "profile_id": {
+            "type": "string",
+            "title": "Profile Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "current_revision": {
+            "type": "integer",
+            "title": "Current Revision"
+          },
+          "presentation_gender": {
+            "type": "string",
+            "title": "Presentation Gender"
+          },
+          "stature_cm": {
+            "type": "number",
+            "title": "Stature Cm"
+          },
+          "reported_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reported Weight Kg"
+          },
+          "active_measurements": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Active Measurements"
+          },
+          "shape_controls": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Shape Controls"
+          },
+          "latest_asset_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Asset Url"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profile_id",
+          "user_id",
+          "current_revision",
+          "presentation_gender",
+          "stature_cm",
+          "reported_weight_kg",
+          "active_measurements",
+          "shape_controls",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ProfileResponse"
+      },
+      "RecordMeasurementsRequest": {
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "title": "Expected Revision"
+          },
+          "measurements": {
+            "items": {
+              "$ref": "#/components/schemas/MeasurementItem"
+            },
+            "type": "array",
+            "title": "Measurements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "expected_revision",
+          "measurements"
+        ],
+        "title": "RecordMeasurementsRequest"
+      },
+      "RegionalComparisonItem": {
+        "properties": {
+          "region": {
+            "type": "string",
+            "title": "Region"
+          },
+          "body_measurement_cm": {
+            "type": "number",
+            "title": "Body Measurement Cm"
+          },
+          "garment_dimension_cm": {
+            "type": "number",
+            "title": "Garment Dimension Cm"
+          },
+          "ease_cm": {
+            "type": "number",
+            "title": "Ease Cm"
+          },
+          "classification": {
+            "type": "string",
+            "title": "Classification"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "region",
+          "body_measurement_cm",
+          "garment_dimension_cm",
+          "ease_cm",
+          "classification",
+          "explanation"
+        ],
+        "title": "RegionalComparisonItem"
+      },
+      "UpdateControlsRequest": {
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "title": "Expected Revision"
+          },
+          "controls": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Controls"
+          }
+        },
+        "type": "object",
+        "required": [
+          "expected_revision",
+          "controls"
+        ],
+        "title": "UpdateControlsRequest"
+      },
+      "UpdateProfileRequest": {
+        "properties": {
+          "presentation_gender": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(masculine|feminine|neutral)$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Presentation Gender"
+          },
+          "reported_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 300.0,
+                "minimum": 30.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reported Weight Kg"
+          }
+        },
+        "type": "object",
+        "title": "UpdateProfileRequest"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
