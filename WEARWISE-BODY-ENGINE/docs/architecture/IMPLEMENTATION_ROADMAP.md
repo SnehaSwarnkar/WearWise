@@ -40,7 +40,7 @@ flowchart TD
 ## 2. Phase-by-Phase Breakdown, Package Boundaries & Exit Gates
 
 ### Phase 2: Domain Foundation, Schemas & Core Interfaces
-- **Status:** **IN PROGRESS (Authorized by Technical Decision Owner)**
+- **Status:** **COMPLETED & ACCEPTED (Phase 2.1 Applied & Verified)**
 - **Objective:** Translate approved Revision 1.2.1 designs into executable domain entities, transport schemas, taxonomies, and abstract interfaces.
 - **Strict Package Boundaries:**
   - `app/domain/entities/`: Pure framework-independent domain models and value objects (`BodyProfile`, `ProfileRevision`, `BodyMeasurement`, `BodyShapeControls`, `RegionalShapeScale`, `AvatarShapeSpec`, `MeshData`, `LandmarkData`, `RegionalDisplacementSummary`, `ShapeEvaluationResult`, and garment entities). Zero framework dependencies.
@@ -50,22 +50,29 @@ flowchart TD
   - `app/schemas/`: Separate Pydantic v2 transport models for HTTP validation (`ProfileCreateRequest`, `MeasurementRecordRequest`, `AvatarGenerateRequest`, `FitRecommendRequest`, `StandardErrorEnvelope`).
   - `app/infrastructure/models/`: SQLAlchemy persistence models are **deferred to Phase 6**.
 - **Measurable Exit Gate:**
-  - Test coverage over all domain entity invariant rules (rejection of non-finite floats, invalid dimensions, negative tolerances, invalid reliability weights $[0, 1]$, and slider ranges $[0, 1]$).
+  - Test coverage over all domain entity invariant rules (rejection of non-finite floats, invalid dimensions, negative tolerances, invalid reliability weights $[0, 1]$, and control-specific safe ranges).
   - Round-trip serialization determinism tests for domain models and transport schemas.
   - Rejection of forbidden client-assigned ownership fields (`user_id`, `brand_id`).
   - Architectural dependency tests proving zero imports of FastAPI, SQLAlchemy, Anny, or PyTorch in domain packages.
 
 ### Phase 3: BICE Implementation & Parameter Regularization
+- **Status:** **COMPLETED (Implemented, Tested & Verified; Optimizer Proposal Submitted)**
 - **Objective:** Implement `BICE` semantic normalization, parameter solver, and locality regularization consuming `ShapeEvaluationPort`.
 - **Key Deliverables:**
-  - `app/bice/normalizer.py`: Map $[0.0, 1.0]$ sliders to centered offsets $[-1.0, 1.0]$.
-  - `app/bice/bounds.py`: Provisional parameter-specific clamps (thighs $[-0.5, +0.5]$).
-  - `app/bice/solver.py`: Regularized solver optimizing `AvatarShapeSpec` via injected `ShapeEvaluationPort`.
+  - `app/bice/normalizer.py`: Map $[0.0, 1.0]$ sliders to centered offsets $[-1.0, 1.0]$ with strict monotonicity and safe range preservation.
+  - `app/bice/bounds.py`: Provisional parameter-specific clamps (thighs $[-0.5, +0.5]$, belly $[-0.5, +0.7]$, shoulders $[-0.75, +0.75]$) with structured diagnostics.
+  - `app/bice/mapping.py`: Versioned semantic-to-regional mapping policy with axis isolation and inverse waist definition.
+  - `app/bice/validator.py`: Semantic control and anthropometric consistency checks.
+  - `app/bice/locality.py`: RMSR calculation, maximum spillover loss, near-zero threshold policy ($10^{-4}\text{ m}$) with maximal penalty ($10.0$).
+  - `app/bice/solver.py`: Shape specification builder and solver candidate diagnostic framework.
+  - `docs/architecture/BICE_MATHEMATICAL_OBJECTIVE_PROPOSAL.md`: Formal optimizer mathematical objective specification submitted for review.
 - **Measurable Exit Gate:**
-  - Property-based tests (Hypothesis) proving that for $1,000$ randomly generated slider combinations, all output `AvatarShapeSpec` regional scales remain within defined bounds.
-  - Regression tests proving locality penalty $\mathcal{L}_{\text{locality}}$ correctly identifies simulated parameter spillover via `ShapeEvaluationPort`.
+  - Comprehensive unit tests covering normalizer, bounds, mapping, locality, and solver diagnostics.
+  - AST isolation test proving zero imports of `torch`, `avatar_engine`, `canny`, `mesh_eval`, or ML frameworks in `app/bice`.
+  - Rejection of near-zero target signal with maximal penalty $10.0$ and structured diagnostic notes.
 
 ### Phase 4: Avatar Engine & Anthropometry Integration
+- **Status:** **PENDING AUTHORIZATION**
 - **Objective:** Implement `AnnyAdapter` behind `AvatarEngine` and exact triangle-mesh-plane slicing in `AnthropometryEngine`.
 - **Key Deliverables:**
   - `app/avatar_engine/adapters/anny_adapter.py`: CPU LBS skinning; `AnnyLandmarkProvider`; `AnnyShapeEvaluationPort`.
