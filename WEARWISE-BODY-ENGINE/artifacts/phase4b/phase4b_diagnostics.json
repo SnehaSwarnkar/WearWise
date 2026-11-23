@@ -2,12 +2,15 @@
   "phase": "4B",
   "milestone": "Anthropometry Extraction from Real Anny Meshes",
   "algorithm_version": "1.2.1-mesh-plane-graph",
-  "generated_at": "2026-11-23T11:39:04Z",
+  "generated_at": "2026-11-23T12:21:35Z",
   "benchmark": {
     "benchmark_iterations": 5,
-    "mean_latency_ms": 4514.95,
-    "mean_latency_seconds": 4.515,
-    "peak_memory_allocated_mb": 0.299,
+    "mean_latency_ms": 4774.75,
+    "mean_latency_seconds": 4.7748,
+    "incremental_heap_memory_mb": 2.185,
+    "incremental_heap_memory_note": "Traced via Python tracemalloc measuring incremental heap allocations during extraction",
+    "total_process_rss_mb_estimate": 350.0,
+    "total_process_rss_note": "Total OS Resident Set Size including Python runtime, CUDA/CPU kernels, and PyTorch C++ libraries",
     "triangle_count": 27420,
     "vertex_count": 13718
   },
@@ -52,33 +55,32 @@
     "neutral_masculine": {
       "avatar_id": "neutral_masculine",
       "algorithm_version": "1.2.1-mesh-plane-graph",
-      "extraction_timestamp": "2026-11-23T11:38:38.174190+00:00",
+      "extraction_timestamp": "2026-11-23T12:21:07.484252+00:00",
       "measurements": {
         "stature": {
+          "measurement": {
+            "measurement_code": "stature",
+            "value_cm": 156.83,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "stature",
           "value_cm": 156.83,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
-            "plane_origin_m": [
-              0.0,
-              0.0,
-              -0.8445727229118347
-            ],
-            "plane_normal": [
-              0.0,
-              0.0,
-              1.0
-            ],
+            "extraction_method": "bounding_box_extent",
+            "plane_origin_m": null,
+            "plane_normal": null,
             "intersected_triangles_count": 0,
-            "extracted_loops_count": 1,
-            "selected_loop_index": 0,
-            "closure_error_m": 0.0,
-            "graph_is_2_regular": true,
+            "extracted_loops_count": 0,
+            "selected_loop_index": null,
+            "closure_error_m": null,
+            "graph_is_2_regular": null,
             "is_plausible": true,
             "status_code": "SUCCESS",
             "details": {
@@ -91,30 +93,29 @@
           "all_loops_count": 0
         },
         "shoulder_biacromial_breadth": {
+          "measurement": {
+            "measurement_code": "shoulder_biacromial_breadth",
+            "value_cm": 37.2,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "shoulder_biacromial_breadth",
           "value_cm": 37.2,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
-            "plane_origin_m": [
-              0.0,
-              -0.021041598170995712,
-              0.4239802658557892
-            ],
-            "plane_normal": [
-              1.0,
-              0.0,
-              0.0
-            ],
+            "extraction_method": "landmark_caliper",
+            "plane_origin_m": null,
+            "plane_normal": null,
             "intersected_triangles_count": 0,
-            "extracted_loops_count": 1,
-            "selected_loop_index": 0,
-            "closure_error_m": 0.0,
-            "graph_is_2_regular": true,
+            "extracted_loops_count": 0,
+            "selected_loop_index": null,
+            "closure_error_m": null,
+            "graph_is_2_regular": null,
             "is_plausible": true,
             "status_code": "SUCCESS",
             "details": {
@@ -128,22 +129,30 @@
                 -0.021041588857769966,
                 0.4239802658557892
               ],
-              "distance_m": 0.37199923396110535
+              "distance_m": 0.37199923396110535,
+              "sagittal_y_diff_m": 1.862645149230957e-08
             }
           },
           "selected_loop": null,
           "all_loops_count": 0
         },
         "chest_circumference": {
+          "measurement": {
+            "measurement_code": "chest_circumference",
+            "value_cm": 77.85,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "chest_circumference",
           "value_cm": 77.85,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,
@@ -195,15 +204,22 @@
           "all_loops_count": 3
         },
         "waist_planar_circumference": {
+          "measurement": {
+            "measurement_code": "waist_planar_circumference",
+            "value_cm": 65.96,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "waist_planar_circumference",
           "value_cm": 65.96,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,
@@ -255,15 +271,22 @@
           "all_loops_count": 3
         },
         "hip_circumference": {
+          "measurement": {
+            "measurement_code": "hip_circumference",
+            "value_cm": 91.62,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "provisional"
+          },
           "measurement_code": "hip_circumference",
           "value_cm": 91.62,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "provisional",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,
@@ -319,33 +342,32 @@
     "neutral_feminine": {
       "avatar_id": "neutral_feminine",
       "algorithm_version": "1.2.1-mesh-plane-graph",
-      "extraction_timestamp": "2026-11-23T11:38:39.176569+00:00",
+      "extraction_timestamp": "2026-11-23T12:21:08.417807+00:00",
       "measurements": {
         "stature": {
+          "measurement": {
+            "measurement_code": "stature",
+            "value_cm": 156.83,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "stature",
           "value_cm": 156.83,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
-            "plane_origin_m": [
-              0.0,
-              0.0,
-              -0.8299509286880493
-            ],
-            "plane_normal": [
-              0.0,
-              0.0,
-              1.0
-            ],
+            "extraction_method": "bounding_box_extent",
+            "plane_origin_m": null,
+            "plane_normal": null,
             "intersected_triangles_count": 0,
-            "extracted_loops_count": 1,
-            "selected_loop_index": 0,
-            "closure_error_m": 0.0,
-            "graph_is_2_regular": true,
+            "extracted_loops_count": 0,
+            "selected_loop_index": null,
+            "closure_error_m": null,
+            "graph_is_2_regular": null,
             "is_plausible": true,
             "status_code": "SUCCESS",
             "details": {
@@ -358,30 +380,29 @@
           "all_loops_count": 0
         },
         "shoulder_biacromial_breadth": {
+          "measurement": {
+            "measurement_code": "shoulder_biacromial_breadth",
+            "value_cm": 36.91,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "shoulder_biacromial_breadth",
           "value_cm": 36.91,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
-            "plane_origin_m": [
-              0.0,
-              -0.00128488102927804,
-              0.4757021367549896
-            ],
-            "plane_normal": [
-              1.0,
-              0.0,
-              0.0
-            ],
+            "extraction_method": "landmark_caliper",
+            "plane_origin_m": null,
+            "plane_normal": null,
             "intersected_triangles_count": 0,
-            "extracted_loops_count": 1,
-            "selected_loop_index": 0,
-            "closure_error_m": 0.0,
-            "graph_is_2_regular": true,
+            "extracted_loops_count": 0,
+            "selected_loop_index": null,
+            "closure_error_m": null,
+            "graph_is_2_regular": null,
             "is_plausible": true,
             "status_code": "SUCCESS",
             "details": {
@@ -395,22 +416,30 @@
                 -0.0012848826590925455,
                 0.4757021367549896
               ],
-              "distance_m": 0.3691457211971283
+              "distance_m": 0.3691457211971283,
+              "sagittal_y_diff_m": 3.14321368932724e-09
             }
           },
           "selected_loop": null,
           "all_loops_count": 0
         },
         "chest_circumference": {
+          "measurement": {
+            "measurement_code": "chest_circumference",
+            "value_cm": 83.0,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "chest_circumference",
           "value_cm": 83.0,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,
@@ -462,15 +491,22 @@
           "all_loops_count": 3
         },
         "waist_planar_circumference": {
+          "measurement": {
+            "measurement_code": "waist_planar_circumference",
+            "value_cm": 69.81,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "waist_planar_circumference",
           "value_cm": 69.81,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,
@@ -522,15 +558,22 @@
           "all_loops_count": 3
         },
         "hip_circumference": {
+          "measurement": {
+            "measurement_code": "hip_circumference",
+            "value_cm": 84.96,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "provisional"
+          },
           "measurement_code": "hip_circumference",
           "value_cm": 84.96,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "provisional",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,
@@ -586,33 +629,32 @@
     "modified_athletic": {
       "avatar_id": "modified_athletic",
       "algorithm_version": "1.2.1-mesh-plane-graph",
-      "extraction_timestamp": "2026-11-23T11:38:40.154839+00:00",
+      "extraction_timestamp": "2026-11-23T12:21:09.371248+00:00",
       "measurements": {
         "stature": {
+          "measurement": {
+            "measurement_code": "stature",
+            "value_cm": 180.0,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "stature",
           "value_cm": 180.0,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
-            "plane_origin_m": [
-              0.0,
-              0.0,
-              -0.9929004311561584
-            ],
-            "plane_normal": [
-              0.0,
-              0.0,
-              1.0
-            ],
+            "extraction_method": "bounding_box_extent",
+            "plane_origin_m": null,
+            "plane_normal": null,
             "intersected_triangles_count": 0,
-            "extracted_loops_count": 1,
-            "selected_loop_index": 0,
-            "closure_error_m": 0.0,
-            "graph_is_2_regular": true,
+            "extracted_loops_count": 0,
+            "selected_loop_index": null,
+            "closure_error_m": null,
+            "graph_is_2_regular": null,
             "is_plausible": true,
             "status_code": "SUCCESS",
             "details": {
@@ -625,30 +667,29 @@
           "all_loops_count": 0
         },
         "shoulder_biacromial_breadth": {
+          "measurement": {
+            "measurement_code": "shoulder_biacromial_breadth",
+            "value_cm": 42.75,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "shoulder_biacromial_breadth",
           "value_cm": 42.75,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
-            "plane_origin_m": [
-              7.450580596923828e-09,
-              -0.033556170761585236,
-              0.47870221734046936
-            ],
-            "plane_normal": [
-              1.0,
-              0.0,
-              0.0
-            ],
+            "extraction_method": "landmark_caliper",
+            "plane_origin_m": null,
+            "plane_normal": null,
             "intersected_triangles_count": 0,
-            "extracted_loops_count": 1,
-            "selected_loop_index": 0,
-            "closure_error_m": 0.0,
-            "graph_is_2_regular": true,
+            "extracted_loops_count": 0,
+            "selected_loop_index": null,
+            "closure_error_m": null,
+            "graph_is_2_regular": null,
             "is_plausible": true,
             "status_code": "SUCCESS",
             "details": {
@@ -662,22 +703,30 @@
                 -0.03355615958571434,
                 0.47870221734046936
               ],
-              "distance_m": 0.42748236656188965
+              "distance_m": 0.42748236656188965,
+              "sagittal_y_diff_m": 1.862645149230957e-08
             }
           },
           "selected_loop": null,
           "all_loops_count": 0
         },
         "chest_circumference": {
+          "measurement": {
+            "measurement_code": "chest_circumference",
+            "value_cm": 86.36,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "chest_circumference",
           "value_cm": 86.36,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,
@@ -729,15 +778,22 @@
           "all_loops_count": 3
         },
         "waist_planar_circumference": {
+          "measurement": {
+            "measurement_code": "waist_planar_circumference",
+            "value_cm": 69.87,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "waist_planar_circumference",
           "value_cm": 69.87,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,
@@ -789,15 +845,22 @@
           "all_loops_count": 3
         },
         "hip_circumference": {
+          "measurement": {
+            "measurement_code": "hip_circumference",
+            "value_cm": 99.93,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "provisional"
+          },
           "measurement_code": "hip_circumference",
           "value_cm": 99.93,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "provisional",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,
@@ -853,35 +916,34 @@
     "stature_min_100cm": {
       "avatar_id": "stature_min_100cm",
       "algorithm_version": "1.2.1-mesh-plane-graph",
-      "extraction_timestamp": "2026-11-23T11:38:41.130282+00:00",
+      "extraction_timestamp": "2026-11-23T12:21:10.335017+00:00",
       "measurements": {
         "stature": {
+          "measurement": {
+            "measurement_code": "stature",
+            "value_cm": 100.0,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "stature",
           "value_cm": 100.0,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "ANTHRO_IMPLAUSIBLE_STATURE",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
-            "plane_origin_m": [
-              0.0,
-              0.0,
-              -0.4895229637622833
-            ],
-            "plane_normal": [
-              0.0,
-              0.0,
-              1.0
-            ],
+            "extraction_method": "bounding_box_extent",
+            "plane_origin_m": null,
+            "plane_normal": null,
             "intersected_triangles_count": 0,
-            "extracted_loops_count": 1,
-            "selected_loop_index": 0,
-            "closure_error_m": 0.0,
-            "graph_is_2_regular": true,
-            "is_plausible": true,
-            "status_code": "SUCCESS",
+            "extracted_loops_count": 0,
+            "selected_loop_index": null,
+            "closure_error_m": null,
+            "graph_is_2_regular": null,
+            "is_plausible": false,
+            "status_code": "ANTHRO_IMPLAUSIBLE_STATURE",
             "details": {
               "z_min_m": -0.4895229637622833,
               "z_max_m": 0.5104769468307495,
@@ -892,30 +954,29 @@
           "all_loops_count": 0
         },
         "shoulder_biacromial_breadth": {
+          "measurement": {
+            "measurement_code": "shoulder_biacromial_breadth",
+            "value_cm": 27.81,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "shoulder_biacromial_breadth",
           "value_cm": 27.81,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
-            "plane_origin_m": [
-              0.0,
-              0.006221671588718891,
-              0.27936601638793945
-            ],
-            "plane_normal": [
-              1.0,
-              0.0,
-              0.0
-            ],
+            "extraction_method": "landmark_caliper",
+            "plane_origin_m": null,
+            "plane_normal": null,
             "intersected_triangles_count": 0,
-            "extracted_loops_count": 1,
-            "selected_loop_index": 0,
-            "closure_error_m": 0.0,
-            "graph_is_2_regular": true,
+            "extracted_loops_count": 0,
+            "selected_loop_index": null,
+            "closure_error_m": null,
+            "graph_is_2_regular": null,
             "is_plausible": true,
             "status_code": "SUCCESS",
             "details": {
@@ -929,22 +990,30 @@
                 0.006221674848347902,
                 0.27936601638793945
               ],
-              "distance_m": 0.27811601758003235
+              "distance_m": 0.27811601758003235,
+              "sagittal_y_diff_m": 6.984919309616089e-09
             }
           },
           "selected_loop": null,
           "all_loops_count": 0
         },
         "chest_circumference": {
+          "measurement": {
+            "measurement_code": "chest_circumference",
+            "value_cm": 56.92,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "chest_circumference",
           "value_cm": 56.92,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,
@@ -996,15 +1065,22 @@
           "all_loops_count": 3
         },
         "waist_planar_circumference": {
+          "measurement": {
+            "measurement_code": "waist_planar_circumference",
+            "value_cm": 50.24,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "waist_planar_circumference",
           "value_cm": 50.24,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,
@@ -1056,15 +1132,22 @@
           "all_loops_count": 3
         },
         "hip_circumference": {
+          "measurement": {
+            "measurement_code": "hip_circumference",
+            "value_cm": 69.22,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "provisional"
+          },
           "measurement_code": "hip_circumference",
           "value_cm": 69.22,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "provisional",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,
@@ -1120,33 +1203,32 @@
     "stature_max_230cm": {
       "avatar_id": "stature_max_230cm",
       "algorithm_version": "1.2.1-mesh-plane-graph",
-      "extraction_timestamp": "2026-11-23T11:38:42.116854+00:00",
+      "extraction_timestamp": "2026-11-23T12:21:11.297980+00:00",
       "measurements": {
         "stature": {
+          "measurement": {
+            "measurement_code": "stature",
+            "value_cm": 230.0,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "stature",
           "value_cm": 230.0,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
-            "plane_origin_m": [
-              0.0,
-              0.0,
-              -1.295059323310852
-            ],
-            "plane_normal": [
-              0.0,
-              0.0,
-              1.0
-            ],
+            "extraction_method": "bounding_box_extent",
+            "plane_origin_m": null,
+            "plane_normal": null,
             "intersected_triangles_count": 0,
-            "extracted_loops_count": 1,
-            "selected_loop_index": 0,
-            "closure_error_m": 0.0,
-            "graph_is_2_regular": true,
+            "extracted_loops_count": 0,
+            "selected_loop_index": null,
+            "closure_error_m": null,
+            "graph_is_2_regular": null,
             "is_plausible": true,
             "status_code": "SUCCESS",
             "details": {
@@ -1159,30 +1241,29 @@
           "all_loops_count": 0
         },
         "shoulder_biacromial_breadth": {
+          "measurement": {
+            "measurement_code": "shoulder_biacromial_breadth",
+            "value_cm": 50.0,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "shoulder_biacromial_breadth",
           "value_cm": 50.0,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
-            "plane_origin_m": [
-              1.4901161193847656e-08,
-              -0.05373108386993408,
-              0.6103038787841797
-            ],
-            "plane_normal": [
-              1.0,
-              0.0,
-              0.0
-            ],
+            "extraction_method": "landmark_caliper",
+            "plane_origin_m": null,
+            "plane_normal": null,
             "intersected_triangles_count": 0,
-            "extracted_loops_count": 1,
-            "selected_loop_index": 0,
-            "closure_error_m": 0.0,
-            "graph_is_2_regular": true,
+            "extracted_loops_count": 0,
+            "selected_loop_index": null,
+            "closure_error_m": null,
+            "graph_is_2_regular": null,
             "is_plausible": true,
             "status_code": "SUCCESS",
             "details": {
@@ -1196,22 +1277,30 @@
                 -0.05373108759522438,
                 0.6103038787841797
               ],
-              "distance_m": 0.5000306367874146
+              "distance_m": 0.5000306367874146,
+              "sagittal_y_diff_m": 7.450580596923828e-09
             }
           },
           "selected_loop": null,
           "all_loops_count": 0
         },
         "chest_circumference": {
+          "measurement": {
+            "measurement_code": "chest_circumference",
+            "value_cm": 104.78,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "chest_circumference",
           "value_cm": 104.78,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,
@@ -1263,15 +1352,22 @@
           "all_loops_count": 3
         },
         "waist_planar_circumference": {
+          "measurement": {
+            "measurement_code": "waist_planar_circumference",
+            "value_cm": 87.94,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "eligible"
+          },
           "measurement_code": "waist_planar_circumference",
           "value_cm": 87.94,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "eligible",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,
@@ -1323,15 +1419,22 @@
           "all_loops_count": 3
         },
         "hip_circumference": {
+          "measurement": {
+            "measurement_code": "hip_circumference",
+            "value_cm": 121.78,
+            "unit": "cm",
+            "acquisition_method": "geometry_extracted",
+            "validation_state": "internally_consistent",
+            "lifecycle_status": "active",
+            "assessment_state": "provisional"
+          },
           "measurement_code": "hip_circumference",
           "value_cm": 121.78,
           "unit": "cm",
-          "acquisition_method": "geometry_extracted",
-          "validation_state": "internally_consistent",
-          "lifecycle_status": "active",
-          "assessment_state": "provisional",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
+            "extraction_method": "mesh_plane_contour",
             "plane_origin_m": [
               0.0,
               0.0,

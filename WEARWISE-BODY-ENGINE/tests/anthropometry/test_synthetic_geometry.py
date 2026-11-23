@@ -407,3 +407,170 @@ def test_16_explicit_failures_for_ambiguous_or_invalid_contours():
     with pytest.raises(ImplausiblePerimeterError) as exc_info2:
         select_landmark_guided_loop([tiny_loop], landmark_origin, min_perimeter_cm=60.0, max_perimeter_cm=200.0, site_name="chest")
     assert "outside plausible range" in str(exc_info2.value)
+
+
+# --- Dedicated Stage A Degree-Four & Topology Provenance Test Cases ---
+
+def test_successful_degree_four_disambiguation_via_tangents():
+    """Verifies successful resolution of a degree-4 node where tangent continuity is clear."""
+    # Loop 1 (horizontal): (-1, 0) -> (0, 0) -> (+1, 0) -> (+1, 2) -> (-1, 2) -> (-1, 0)
+    # Loop 2 (vertical): (0, -1) -> (0, 0) -> (0, +1) -> (-2, +1) -> (-2, -1) -> (0, -1)
+    # At (0, 0), outward directions:
+    # Left: (-1, 0), Right: (+1, 0) -> dot = -1.0 (straight!)
+    # Down: (0, -1), Up: (0, +1) -> dot = -1.0 (straight!)
+    p_center = np.array([0.0, 0.0, 0.0])
+    
+    # Loop 1 segments
+    p_l = np.array([-1.0, 0.0, 0.0])
+    p_r = np.array([1.0, 0.0, 0.0])
+    p_tr = np.array([1.0, 2.0, 0.0])
+    p_tl = np.array([-1.0, 2.0, 0.0])
+    loop1_segs = [
+        (p_l, p_center),
+        (p_center, p_r),
+        (p_r, p_tr),
+        (p_tr, p_tl),
+        (p_tl, p_l),
+    ]
+
+    # Loop 2 segments
+    p_d = np.array([0.0, -1.0, 0.0])
+    p_u = np.array([0.0, 1.0, 0.0])
+    p_ul = np.array([-2.0, 1.0, 0.0])
+    p_dl = np.array([-2.0, -1.0, 0.0])
+    loop2_segs = [
+        (p_d, p_center),
+        (p_center, p_u),
+        (p_u, p_ul),
+        (p_ul, p_dl),
+        (p_dl, p_d),
+    ]
+
+    loops = stitch_segments_into_loops(loop1_segs + loop2_segs)
+    assert len(loops) == 2
+    assert loops[0].is_closed and loops[1].is_closed
+
+    # Verify perimeters match analytical values
+    # Loop 1: 1 + 1 + 2 + 2 + 2 = 8.0 m -> 800.0 cm
+    # Loop 2: 1 + 1 + 2 + 2 + 2 = 8.0 m -> 800.0 cm
+    for l in loops:
+        assert pytest.approx(l.perimeter_cm, abs=1e-4) == 800.0
+        # Verify node at (0, 0, 0) was preserved in point coordinates
+        dists_to_center = [np.linalg.norm(pt - p_center) for pt in l.points_3d_m]
+        assert min(dists_to_center) < 1e-8
+
+
+def test_ambiguous_degree_four_rejection():
+    """Verifies that an ambiguous degree-4 junction with no straight continuation is strictly rejected."""
+    # 4 segments meeting at (0, 0) at 90-degree angles:
+    # (+1, 0), (0, +1), (-1, 0), (0, -1)
+    # But closing in a way where each pairing is equally non-straight (e.g. all 90 degree bends)
+    p_center = np.array([0.0, 0.0, 0.0])
+    p1 = np.array([1.0, 0.0, 0.0])
+    p2 = np.array([0.0, 1.0, 0.0])
+    p3 = np.array([0.5, 0.5, 0.0])
+    p4 = np.array([0.2, 0.8, 0.0])
+
+    segments = [
+        (p1, p_center), (p2, p_center), (p3, p_center), (p4, p_center),
+        (p1, p2), (p3, p4),
+    ]
+
+    with pytest.raises(NonManifoldContourError) as exc_info:
+        stitch_segments_into_loops(segments)
+    assert "ambiguous" in str(exc_info.value).lower() or "degree-4" in str(exc_info.value).lower()
+
+
+def test_multiple_degree_four_nodes_handling():
+    """Verifies that multiple degree-4 nodes are resolved simultaneously without node-ID collisions."""
+    # Two crossings at (0, 0, 0) and (10, 0, 0)
+    p_c1 = np.array([0.0, 0.0, 0.0])
+    p_c2 = np.array([10.0, 0.0, 0.0])
+
+    def make_cross_loops(center, offset_x):
+        cx = offset_x
+        # Loop A (horizontal)
+        lA = [
+            (np.array([cx - 1, 0, 0]), center),
+            (center, np.array([cx + 1, 0, 0])),
+            (np.array([cx + 1, 0, 0]), np.array([cx + 1, 2, 0])),
+            (np.array([cx + 1, 2, 0]), np.array([cx - 1, 2, 0])),
+            (np.array([cx - 1, 2, 0]), np.array([cx - 1, 0, 0])),
+        ]
+        # Loop B (vertical)
+        lB = [
+            (np.array([cx, -1, 0]), center),
+            (center, np.array([cx, 1, 0])),
+            (np.array([cx, 1, 0]), np.array([cx - 2, 1, 0])),
+            (np.array([cx - 2, 1, 0]), np.array([cx - 2, -1, 0])),
+            (np.array([cx - 2, -1, 0]), np.array([cx, -1, 0])),
+        ]
+        return lA + lB
+
+    segs = make_cross_loops(p_c1, 0.0) + make_cross_loops(p_c2, 10.0)
+    loops = stitch_segments_into_loops(segs)
+    assert len(loops) == 4
+    for l in loops:
+        assert l.is_closed
+        assert pytest.approx(l.perimeter_cm, abs=1e-4) == 800.0
+
+
+def test_topology_provenance_primary_disambiguation():
+    """Verifies that mesh topology face provenance successfully resolves degree-4 node even when tangents are angled."""
+    from app.anthropometry.geometry import IntersectionSegment
+
+    p_center = np.array([0.0, 0.0, 0.0])
+    p1 = np.array([1.0, 0.5, 0.0])
+    p2 = np.array([-0.8, 0.2, 0.0])
+    p3 = np.array([0.2, 1.0, 0.0])
+    p4 = np.array([-0.3, -1.0, 0.0])
+
+    # Segments meeting at p_center with shared face indices:
+    # Pair 1: (p1, p_center) and (p_center, p2) both belong to face 101
+    # Pair 2: (p3, p_center) and (p_center, p4) both belong to face 202
+    segs = [
+        IntersectionSegment(start_point=p1, end_point=p_center, face_index=101),
+        IntersectionSegment(start_point=p_center, end_point=p2, face_index=101),
+        IntersectionSegment(start_point=p2, end_point=p1, face_index=101),  # closes loop 1
+
+        IntersectionSegment(start_point=p3, end_point=p_center, face_index=202),
+        IntersectionSegment(start_point=p_center, end_point=p4, face_index=202),
+        IntersectionSegment(start_point=p4, end_point=p3, face_index=202),  # closes loop 2
+    ]
+
+    loops = stitch_segments_into_loops(segs)
+    assert len(loops) == 2
+    assert loops[0].is_closed and loops[1].is_closed
+
+
+def test_deterministic_traversal_after_segment_shuffling_degree_four():
+    """Verifies that shuffling segments of a degree-4 resolved system yields bitwise deterministic loops."""
+    p_center = np.array([0.0, 0.0, 0.0])
+    p_l = np.array([-1.0, 0.0, 0.0])
+    p_r = np.array([1.0, 0.0, 0.0])
+    p_tr = np.array([1.0, 2.0, 0.0])
+    p_tl = np.array([-1.0, 2.0, 0.0])
+
+    p_d = np.array([0.0, -1.0, 0.0])
+    p_u = np.array([0.0, 1.0, 0.0])
+    p_ul = np.array([-2.0, 1.0, 0.0])
+    p_dl = np.array([-2.0, -1.0, 0.0])
+
+    segs = [
+        (p_l, p_center), (p_center, p_r), (p_r, p_tr), (p_tr, p_tl), (p_tl, p_l),
+        (p_d, p_center), (p_center, p_u), (p_u, p_ul), (p_ul, p_dl), (p_dl, p_d),
+    ]
+
+    base_loops = stitch_segments_into_loops(segs)
+    base_pts = [l.points_3d_m for l in base_loops]
+
+    rng = random.Random(123)
+    for _ in range(10):
+        shuffled = list(segs)
+        rng.shuffle(shuffled)
+        shuffled = [(b, a) if rng.random() > 0.5 else (a, b) for a, b in shuffled]
+        shuffled_loops = stitch_segments_into_loops(shuffled)
+        assert len(shuffled_loops) == len(base_loops)
+        for i in range(len(base_loops)):
+            assert np.allclose(shuffled_loops[i].points_3d_m, base_pts[i], atol=1e-8)
+

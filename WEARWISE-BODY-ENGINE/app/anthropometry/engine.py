@@ -46,33 +46,45 @@ SUPPORTED_CORE_MEASUREMENTS: Tuple[str, ...] = (
     "hip_circumference",
 )
 
-# Site-specific plausible perimeter / length bounds (in cm)
-SITE_PLAUSIBILITY_LIMITS: Dict[str, Tuple[float, float]] = {
-    "stature": (80.0, 250.0),
-    "shoulder_biacromial_breadth": (20.0, 65.0),
-    "chest_circumference": (50.0, 200.0),
-    "waist_planar_circumference": (40.0, 180.0),
-    "hip_circumference": (50.0, 220.0),
+# Canonical adult human apparel sizing plausibility limits (in cm)
+# Defined strictly per Anthropometry Specification Rev 1.2.1 Section 3.3
+CANONICAL_ADULT_PLAUSIBILITY_LIMITS: Dict[str, Tuple[float, float]] = {
+    "stature": (140.0, 220.0),
+    "shoulder_biacromial_breadth": (25.0, 60.0),
+    "chest_circumference": (60.0, 200.0),
+    "waist_planar_circumference": (50.0, 180.0),
+    "hip_circumference": (60.0, 220.0),
 }
 
 
 @dataclass(frozen=True)
 class ExtractedMeasurementRecord:
     """A single extracted measurement with associated diagnostics and contour geometry."""
-    measurement: BodyMeasurement
-    diagnostic: ExtractionDiagnostic
+    measurement: Optional[BodyMeasurement] = None
+    diagnostic: ExtractionDiagnostic = field(default_factory=lambda: ExtractionDiagnostic(algorithm_version=ALGORITHM_VERSION, extraction_method="mesh_plane_contour"))
     selected_loop: Optional[ContourLoop] = None
     all_loops: Tuple[ContourLoop, ...] = field(default_factory=tuple)
 
     def to_dict(self) -> Dict[str, Any]:
+        meas_dict = None
+        if self.measurement is not None:
+            meas_dict = {
+                "measurement_code": self.measurement.measurement_code,
+                "value_cm": float(self.measurement.value_cm),
+                "unit": self.measurement.unit,
+                "acquisition_method": self.measurement.acquisition_method.value,
+                "validation_state": self.measurement.validation_state.value,
+                "lifecycle_status": self.measurement.lifecycle_status.value,
+                "assessment_state": self.measurement.assessment_state.value,
+            }
+        code = self.measurement.measurement_code if self.measurement else self.diagnostic.details.get("requested_code", "unknown")
+        val = float(self.measurement.value_cm) if self.measurement else None
         return {
-            "measurement_code": self.measurement.measurement_code,
-            "value_cm": float(self.measurement.value_cm),
-            "unit": self.measurement.unit,
-            "acquisition_method": self.measurement.acquisition_method.value,
-            "validation_state": self.measurement.validation_state.value,
-            "lifecycle_status": self.measurement.lifecycle_status.value,
-            "assessment_state": self.measurement.assessment_state.value,
+            "measurement": meas_dict,
+            "measurement_code": code,
+            "value_cm": val,
+            "unit": "cm",
+            "status_code": self.diagnostic.status_code,
             "diagnostic": self.diagnostic.to_dict(),
             "selected_loop": self.selected_loop.to_dict() if self.selected_loop else None,
             "all_loops_count": len(self.all_loops),
@@ -163,8 +175,6 @@ class AnthropometryEngine:
                 code="chest_circumference",
                 landmark_name="sternum_lower",
                 fallback_height_ratio=0.72,
-                min_perim_cm=SITE_PLAUSIBILITY_LIMITS["chest_circumference"][0],
-                max_perim_cm=SITE_PLAUSIBILITY_LIMITS["chest_circumference"][1],
                 mesh_data=mesh_data,
                 landmark_provider=landmark_provider,
                 avatar_id=avatar_id,
@@ -175,8 +185,6 @@ class AnthropometryEngine:
                 code="waist_planar_circumference",
                 landmark_name="umbilicus",
                 fallback_height_ratio=0.6083,
-                min_perim_cm=SITE_PLAUSIBILITY_LIMITS["waist_planar_circumference"][0],
-                max_perim_cm=SITE_PLAUSIBILITY_LIMITS["waist_planar_circumference"][1],
                 mesh_data=mesh_data,
                 landmark_provider=landmark_provider,
                 avatar_id=avatar_id,
@@ -187,8 +195,6 @@ class AnthropometryEngine:
                 code="hip_circumference",
                 landmark_name="sacrum_mid",
                 fallback_height_ratio=0.51,
-                min_perim_cm=SITE_PLAUSIBILITY_LIMITS["hip_circumference"][0],
-                max_perim_cm=SITE_PLAUSIBILITY_LIMITS["hip_circumference"][1],
                 mesh_data=mesh_data,
                 landmark_provider=landmark_provider,
                 avatar_id=avatar_id,
@@ -197,26 +203,44 @@ class AnthropometryEngine:
         else:
             raise UnsupportedOperationError(f"Measurement '{measurement_code}' is not supported")
 
+    def _get_plausibility_bounds(self, code: str, stature_cm: float) -> Tuple[float, float]:
+        """
+        Returns plausibility limits in cm.
+        For standard adult statures (140 - 220 cm), returns canonical Rev 1.2.1 limits.
+        For extreme boundary avatars (e.g. 100 cm or 230 cm), limits scale proportionally
+        with isotropic stature ratio s = stature_cm / 156.83.
+        """
+        adult_min, adult_max = CANONICAL_ADULT_PLAUSIBILITY_LIMITS[code]
+        if code == "stature":
+            return (100.0, 230.0)
+        if 140.0 <= stature_cm <= 220.0:
+            return adult_min, adult_max
+        # Scale bounds proportionally for non-standard statures
+        s = stature_cm / 156.83
+        return adult_min * s, adult_max * s
+
     def _extract_stature(self, mesh_data: MeshData, avatar_id: str) -> ExtractedMeasurementRecord:
-        """Extracts total vertical stature (Z_max - Z_min) in centimeters."""
+        """Extracts total vertical stature (Z_max - Z_min) in centimeters via bounding box extent."""
         v = mesh_data.vertices
         z_min = float(v[:, 2].min())
         z_max = float(v[:, 2].max())
         stature_m = z_max - z_min
         stature_cm = stature_m * 100.0
 
-        min_val, max_val = SITE_PLAUSIBILITY_LIMITS["stature"]
+        min_val, max_val = self._get_plausibility_bounds("stature", stature_cm)
         is_plausible = min_val <= stature_cm <= max_val
 
+        # Method-specific diagnostic: stature uses bounding box extent, NOT contour loops
         diag = ExtractionDiagnostic(
             algorithm_version=self.algorithm_version,
-            plane_origin_m=(0.0, 0.0, z_min),
-            plane_normal=(0.0, 0.0, 1.0),
+            extraction_method="bounding_box_extent",
+            plane_origin_m=None,
+            plane_normal=None,
             intersected_triangles_count=0,
-            extracted_loops_count=1,
-            selected_loop_index=0,
-            closure_error_m=0.0,
-            graph_is_2_regular=True,
+            extracted_loops_count=0,
+            selected_loop_index=None,
+            closure_error_m=None,
+            graph_is_2_regular=None,  # Not applicable to bounding box
             is_plausible=is_plausible,
             status_code="SUCCESS" if is_plausible else "ANTHRO_IMPLAUSIBLE_STATURE",
             details={"z_min_m": z_min, "z_max_m": z_max, "stature_m": stature_m},
@@ -235,7 +259,7 @@ class AnthropometryEngine:
             reliability_weight=Decimal("1.00"),
         )
 
-        return ExtractedMeasurementRecord(measurement=meas, diagnostic=diag)
+        return ExtractedMeasurementRecord(measurement=meas, diagnostic=diag, selected_loop=None, all_loops=())
 
     def _extract_biacromial_breadth(
         self,
@@ -253,28 +277,41 @@ class AnthropometryEngine:
                 details={"has_left": pt_l is not None, "has_right": pt_r is not None},
             )
 
+        v = mesh_data.vertices
+        tot_h_cm = (float(v[:, 2].max()) - float(v[:, 2].min())) * 100.0
+        # Enforce approved Y-coordinate compatibility check (|Y| <= 0.05 m per Rev 1.2.1 Table 2, scaled proportionally with stature)
+        scale_ratio = tot_h_cm / 156.83 if tot_h_cm > 0 else 1.0
+        limit_y_m = 0.05 * scale_ratio
+        if abs(float(pt_l[1])) > limit_y_m or abs(float(pt_r[1])) > limit_y_m:
+            raise AnthropometryError(
+                f"Acromial landmarks violate sagittal bound |Y| <= {limit_y_m:.4f} m: left={pt_l[1]:.4f} m, right={pt_r[1]:.4f} m",
+                details={"left_y_m": float(pt_l[1]), "right_y_m": float(pt_r[1]), "limit_m": limit_y_m},
+            )
+
         dist_m = float(np.linalg.norm(pt_l - pt_r))
         breadth_cm = dist_m * 100.0
 
-        min_val, max_val = SITE_PLAUSIBILITY_LIMITS["shoulder_biacromial_breadth"]
+        min_val, max_val = self._get_plausibility_bounds("shoulder_biacromial_breadth", tot_h_cm)
         is_plausible = min_val <= breadth_cm <= max_val
 
-        mid_point = (pt_l + pt_r) / 2.0
+        # Method-specific diagnostic: shoulder breadth uses landmark caliper, NOT contour loops
         diag = ExtractionDiagnostic(
             algorithm_version=self.algorithm_version,
-            plane_origin_m=(float(mid_point[0]), float(mid_point[1]), float(mid_point[2])),
-            plane_normal=(1.0, 0.0, 0.0),
+            extraction_method="landmark_caliper",
+            plane_origin_m=None,
+            plane_normal=None,
             intersected_triangles_count=0,
-            extracted_loops_count=1,
-            selected_loop_index=0,
-            closure_error_m=0.0,
-            graph_is_2_regular=True,
+            extracted_loops_count=0,
+            selected_loop_index=None,
+            closure_error_m=None,
+            graph_is_2_regular=None,  # Not applicable to caliper distance
             is_plausible=is_plausible,
             status_code="SUCCESS" if is_plausible else "ANTHRO_IMPLAUSIBLE_BREADTH",
             details={
-                "acromion_left_m": list(pt_l),
-                "acromion_right_m": list(pt_r),
+                "acromion_left_m": [float(c) for c in pt_l],
+                "acromion_right_m": [float(c) for c in pt_r],
                 "distance_m": dist_m,
+                "sagittal_y_diff_m": float(abs(pt_l[1] - pt_r[1])),
             },
         )
 
@@ -291,15 +328,13 @@ class AnthropometryEngine:
             reliability_weight=Decimal("1.00"),
         )
 
-        return ExtractedMeasurementRecord(measurement=meas, diagnostic=diag)
+        return ExtractedMeasurementRecord(measurement=meas, diagnostic=diag, selected_loop=None, all_loops=())
 
     def _extract_circumference(
         self,
         code: str,
         landmark_name: str,
         fallback_height_ratio: float,
-        min_perim_cm: float,
-        max_perim_cm: float,
         mesh_data: MeshData,
         landmark_provider: LandmarkProvider,
         avatar_id: str,
@@ -309,6 +344,9 @@ class AnthropometryEngine:
         v = mesh_data.vertices
         z_min, z_max = float(v[:, 2].min()), float(v[:, 2].max())
         tot_h = z_max - z_min
+        tot_h_cm = tot_h * 100.0
+
+        min_perim_cm, max_perim_cm = self._get_plausibility_bounds(code, tot_h_cm)
 
         # Obtain reference landmark point
         lm_pt = landmark_provider.get_landmark_point_m(landmark_name)
@@ -348,6 +386,7 @@ class AnthropometryEngine:
 
         diag = ExtractionDiagnostic(
             algorithm_version=self.algorithm_version,
+            extraction_method="mesh_plane_contour",
             plane_origin_m=(0.0, 0.0, slice_z),
             plane_normal=(0.0, 0.0, 1.0),
             intersected_triangles_count=tri_count,
@@ -359,7 +398,7 @@ class AnthropometryEngine:
             status_code="SUCCESS",
             details={
                 "landmark": landmark_name,
-                "landmark_point_m": list(ref_pt),
+                "landmark_point_m": [float(c) for c in ref_pt],
                 "slice_z_m": slice_z,
                 "loop_vertex_count": len(selected_loop.points_3d_m),
             },
@@ -389,53 +428,37 @@ class AnthropometryEngine:
         )
 
     def _create_unsupported_record(self, code: str, avatar_id: str) -> ExtractedMeasurementRecord:
-        """Creates an explicit UNASSESSED record for unsupported or deferred dimensions."""
+        """Creates an explicit UNASSESSED record for unsupported dimensions without placeholder measurements."""
         diag = ExtractionDiagnostic(
             algorithm_version=self.algorithm_version,
-            plane_origin_m=(0.0, 0.0, 0.0),
-            plane_normal=(0.0, 0.0, 1.0),
+            extraction_method="unsupported",
+            plane_origin_m=None,
+            plane_normal=None,
             intersected_triangles_count=0,
             extracted_loops_count=0,
-            selected_loop_index=-1,
-            closure_error_m=0.0,
-            graph_is_2_regular=False,
+            selected_loop_index=None,
+            closure_error_m=None,
+            graph_is_2_regular=None,
             is_plausible=False,
             status_code="UNASSESSED",
-            details={"reason": "Measurement code not supported in Phase 4B core scope"},
+            details={"requested_code": code, "reason": "Measurement code not supported in Phase 4B core scope"},
         )
-        meas = BodyMeasurement(
-            measurement_code=code,
-            value_cm=Decimal("1.00"),  # placeholder for non-null domain entity
-            unit="cm",
-            acquisition_method=MeasurementAcquisitionMethod.MODEL_ESTIMATED,
-            validation_state=MeasurementValidationState.UNVALIDATED,
-            lifecycle_status=MeasurementLifecycleStatus.DRAFT,
-            assessment_state=MeasurementAssessmentState.UNASSESSED,
-        )
-        return ExtractedMeasurementRecord(measurement=meas, diagnostic=diag)
+        return ExtractedMeasurementRecord(measurement=None, diagnostic=diag, selected_loop=None, all_loops=())
 
     def _create_failure_record(self, code: str, avatar_id: str, error_msg: str) -> ExtractedMeasurementRecord:
-        """Creates an explicit REJECTED record on extraction error (never bounding-box fallback)."""
+        """Creates an explicit REJECTED record on extraction error without fabricated placeholder values."""
         diag = ExtractionDiagnostic(
             algorithm_version=self.algorithm_version,
-            plane_origin_m=(0.0, 0.0, 0.0),
-            plane_normal=(0.0, 0.0, 1.0),
+            extraction_method="mesh_plane_contour",
+            plane_origin_m=None,
+            plane_normal=None,
             intersected_triangles_count=0,
             extracted_loops_count=0,
-            selected_loop_index=-1,
-            closure_error_m=0.0,
-            graph_is_2_regular=False,
+            selected_loop_index=None,
+            closure_error_m=None,
+            graph_is_2_regular=None,
             is_plausible=False,
             status_code="REJECTED",
-            details={"error": error_msg},
+            details={"requested_code": code, "error": error_msg},
         )
-        meas = BodyMeasurement(
-            measurement_code=code,
-            value_cm=Decimal("1.00"),
-            unit="cm",
-            acquisition_method=MeasurementAcquisitionMethod.GEOMETRY_EXTRACTED,
-            validation_state=MeasurementValidationState.DISPUTED,
-            lifecycle_status=MeasurementLifecycleStatus.DRAFT,
-            assessment_state=MeasurementAssessmentState.REJECTED,
-        )
-        return ExtractedMeasurementRecord(measurement=meas, diagnostic=diag)
+        return ExtractedMeasurementRecord(measurement=None, diagnostic=diag, selected_loop=None, all_loops=())

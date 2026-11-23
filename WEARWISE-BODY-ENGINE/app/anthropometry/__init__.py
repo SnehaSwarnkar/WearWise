@@ -25,6 +25,7 @@ from app.anthropometry.exceptions import (
 from app.anthropometry.geometry import (
     stitch_segments_into_loops,
     intersect_triangle_with_plane,
+    IntersectionSegment,
     EPSILON_PLANE_M,
     EPSILON_SNAP_M,
     EPSILON_LEN_M,
@@ -45,6 +46,7 @@ __all__ = [
     "MeshSliceError",
     "stitch_segments_into_loops",
     "intersect_triangle_with_plane",
+    "IntersectionSegment",
     "EPSILON_PLANE_M",
     "EPSILON_SNAP_M",
     "EPSILON_LEN_M",

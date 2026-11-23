@@ -37,28 +37,30 @@ class ContourLoop:
 
 @dataclass(frozen=True)
 class ExtractionDiagnostic:
-    """Diagnostic metadata for measurement extraction."""
+    """Diagnostic metadata for measurement extraction with method-specific semantics."""
     algorithm_version: str
-    plane_origin_m: Tuple[float, float, float]
-    plane_normal: Tuple[float, float, float]
-    intersected_triangles_count: int
-    extracted_loops_count: int
-    selected_loop_index: int
-    closure_error_m: float
-    graph_is_2_regular: bool
-    is_plausible: bool
-    status_code: str
+    extraction_method: str  # "mesh_plane_contour", "bounding_box_extent", "landmark_caliper"
+    plane_origin_m: Optional[Tuple[float, float, float]] = None
+    plane_normal: Optional[Tuple[float, float, float]] = None
+    intersected_triangles_count: int = 0
+    extracted_loops_count: int = 0
+    selected_loop_index: Optional[int] = None
+    closure_error_m: Optional[float] = None
+    graph_is_2_regular: Optional[bool] = None
+    is_plausible: bool = True
+    status_code: str = "SUCCESS"
     details: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             "algorithm_version": self.algorithm_version,
-            "plane_origin_m": list(self.plane_origin_m),
-            "plane_normal": list(self.plane_normal),
+            "extraction_method": self.extraction_method,
+            "plane_origin_m": list(self.plane_origin_m) if self.plane_origin_m is not None else None,
+            "plane_normal": list(self.plane_normal) if self.plane_normal is not None else None,
             "intersected_triangles_count": self.intersected_triangles_count,
             "extracted_loops_count": self.extracted_loops_count,
             "selected_loop_index": self.selected_loop_index,
-            "closure_error_m": float(self.closure_error_m),
+            "closure_error_m": float(self.closure_error_m) if self.closure_error_m is not None else None,
             "graph_is_2_regular": self.graph_is_2_regular,
             "is_plausible": self.is_plausible,
             "status_code": self.status_code,

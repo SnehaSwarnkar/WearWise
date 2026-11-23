@@ -69,10 +69,11 @@ ANNY_CANONICAL_LANDMARKS: Dict[str, Tuple[int, str]] = {
 class AnnyLandmarkProvider:
     """
     Implements LandmarkProvider without exposing Anny internal topology to external consumers.
-    Computes 3D coordinates in meters from the active or most recently generated mesh.
+    Computes 3D coordinates in meters from the bound mesh, specified mesh, or active adapter state.
     """
-    def __init__(self, adapter: "AnnyAdapter") -> None:
+    def __init__(self, adapter: "AnnyAdapter", mesh: Optional[MeshData] = None) -> None:
         self._adapter = adapter
+        self._mesh = mesh
         self._region_masks: Dict[str, Set[int]] = self._build_region_masks()
 
     def _build_region_masks(self) -> Dict[str, Set[int]]:
@@ -124,13 +125,13 @@ class AnnyLandmarkProvider:
             anatomical_region=region,
         )
 
-    def get_landmark_point_m(self, landmark_code: str) -> Optional[np.ndarray]:
+    def get_landmark_point_m(self, landmark_code: str, mesh: Optional[MeshData] = None) -> Optional[np.ndarray]:
         if landmark_code not in ANNY_CANONICAL_LANDMARKS:
             return None
         v_idx, _ = ANNY_CANONICAL_LANDMARKS[landmark_code]
-        last_mesh = self._adapter.get_last_mesh()
-        if last_mesh is not None:
-            return last_mesh.vertices[v_idx].copy()
+        active_mesh = mesh or self._mesh or self._adapter.get_last_mesh()
+        if active_mesh is not None:
+            return active_mesh.vertices[v_idx].copy()
         # Fallback to neutral template
         model = self._adapter.get_model()
         return model.template_vertices[v_idx].detach().cpu().numpy().copy()
@@ -610,8 +611,10 @@ class AnnyAdapter:
         except Exception as e:
             raise GLBExportError(f"Failed to serialize mesh to GLB: {str(e)}") from e
 
-    def get_landmark_provider(self) -> LandmarkProvider:
-        """Returns landmark query interface for Anthropometry Engine."""
+    def get_landmark_provider(self, mesh: Optional[MeshData] = None) -> LandmarkProvider:
+        """Returns landmark query interface for Anthropometry Engine, optionally bound to a specific mesh."""
+        if mesh is not None:
+            return AnnyLandmarkProvider(self, mesh=mesh)
         if self._landmark_provider is None:
             self._landmark_provider = AnnyLandmarkProvider(self)
         return self._landmark_provider

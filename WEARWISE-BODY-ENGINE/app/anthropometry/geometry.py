@@ -4,7 +4,8 @@ Exact triangle-mesh-plane intersection, diameter-bounded endpoint clustering,
 deterministic loop stitching, degree-2 graph validation, and perimeter calculation.
 """
 
-from typing import List, Tuple, Dict, Set, Optional, Any
+from dataclasses import dataclass
+from typing import List, Tuple, Dict, Set, Optional, Any, Union
 import math
 import numpy as np
 from scipy.spatial import KDTree
@@ -23,6 +24,15 @@ EPSILON_PLANE_M: float = 1e-6   # Signed distance plane classification (1 microm
 EPSILON_SNAP_M: float = 1e-5    # Endpoint snapping / clustering tolerance (10 micrometers)
 EPSILON_LEN_M: float = 1e-6     # Minimum valid segment length (1 micrometer)
 AMBIGUITY_MARGIN_M: float = 0.02 # Ambiguity threshold between nearest loops (2.0 cm)
+
+
+@dataclass(frozen=True)
+class IntersectionSegment:
+    """A directed intersection line segment with source mesh provenance."""
+    start_point: np.ndarray
+    end_point: np.ndarray
+    face_index: Optional[int] = None
+    edge_index: Optional[Tuple[int, int]] = None
 
 
 def intersect_triangle_with_plane(
@@ -233,7 +243,7 @@ def check_self_intersection_2d(points_2d: np.ndarray) -> bool:
 
 
 def stitch_segments_into_loops(
-    segments: List[Tuple[np.ndarray, np.ndarray]],
+    segments: List[Union[Tuple[np.ndarray, np.ndarray], IntersectionSegment]],
     tolerance_m: float = EPSILON_SNAP_M,
 ) -> List[ContourLoop]:
     """
@@ -243,29 +253,49 @@ def stitch_segments_into_loops(
     1. Bounded-diameter endpoint clustering (diameter <= tolerance_m).
     2. Zero-length segment discarding.
     3. Duplicate and antiparallel segment deduplication.
-    4. Deterministic graph construction.
+    4. Deterministic graph construction with explicit node-coordinate mapping.
     5. Strict rejection of degree-1 open boundaries (OpenContourError).
-    6. Resolution of even higher-degree nodes (e.g. degree 4) via tangent continuity
-       or strict rejection if ambiguous / odd degree (NonManifoldContourError).
-    7. Closed cycle traversal.
+    6. Resolution of higher-degree nodes (e.g. degree 4) using:
+       - Primary criterion: Mesh topology provenance (face sharing)
+       - Secondary criterion: Tangent continuity (outward dot product ~ -1.0)
+       - Strict rejection if ambiguous or odd degree (NonManifoldContourError).
+    7. Closed cycle traversal using explicit node coordinates (no modulo lookup).
     8. 2D self-intersection detection (SelfIntersectingContourError).
     9. Exact polygon perimeter in meters converted to centimeters.
     """
     if not segments:
         return []
 
-    # Collect and flatten all endpoints
+    # Collect and flatten all endpoints, preserving provenance
     endpoints_list: List[np.ndarray] = []
-    for s_start, s_end in segments:
+    seg_face_indices: List[Optional[int]] = []
+
+    for item in segments:
+        if isinstance(item, IntersectionSegment):
+            s_start, s_end = item.start_point, item.end_point
+            f_idx = item.face_index
+        else:
+            s_start, s_end = item[0], item[1]
+            f_idx = None
+
         endpoints_list.append(np.asarray(s_start, dtype=np.float64))
         endpoints_list.append(np.asarray(s_end, dtype=np.float64))
+        seg_face_indices.append(f_idx)
 
     all_points = np.vstack(endpoints_list)
     cluster_ids, centroids = cluster_endpoints(all_points, tolerance_m=tolerance_m)
 
-    # Build unique undirected edges
+    # Initialize explicit node coordinate mapping
+    node_coords: Dict[int, np.ndarray] = {
+        c_idx: centroids[c_idx].copy() for c_idx in range(len(centroids))
+    }
+    next_node_id = len(centroids)
+
+    # Build unique undirected edges with face provenance
     unique_edges: Set[Tuple[int, int]] = set()
+    edge_faces: Dict[Tuple[int, int], Set[int]] = {}
     num_segs = len(segments)
+
     for s_i in range(num_segs):
         u = int(cluster_ids[2 * s_i])
         v = int(cluster_ids[2 * s_i + 1])
@@ -274,6 +304,9 @@ def stitch_segments_into_loops(
             continue
         edge = (min(u, v), max(u, v))
         unique_edges.add(edge)
+        f_idx = seg_face_indices[s_i]
+        if f_idx is not None:
+            edge_faces.setdefault(edge, set()).add(f_idx)
 
     if not unique_edges:
         return []
@@ -300,7 +333,6 @@ def stitch_segments_into_loops(
             )
 
     # 2. Check for open boundary nodes (deg == 1)
-    # If any degree-1 nodes exist in a graph without deg >= 3, raise OpenContourError
     has_deg_1 = any(len(neighbors) == 1 for neighbors in adj.values())
     deg4_nodes = [node for node, neighbors in adj.items() if len(neighbors) == 4]
 
@@ -312,50 +344,86 @@ def stitch_segments_into_loops(
                     f"Contour has degree-1 boundary node at cluster {node}: open contour detected",
                     details={"node": node, "neighbors": list(neighbors)},
                 )
+
+    # Resolve degree-4 nodes
     for node in deg4_nodes:
         neighbors = sorted(list(adj[node]))
-        c_u = centroids[node]
+        c_u = node_coords[node]
         t_vecs = []
         for w in neighbors:
-            vec = centroids[w] - c_u
+            vec = node_coords[w] - c_u
             norm = np.linalg.norm(vec)
             if norm < 1e-12:
                 raise NonManifoldContourError(f"Degenerate edge length at node {node}")
             t_vecs.append(vec / norm)
 
-        # 3 possible pairings of the 4 neighbors
+        # 3 possible pairings of the 4 neighbors:
+        # Pairing 0: (0, 1) and (2, 3)
+        # Pairing 1: (0, 2) and (1, 3)
+        # Pairing 2: (0, 3) and (1, 2)
         pairings = [
             ((0, 1), (2, 3)),
             ((0, 2), (1, 3)),
             ((0, 3), (1, 2)),
         ]
 
-        scored_pairings = []
+        resolved_pairing: Optional[Tuple[Tuple[int, int], Tuple[int, int]]] = None
+
+        # PRIMARY CRITERION: Mesh topology face provenance
+        topology_matches = []
         for p1, p2 in pairings:
-            # For outward pointing vectors, straight continuation means dot product ~ -1.0
-            dot1 = float(np.dot(t_vecs[p1[0]], t_vecs[p1[1]]))
-            dot2 = float(np.dot(t_vecs[p2[0]], t_vecs[p2[1]]))
-            # Error metric: deviation from straight continuation (-1.0)
-            err = max(abs(dot1 + 1.0), abs(dot2 + 1.0))
-            scored_pairings.append((err, dot1, dot2, p1, p2))
+            edge_1a = (min(node, neighbors[p1[0]]), max(node, neighbors[p1[0]]))
+            edge_1b = (min(node, neighbors[p1[1]]), max(node, neighbors[p1[1]]))
+            edge_2a = (min(node, neighbors[p2[0]]), max(node, neighbors[p2[0]]))
+            edge_2b = (min(node, neighbors[p2[1]]), max(node, neighbors[p2[1]]))
 
-        scored_pairings.sort(key=lambda x: x[0])
-        best_err, best_d1, best_d2, best_p1, best_p2 = scored_pairings[0]
-        second_err = scored_pairings[1][0]
+            faces_1a = edge_faces.get(edge_1a, set())
+            faces_1b = edge_faces.get(edge_1b, set())
+            faces_2a = edge_faces.get(edge_2a, set())
+            faces_2b = edge_faces.get(edge_2b, set())
 
-        # Straight continuation requires dot products <= -0.75 (angle >= 138 deg)
-        # and unambiguous margin over alternate pairings
-        if best_d1 <= -0.75 and best_d2 <= -0.75 and (second_err - best_err) >= 0.25:
-            # Successfully disambiguated: split node into two virtual nodes
-            # Remove original node connections
+            # Check if each pair shares a common face
+            has_top_1 = bool(faces_1a and faces_1b and (faces_1a & faces_1b))
+            has_top_2 = bool(faces_2a and faces_2b and (faces_2a & faces_2b))
+            if has_top_1 and has_top_2:
+                topology_matches.append((p1, p2))
+
+        if len(topology_matches) == 1:
+            resolved_pairing = topology_matches[0]
+
+        # SECONDARY CRITERION: Tangent continuity
+        if resolved_pairing is None:
+            scored_pairings = []
+            for p1, p2 in pairings:
+                # For outward pointing vectors, straight continuation means dot product ~ -1.0
+                dot1 = float(np.dot(t_vecs[p1[0]], t_vecs[p1[1]]))
+                dot2 = float(np.dot(t_vecs[p2[0]], t_vecs[p2[1]]))
+                err = max(abs(dot1 + 1.0), abs(dot2 + 1.0))
+                scored_pairings.append((err, dot1, dot2, p1, p2))
+
+            scored_pairings.sort(key=lambda x: x[0])
+            best_err, best_d1, best_d2, best_p1, best_p2 = scored_pairings[0]
+            second_err = scored_pairings[1][0]
+
+            # Straight continuation requires dot products <= -0.75 (angle >= 138 deg)
+            # and unambiguous margin over alternate pairings (>= 0.25)
+            if best_d1 <= -0.75 and best_d2 <= -0.75 and (second_err - best_err) >= 0.25:
+                resolved_pairing = (best_p1, best_p2)
+
+        if resolved_pairing is not None:
+            best_p1, best_p2 = resolved_pairing
+            # Successfully disambiguated: split node into two explicit nodes
+            split_node_1 = node
+            split_node_2 = next_node_id
+            next_node_id += 1
+
+            # Explicitly store exact coordinate of original node for the new split node
+            node_coords[split_node_2] = node_coords[node].copy()
+
+            # Rewire adjacency
             w_p1 = [neighbors[best_p1[0]], neighbors[best_p1[1]]]
             w_p2 = [neighbors[best_p2[0]], neighbors[best_p2[1]]]
 
-            # Create new split node IDs
-            split_node_1 = node
-            split_node_2 = len(centroids) + len(deg4_nodes) + 1000 + node
-
-            # Rewire adj
             adj[split_node_1] = set(w_p1)
             for w in w_p1:
                 adj[w].remove(node)
@@ -367,8 +435,8 @@ def stitch_segments_into_loops(
                 adj[w].add(split_node_2)
         else:
             raise NonManifoldContourError(
-                f"Degree-4 node {node} has ambiguous tangent continuation (best error {best_err:.3f}, second {second_err:.3f})",
-                details={"node": node, "best_dots": (best_d1, best_d2)},
+                f"Degree-4 node {node} has ambiguous continuation that cannot be resolved",
+                details={"node": node, "neighbors": neighbors},
             )
 
     # 3. Check again for any remaining degree-1 nodes after degree-4 resolution
@@ -383,11 +451,10 @@ def stitch_segments_into_loops(
     visited_nodes: Set[int] = set()
     extracted_loops: List[ContourLoop] = []
 
-    # Sort all active nodes deterministically by coordinates
-    def node_sort_key(n: int) -> Tuple[float, float, float]:
-        idx_c = n if n < len(centroids) else (n % 1000)
-        c = centroids[idx_c]
-        return (float(c[2]), float(c[1]), float(c[0]))
+    # Sort all active nodes deterministically using explicit node_coords mapping
+    def node_sort_key(n: int) -> Tuple[float, float, float, int]:
+        c = node_coords[n]
+        return (float(c[2]), float(c[1]), float(c[0]), n)
 
     active_nodes = sorted(list(adj.keys()), key=node_sort_key)
 
@@ -425,21 +492,15 @@ def stitch_segments_into_loops(
             # Degenerate 2-vertex cycle
             continue
 
-        # Extract 3D points
+        # Extract 3D points directly from explicit node_coords dictionary
         pts_3d = np.array([
-            centroids[n if n < len(centroids) else (n % 1000)]
-            for n in cycle_nodes
+            node_coords[n] for n in cycle_nodes
         ], dtype=np.float64)
 
         # Self-intersection check: project to best-fit 2D plane
-        # Center points
         centroid = np.mean(pts_3d, axis=0)
         centered = pts_3d - centroid
-        # Normal via SVD
         _, _, vh = np.linalg.svd(centered)
-        # Normal is least singular vector
-        plane_normal = vh[2]
-        # Basis vectors in plane
         u_axis = vh[0]
         v_axis = vh[1]
         pts_2d = np.column_stack([np.dot(centered, u_axis), np.dot(centered, v_axis)])
@@ -469,3 +530,4 @@ def stitch_segments_into_loops(
         ))
 
     return extracted_loops
+

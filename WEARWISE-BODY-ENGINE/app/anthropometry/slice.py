@@ -17,6 +17,7 @@ from app.anthropometry.exceptions import (
 from app.anthropometry.geometry import (
     intersect_triangle_with_plane,
     stitch_segments_into_loops,
+    IntersectionSegment,
     EPSILON_PLANE_M,
     EPSILON_SNAP_M,
     EPSILON_LEN_M,
@@ -67,7 +68,7 @@ def slice_mesh_with_plane(
         # Plane completely misses mesh bounding box
         return [], 0
 
-    all_segments: List[Tuple[np.ndarray, np.ndarray]] = []
+    all_segments: List[IntersectionSegment] = []
     intersected_count = 0
 
     for f_idx in range(len(faces)):
@@ -93,7 +94,12 @@ def slice_mesh_with_plane(
         )
         if segs:
             intersected_count += 1
-            all_segments.extend(segs)
+            for s_start, s_end in segs:
+                all_segments.append(IntersectionSegment(
+                    start_point=s_start,
+                    end_point=s_end,
+                    face_index=f_idx,
+                ))
 
     if not all_segments:
         return [], 0

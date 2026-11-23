@@ -112,8 +112,8 @@ class AvatarEngine(Protocol):
         """
         ...
         
-    def get_landmark_provider(self) -> LandmarkProvider:
-        """Return neutral landmark query interface for Anthropometry Engine."""
+    def get_landmark_provider(self, mesh: Optional[MeshData] = None) -> LandmarkProvider:
+        """Return neutral landmark query interface for Anthropometry Engine, optionally bound to a specific mesh."""
         ...
 
     def get_shape_evaluation_port(self) -> ShapeEvaluationPort:

@@ -46,21 +46,34 @@ def test_neutral_masculine_extraction(anny_engine: AnnyAdapter, anthro_engine: A
     # 1. Stature
     st_rec = result.records["stature"]
     assert st_rec.diagnostic.status_code == "SUCCESS"
+    assert st_rec.diagnostic.extraction_method == "bounding_box_extent"
+    assert st_rec.diagnostic.graph_is_2_regular is None  # Not a contour graph
+    assert st_rec.diagnostic.extracted_loops_count == 0
+    assert st_rec.selected_loop is None
+    assert st_rec.measurement is not None
     assert st_rec.measurement.value_cm == Decimal("156.83")
     assert st_rec.measurement.assessment_state == MeasurementAssessmentState.ELIGIBLE
 
     # 2. Shoulder biacromial breadth
     sh_rec = result.records["shoulder_biacromial_breadth"]
     assert sh_rec.diagnostic.status_code == "SUCCESS"
+    assert sh_rec.diagnostic.extraction_method == "landmark_caliper"
+    assert sh_rec.diagnostic.graph_is_2_regular is None  # Not a contour graph
+    assert sh_rec.diagnostic.extracted_loops_count == 0
+    assert sh_rec.selected_loop is None
+    assert sh_rec.measurement is not None
     assert pytest.approx(float(sh_rec.measurement.value_cm), abs=0.5) == 37.20
     assert sh_rec.measurement.assessment_state == MeasurementAssessmentState.ELIGIBLE
 
     # 3. Chest circumference
     ch_rec = result.records["chest_circumference"]
     assert ch_rec.diagnostic.status_code == "SUCCESS"
-    assert pytest.approx(float(ch_rec.measurement.value_cm), abs=1.0) == 77.85
-    assert ch_rec.diagnostic.graph_is_2_regular
+    assert ch_rec.diagnostic.extraction_method == "mesh_plane_contour"
+    assert ch_rec.diagnostic.graph_is_2_regular is True
+    assert ch_rec.diagnostic.extracted_loops_count > 0
     assert ch_rec.selected_loop is not None and ch_rec.selected_loop.is_closed
+    assert ch_rec.measurement is not None
+    assert pytest.approx(float(ch_rec.measurement.value_cm), abs=1.0) == 77.85
 
     # 4. Waist planar circumference
     w_rec = result.records["waist_planar_circumference"]
@@ -227,17 +240,40 @@ def test_anthropometry_evaluation_port_contract(anny_engine: AnnyAdapter, anthro
 
 
 def test_unsupported_measurement_handling(anny_engine: AnnyAdapter, anthro_engine: AnthropometryEngine):
-    """Verifies that requesting unsupported dimensions records explicit UNASSESSED status (no invented data)."""
+    """Verifies that requesting unsupported dimensions records explicit UNASSESSED status without placeholder measurements."""
     mesh = anny_engine.generate_baseline("masculine")
-    lp = anny_engine.get_landmark_provider()
+    lp = anny_engine.get_landmark_provider(mesh=mesh)
     result = anthro_engine.extract_all(mesh, lp, measurement_codes=["stature", "torso_length", "unsupported_xyz"])
 
     assert result.records["stature"].diagnostic.status_code == "SUCCESS"
+    assert result.records["stature"].measurement is not None
     
     unsupp1 = result.records["torso_length"]
     assert unsupp1.diagnostic.status_code == "UNASSESSED"
-    assert unsupp1.measurement.assessment_state == MeasurementAssessmentState.UNASSESSED
+    assert unsupp1.diagnostic.extraction_method == "unsupported"
+    assert unsupp1.measurement is None  # No fabricated Decimal("1.00")
+    assert unsupp1.selected_loop is None
+    assert unsupp1.all_loops == ()
 
     unsupp2 = result.records["unsupported_xyz"]
     assert unsupp2.diagnostic.status_code == "UNASSESSED"
-    assert unsupp2.measurement.assessment_state == MeasurementAssessmentState.UNASSESSED
+    assert unsupp2.diagnostic.extraction_method == "unsupported"
+    assert unsupp2.measurement is None  # No fabricated Decimal("1.00")
+
+
+def test_evaluation_port_explicit_failure_on_unsupported(anny_engine: AnnyAdapter, anthro_engine: AnthropometryEngine):
+    """Verifies that DefaultAnthropometryEvaluationPort raises explicit error on missing/unsupported codes."""
+    from app.anthropometry.exceptions import AnthropometryError
+
+    port = DefaultAnthropometryEvaluationPort(anny_engine, anthro_engine)
+    spec = AvatarShapeSpec(
+        spec_version="1.2.1",
+        presentation=PresentationGender.MASCULINE,
+        target_stature_cm=175.0,
+        target_measurements={"stature": 175.0},
+        regional_scales={},
+        semantic_controls={},
+    )
+    with pytest.raises(AnthropometryError) as exc_info:
+        port.extract_candidate_measurements(spec, ["stature", "unsupported_dimension_xyz"])
+    assert "Candidate anthropometry evaluation failed" in str(exc_info.value)
