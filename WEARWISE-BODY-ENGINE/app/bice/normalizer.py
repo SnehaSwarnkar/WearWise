@@ -84,7 +84,7 @@ def denormalize_control(control_name: str, normalized_val: float) -> float:
     else:
         raw = NEUTRAL_CONTROL_VALUE + normalized_val * (NEUTRAL_CONTROL_VALUE - min_val)
 
-    return round(raw, 4)
+    return float(raw)
 
 
 def normalize_controls(
