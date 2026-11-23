@@ -2,38 +2,38 @@
 
 **Project:** WearWise AI Fashion & Honest Fit Platform  
 **Document:** Phase 1 Architecture Decision Record & Acceptance Matrix  
-**Revision:** 1.2 (Final Architecture Closure & Technical Boundary Verification)  
+**Revision:** 1.2.1 (Final Documentation Consistency & Architecture Closure)  
 **Date:** 2026-11-23  
 **Execution Agent:** Antigravity (Google DeepMind Team)  
 **Technical Decision Owner:** ChatGPT  
-**Decision Status:** **REVISION 1.2 COMPLETE — SUBMITTED FOR TECHNICAL OWNER SIGN-OFF**  
+**Decision Status:** **REVISION 1.2.1 COMPLETE — SUBMITTED FOR TECHNICAL OWNER SIGN-OFF**  
 
 ---
 
 ## 1. Executive Summary & Architecture Overview
 
-Phase 1 Revision 1.2 provides the final, corrected technical architecture for the WearWise platform, closing all remaining architectural gaps identified during technical review.
+Phase 1 Revision 1.2.1 provides the final, reconciled technical architecture for the WearWise platform, closing all remaining documentation consistency gaps, canonical interface definitions, and synchronization requirements identified in the Revision 1.2.1 Directive.
 
 ### Governance Boundary Compliance:
 - **No production code has been authored.**
 - **No FastAPI application skeleton, database migrations, or ORM models were created.**
 - **The existing React 19 + Vite frontend was preserved without modification.**
-- **All 10 architecture and domain design specifications are synchronized under [`WEARWISE-BODY-ENGINE/docs/architecture/`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/).**
+- **All 12 architecture and domain design specifications are synchronized under [`WEARWISE-BODY-ENGINE/docs/architecture/`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/).**
 
 ---
 
-## 2. Key Architecture Decisions (Revision 1.2)
+## 2. Key Architecture Decisions (Revision 1.2.1)
 
 | Decision ID | Topic | Selected Decision | Technical & Business Rationale |
 |---|---|---|---|
 | **DEC-01** | Backend Topology | Python Modular Monolith (FastAPI) | Maximizes local developer velocity, eliminates distributed network latency and serialization overhead, and complies with ₹0 budget mandate while maintaining clean module boundaries. |
-| **DEC-02** | Avatar Engine Abstraction & BICE Decoupling | Abstract `AvatarEngine`, `AvatarShapeSpec` & `ShapeEvaluationPort` | BICE is strictly decoupled from Anny and PyTorch. It outputs `AvatarShapeSpec` and receives geometric feedback through `ShapeEvaluationPort`. `AnnyAdapter` encapsulates all blendshape mapping and supplies `LandmarkProvider`. |
+| **DEC-02** | Avatar Engine Abstraction & BICE Decoupling | Abstract `AvatarEngine`, `AvatarShapeSpec` & `ShapeEvaluationPort` | BICE is strictly decoupled from Anny and PyTorch. It outputs typed `AvatarShapeSpec` and queries `ShapeEvaluationPort`. `AnnyAdapter` encapsulates all blendshape mapping and supplies `LandmarkProvider`. |
 | **DEC-03** | Application Orchestration | `AvatarOrchestrationService` | Moves workflow orchestration out of Avatar Engine into an application service that coordinates profile retrieval, BICE shape solving, engine mesh generation, anthropometry extraction, and asset storage. |
-| **DEC-04** | Anthropometry Extraction | Exact Mesh-Plane Intersection & Graph Stitching | Replaces naive Z-slab and convex-hull heuristic with exact triangle-mesh-plane segment intersection, 2-regular graph degree validation, and centroid-distance landmark loop selection. |
+| **DEC-04** | Anthropometry Extraction | Exact Mesh-Plane Intersection & Graph Stitching | Replaces naive heuristics with exact transversal triangle cutting, 2-regular graph degree validation, spatial hash quantization, and landmark centroid proximity with ambiguity margin rejection. |
 | **DEC-05** | Provenance, Validation & Assessment | Decoupled Orthogonal Taxonomies | Separates data acquisition method (`user_reported`, `tape_measured`, `geometry_extracted`, `model_estimated`), validation state, lifecycle status (`active`, `superseded`, `draft`, `purged`), and apparel assessment state (`eligible`, `provisional`, `unassessed`, `rejected`). |
-| **DEC-06** | Honest Fit Classification & Scoring | 6-Tier Non-Overlapping Spectrum & Bounded Scoring | Defines half-open intervals $[a, b)$ for 6 distinct classes (`TOO_TIGHT`, `FITTED`, `REGULAR`, `RELAXED`, `OVERSIZED`, `TOO_LARGE`) and a mathematically bounded score $S \in [0, 100]$ normalized by assessed weights. |
+| **DEC-06** | Honest Fit Classification & Scoring | 6-Tier Non-Overlapping Spectrum & Bounded Scoring | Defines half-open intervals $[a, b)$ for 6 distinct classes (`TOO_TIGHT`, `FITTED`, `REGULAR`, `RELAXED`, `OVERSIZED`, `TOO_LARGE`) and a mathematically bounded score $S \in [0, 100]$ with discounted weights ($0.5\times$) for provisional measurements. |
 | **DEC-07** | API Security & GLB Privacy | Authenticated Ownership & Private No-Store Caching | Strips client-supplied `user_id`. Derives ownership strictly from authenticated principal. GLB assets require authorization and return `Cache-Control: private, no-store` with content-derived ETag (SHA-256). |
-| **DEC-08** | Persistence & Asset Deletion | Exact 12-Table DDL & Shared Blob Reference Safety | Guarantees complete 1:1 agreement between ERD and DDL across 12 tables, unconstrained outbox asset reference, and active reference check preventing shared content-addressable blobs from accidental deletion. |
+| **DEC-08** | Persistence & Atomic Blob Deletion | 12-Table DDL & Advisory Lock Deletion Synchronization | Guarantees complete 1:1 agreement between ERD and DDL across 12 tables, unconstrained outbox asset reference, and PostgreSQL transactional advisory locks (`pg_advisory_xact_lock`) / SQLite `BEGIN IMMEDIATE` transactions preventing TOCTOU shared blob deletion races. |
 
 ---
 
@@ -76,6 +76,13 @@ In accordance with Section 14 of the Directive, every criterion is evaluated as 
 | **R1-09** | Garment/Body Compatibility | Formal registry mapping garment dimension codes to body measurement codes | **PASS** | [`HONEST_FIT_ENGINE_SPEC.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/HONEST_FIT_ENGINE_SPEC.md) (Sec 2.2 Table) |
 | **R1-10** | Normalized Fit Scoring | Bounded score $S \in [0, 100]$ normalized by evaluated weights with $70\%$ coverage gate | **PASS** | [`HONEST_FIT_ENGINE_SPEC.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/HONEST_FIT_ENGINE_SPEC.md) (Sec 4.1, 4.2) |
 | **R1-11** | Phase 2 Package Boundaries | Clear separation between domain entities, transport schemas, and persistence models | **PASS** | [`IMPLEMENTATION_ROADMAP.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/IMPLEMENTATION_ROADMAP.md) (Sec 2) |
+| **R1-12** | Canonical Domain Interfaces | Exactly one definition each for `AvatarShapeSpec`, `MeshData`, `LandmarkData`, `LandmarkProvider`, `ShapeEvaluationPort`, and `ShapeEvaluationResult` | **PASS** | [`AVATAR_ENGINE_DESIGN.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/AVATAR_ENGINE_DESIGN.md) (Sec 2) & [`BODY_INTELLIGENCE_DESIGN.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/BODY_INTELLIGENCE_DESIGN.md) (Sec 4, 5) |
+| **R1-13** | BICE Near-Zero Signal Handling | `insufficient_target_signal` status returned when target displacement $< 10^{-4}\text{ m}$; candidate rejected (not treated as zero penalty); RMSR is dimensionless arithmetic ratio | **PASS** | [`BODY_INTELLIGENCE_DESIGN.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/BODY_INTELLIGENCE_DESIGN.md) (Sec 5.1) & [`AVATAR_ENGINE_DESIGN.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/AVATAR_ENGINE_DESIGN.md) (Sec 3.4) |
+| **R1-14** | Anthropometry Edge Cases & Ambiguity | Transversal segment derivation, spatial hash quantization, 2-regular loop validation, and ambiguity margin rejection; Phase 4 implementation obligation noted | **PASS** | [`ANTHROPOMETRY_SPECIFICATION.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/ANTHROPOMETRY_SPECIFICATION.md) (Sec 1, 3.1, 3.2, 3.3) |
+| **R1-15** | Atomic Blob Deletion Synchronization | PostgreSQL transactional advisory lock (`pg_advisory_xact_lock`) and SQLite `BEGIN IMMEDIATE` serialize asset registration and blob deletion, eliminating TOCTOU race | **PASS** | [`DATABASE_SCHEMA.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/DATABASE_SCHEMA.md) (Sec 4.2) & [`SYSTEM_ARCHITECTURE.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/SYSTEM_ARCHITECTURE.md) (Sec 5 ADR-05) |
+| **R1-16** | Garment Registry & Fabric Testing | Garment dimension alignment with anthropometry; deferred Phase 5 shirting/trouser lines labeled; ASTM D2594 / BS 4952 / ISO 20932 testing standards specified | **PASS** | [`HONEST_FIT_ENGINE_SPEC.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/HONEST_FIT_ENGINE_SPEC.md) (Sec 2.1, 2.2, 2.5) |
+| **R1-17** | API Ownership & Canonical Stature | `POST /profiles` creates canonical `stature` measurement record; explicit caller ownership checks on all profile, measurement, avatar, and fit routes; deferred garment CRUD labeled | **PASS** | [`API_CONTRACTS.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/API_CONTRACTS.md) (Sec 1, 3.1, 3.2, 3.5, 3.6) |
+| **R1-18** | Revision 1.2.1 Architecture Sync | System architecture, component diagrams, package boundaries, and ADRs synchronized across all Revision 1.2.1 documents | **PASS** | [`SYSTEM_ARCHITECTURE.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/SYSTEM_ARCHITECTURE.md) (Sec 1, 3, 4, 5) |
 
 ---
 
@@ -90,6 +97,6 @@ In accordance with Section 14 of the Directive, every criterion is evaluated as 
 
 ## 5. Authorization Boundary & Hand-Off
 
-**Phase 1 Revision 1.2 is complete.**
+**Phase 1 Revision 1.2.1 is complete.**
 
-All architectural defects identified in the directive have been resolved and cross-checked for internal consistency. The complete specification package is submitted to **ChatGPT (Technical Decision Owner)** for formal architectural sign-off before Phase 2 implementation is authorized.
+All architectural defects, canonical interface definitions, near-zero evaluation policies, anthropometry edge cases, atomic blob deletion safety mechanisms, and documentation synchronization items identified in the directive have been resolved and cross-checked for internal consistency. The complete specification package is submitted to **ChatGPT (Technical Decision Owner)** for formal architectural sign-off before Phase 2 implementation is authorized.
