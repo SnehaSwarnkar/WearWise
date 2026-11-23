@@ -9,6 +9,7 @@ from decimal import Decimal
 import math
 from typing import Dict, Literal, Optional, Tuple, Union
 from app.domain.entities.body import BodyShapeControls, BodyMeasurement
+from app.domain.taxonomies.garment import PresentationGender
 from app.bice.config import (
     MIN_STATURE_CM,
     MAX_STATURE_CM,
@@ -18,20 +19,27 @@ from app.bice.config import (
 from app.bice.exceptions import BICEValidationError
 
 
-VALID_PRESENTATIONS: Tuple[str, ...] = ("masculine", "feminine", "neutral")
+VALID_PRESENTATIONS: Tuple[str, ...] = tuple(e.value for e in PresentationGender)
 
 
-def validate_presentation(presentation: str) -> str:
+def validate_presentation(presentation: Union[str, PresentationGender]) -> PresentationGender:
     """
     Validates presentation morphology parameter.
-    Must be 'masculine', 'feminine', or 'neutral'.
+    Returns PresentationGender enum.
     """
-    if not isinstance(presentation, str) or presentation not in VALID_PRESENTATIONS:
-        raise BICEValidationError(
-            f"Invalid presentation morphology '{presentation}'. "
-            f"Allowed values are: {list(VALID_PRESENTATIONS)}"
-        )
-    return presentation
+    if isinstance(presentation, PresentationGender):
+        return presentation
+
+    if isinstance(presentation, str):
+        try:
+            return PresentationGender(presentation)
+        except ValueError:
+            pass
+
+    raise BICEValidationError(
+        f"Invalid presentation morphology '{presentation}'. "
+        f"Allowed values are: {list(VALID_PRESENTATIONS)}"
+    )
 
 
 def validate_stature(stature_cm: Union[float, Decimal, int]) -> float:
