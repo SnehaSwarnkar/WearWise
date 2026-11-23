@@ -2,12 +2,12 @@
   "phase": "4B",
   "milestone": "Anthropometry Extraction from Real Anny Meshes",
   "algorithm_version": "1.2.1-mesh-plane-graph",
-  "generated_at": "2026-11-23T12:21:35Z",
+  "generated_at": "2026-11-23T13:12:23Z",
   "benchmark": {
     "benchmark_iterations": 5,
-    "mean_latency_ms": 4774.75,
-    "mean_latency_seconds": 4.7748,
-    "incremental_heap_memory_mb": 2.185,
+    "mean_latency_ms": 11827.84,
+    "mean_latency_seconds": 11.8278,
+    "incremental_heap_memory_mb": 19.357,
     "incremental_heap_memory_note": "Traced via Python tracemalloc measuring incremental heap allocations during extraction",
     "total_process_rss_mb_estimate": 350.0,
     "total_process_rss_note": "Total OS Resident Set Size including Python runtime, CUDA/CPU kernels, and PyTorch C++ libraries",
@@ -55,7 +55,7 @@
     "neutral_masculine": {
       "avatar_id": "neutral_masculine",
       "algorithm_version": "1.2.1-mesh-plane-graph",
-      "extraction_timestamp": "2026-11-23T12:21:07.484252+00:00",
+      "extraction_timestamp": "2026-11-23T13:11:17.690473+00:00",
       "measurements": {
         "stature": {
           "measurement": {
@@ -342,7 +342,7 @@
     "neutral_feminine": {
       "avatar_id": "neutral_feminine",
       "algorithm_version": "1.2.1-mesh-plane-graph",
-      "extraction_timestamp": "2026-11-23T12:21:08.417807+00:00",
+      "extraction_timestamp": "2026-11-23T13:11:19.334391+00:00",
       "measurements": {
         "stature": {
           "measurement": {
@@ -629,7 +629,7 @@
     "modified_athletic": {
       "avatar_id": "modified_athletic",
       "algorithm_version": "1.2.1-mesh-plane-graph",
-      "extraction_timestamp": "2026-11-23T12:21:09.371248+00:00",
+      "extraction_timestamp": "2026-11-23T13:11:20.974245+00:00",
       "measurements": {
         "stature": {
           "measurement": {
@@ -916,7 +916,7 @@
     "stature_min_100cm": {
       "avatar_id": "stature_min_100cm",
       "algorithm_version": "1.2.1-mesh-plane-graph",
-      "extraction_timestamp": "2026-11-23T12:21:10.335017+00:00",
+      "extraction_timestamp": "2026-11-23T13:11:22.627142+00:00",
       "measurements": {
         "stature": {
           "measurement": {
@@ -931,7 +931,7 @@
           "measurement_code": "stature",
           "value_cm": 100.0,
           "unit": "cm",
-          "status_code": "ANTHRO_IMPLAUSIBLE_STATURE",
+          "status_code": "SUCCESS",
           "diagnostic": {
             "algorithm_version": "1.2.1-mesh-plane-graph",
             "extraction_method": "bounding_box_extent",
@@ -942,8 +942,8 @@
             "selected_loop_index": null,
             "closure_error_m": null,
             "graph_is_2_regular": null,
-            "is_plausible": false,
-            "status_code": "ANTHRO_IMPLAUSIBLE_STATURE",
+            "is_plausible": true,
+            "status_code": "SUCCESS",
             "details": {
               "z_min_m": -0.4895229637622833,
               "z_max_m": 0.5104769468307495,
@@ -1203,7 +1203,7 @@
     "stature_max_230cm": {
       "avatar_id": "stature_max_230cm",
       "algorithm_version": "1.2.1-mesh-plane-graph",
-      "extraction_timestamp": "2026-11-23T12:21:11.297980+00:00",
+      "extraction_timestamp": "2026-11-23T13:11:24.254714+00:00",
       "measurements": {
         "stature": {
           "measurement": {

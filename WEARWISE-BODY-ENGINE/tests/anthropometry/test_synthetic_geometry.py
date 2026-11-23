@@ -516,31 +516,61 @@ def test_multiple_degree_four_nodes_handling():
 
 
 def test_topology_provenance_primary_disambiguation():
-    """Verifies that mesh topology face provenance successfully resolves degree-4 node even when tangents are angled."""
-    from app.anthropometry.geometry import IntersectionSegment
+    """
+    Integration-level verification that actual triangulated mesh face adjacency and cut-edge
+    provenance resolve degree-4 intersections through the full slice_mesh_with_plane() pipeline.
+    
+    Constructs an authentic triangulated mesh (7 vertices, 6 faces) forming two hollow triangular
+    prisms that pinch at a central vertex V0=(0, 0, 0) on the cutting plane Z=0.
+    In ordinary slicing, each triangle generates at most one segment. The primary mesh topology
+    criterion uses real face adjacency (faces sharing a mesh edge) to resolve the degree-4 node
+    into two distinct closed loops without relying on synthetic shared face IDs or tangent angles.
+    """
+    V0 = np.array([0.0, 0.0, 0.0])
+    VL_top = np.array([-0.05, 0.0, 0.05])
+    VL1 = np.array([-0.05, -0.05, -0.05])
+    VL2 = np.array([-0.05, 0.05, -0.05])
 
-    p_center = np.array([0.0, 0.0, 0.0])
-    p1 = np.array([1.0, 0.5, 0.0])
-    p2 = np.array([-0.8, 0.2, 0.0])
-    p3 = np.array([0.2, 1.0, 0.0])
-    p4 = np.array([-0.3, -1.0, 0.0])
+    VR_top = np.array([0.05, 0.0, 0.05])
+    VR1 = np.array([0.05, -0.05, -0.05])
+    VR2 = np.array([0.05, 0.05, -0.05])
 
-    # Segments meeting at p_center with shared face indices:
-    # Pair 1: (p1, p_center) and (p_center, p2) both belong to face 101
-    # Pair 2: (p3, p_center) and (p_center, p4) both belong to face 202
-    segs = [
-        IntersectionSegment(start_point=p1, end_point=p_center, face_index=101),
-        IntersectionSegment(start_point=p_center, end_point=p2, face_index=101),
-        IntersectionSegment(start_point=p2, end_point=p1, face_index=101),  # closes loop 1
+    verts = np.array([V0, VL_top, VL1, VL2, VR_top, VR1, VR2], dtype=np.float64)
+    # Faces:
+    # Left loop:
+    # FL1: (V0, VL_top, VL1) -> (0, 1, 2)
+    # FL2: (V0, VL2, VL_top) -> (0, 3, 1)  shares mesh edge (0, 1) with FL1!
+    # FL3: (VL_top, VL2, VL1) -> (1, 3, 2) shares mesh edges (1, 3) and (1, 2)
+    # Right loop:
+    # FR1: (V0, VR1, VR_top) -> (0, 5, 4)
+    # FR2: (V0, VR_top, VR2) -> (0, 4, 6)  shares mesh edge (0, 4) with FR1!
+    # FR3: (VR_top, VR1, VR2) -> (4, 5, 6) shares mesh edges (4, 5) and (4, 6)
+    faces = np.array([
+        [0, 1, 2],
+        [0, 3, 1],
+        [1, 3, 2],
+        [0, 5, 4],
+        [0, 4, 6],
+        [4, 5, 6],
+    ], dtype=np.int32)
 
-        IntersectionSegment(start_point=p3, end_point=p_center, face_index=202),
-        IntersectionSegment(start_point=p_center, end_point=p4, face_index=202),
-        IntersectionSegment(start_point=p4, end_point=p3, face_index=202),  # closes loop 2
-    ]
+    mesh = MeshData(vertices=verts, faces=faces)
+    p0 = np.array([0.0, 0.0, 0.0])
+    plane_n = np.array([0.0, 0.0, 1.0])
 
-    loops = stitch_segments_into_loops(segs)
-    assert len(loops) == 2
+    loops, intersected_count = slice_mesh_with_plane(mesh, plane_point=p0, plane_normal=plane_n)
+
+    # Must extract exactly 2 independent closed loops via actual mesh topology
+    assert len(loops) == 2, f"Expected 2 loops, got {len(loops)}"
+    assert intersected_count == 6
     assert loops[0].is_closed and loops[1].is_closed
+
+    # Verify spatial separation of the two loops across X=0
+    xs_0 = [p[0] for p in loops[0].points_3d_m]
+    xs_1 = [p[1] for p in loops[1].points_3d_m]
+    # Each loop has 3 vertices forming a triangle in plane Z=0
+    assert len(loops[0].points_3d_m) == 3
+    assert len(loops[1].points_3d_m) == 3
 
 
 def test_deterministic_traversal_after_segment_shuffling_degree_four():

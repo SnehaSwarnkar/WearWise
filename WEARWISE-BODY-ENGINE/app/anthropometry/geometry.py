@@ -32,7 +32,8 @@ class IntersectionSegment:
     start_point: np.ndarray
     end_point: np.ndarray
     face_index: Optional[int] = None
-    edge_index: Optional[Tuple[int, int]] = None
+    start_edge: Optional[Tuple[int, int]] = None
+    end_edge: Optional[Tuple[int, int]] = None
 
 
 def intersect_triangle_with_plane(
@@ -43,9 +44,12 @@ def intersect_triangle_with_plane(
     plane_normal: np.ndarray,
     epsilon_plane_m: float = EPSILON_PLANE_M,
     epsilon_len_m: float = EPSILON_LEN_M,
-) -> List[Tuple[np.ndarray, np.ndarray]]:
+    return_edges: bool = False,
+    vertex_indices: Optional[Tuple[int, int, int]] = None,
+) -> Any:
     """
     Computes exact line segment(s) resulting from intersecting a 3D triangle with a cutting plane.
+    Optionally returns source mesh edge/vertex identities at endpoints when return_edges=True.
     
     Handles:
     - Standard transverse crossing (1 vertex on one side, 2 on the other)
@@ -62,6 +66,20 @@ def intersect_triangle_with_plane(
         raise ValueError("Plane normal must be non-zero")
     normal = normal / norm_len
 
+    vi = tuple(int(x) for x in vertex_indices) if vertex_indices is not None else None
+
+    def _edge_id(idx_a: int, idx_b: int) -> Optional[Tuple[int, int]]:
+        if vi is None:
+            return None
+        va, vb = vi[idx_a], vi[idx_b]
+        return (min(va, vb), max(va, vb))
+
+    def _vertex_id(idx: int) -> Optional[Tuple[int, int]]:
+        if vi is None:
+            return None
+        v = vi[idx]
+        return (v, v)
+
     # Signed distances to plane
     d = [float(np.dot(verts[i] - p0, normal)) for i in range(3)]
     
@@ -75,7 +93,7 @@ def intersect_triangle_with_plane(
     num_pos = signs.count(1)
     num_neg = signs.count(-1)
 
-    segments: List[Tuple[np.ndarray, np.ndarray]] = []
+    segments: List[Any] = []
 
     # Case 1: Fully coplanar triangle (all 3 vertices on plane)
     if num_zeros == 3:
@@ -88,7 +106,10 @@ def intersect_triangle_with_plane(
         p_a = verts[zero_indices[0]]
         p_b = verts[zero_indices[1]]
         if np.linalg.norm(p_a - p_b) >= epsilon_len_m:
-            segments.append((p_a, p_b))
+            if return_edges:
+                segments.append((p_a, p_b, _vertex_id(zero_indices[0]), _vertex_id(zero_indices[1])))
+            else:
+                segments.append((p_a, p_b))
         return segments
 
     # Case 3: One vertex on plane
@@ -108,7 +129,10 @@ def intersect_triangle_with_plane(
         p_cut = verts[i1] + t * (verts[i2] - verts[i1])
         p_zero = verts[zero_idx]
         if np.linalg.norm(p_zero - p_cut) >= epsilon_len_m:
-            segments.append((p_zero, p_cut))
+            if return_edges:
+                segments.append((p_zero, p_cut, _vertex_id(zero_idx), _edge_id(i1, i2)))
+            else:
+                segments.append((p_zero, p_cut))
         return segments
 
     # Case 4: No vertices on plane
@@ -136,7 +160,10 @@ def intersect_triangle_with_plane(
         p_cut2 = verts[i0] + t2 * (verts[i2] - verts[i0])
 
         if np.linalg.norm(p_cut1 - p_cut2) >= epsilon_len_m:
-            segments.append((p_cut1, p_cut2))
+            if return_edges:
+                segments.append((p_cut1, p_cut2, _edge_id(i0, i1), _edge_id(i0, i2)))
+            else:
+                segments.append((p_cut1, p_cut2))
         return segments
 
     return segments
@@ -245,6 +272,7 @@ def check_self_intersection_2d(points_2d: np.ndarray) -> bool:
 def stitch_segments_into_loops(
     segments: List[Union[Tuple[np.ndarray, np.ndarray], IntersectionSegment]],
     tolerance_m: float = EPSILON_SNAP_M,
+    face_adjacency: Optional[Dict[int, Set[int]]] = None,
 ) -> List[ContourLoop]:
     """
     Stitches an unordered collection of 3D line segments into ordered, closed ContourLoops.
@@ -256,7 +284,7 @@ def stitch_segments_into_loops(
     4. Deterministic graph construction with explicit node-coordinate mapping.
     5. Strict rejection of degree-1 open boundaries (OpenContourError).
     6. Resolution of higher-degree nodes (e.g. degree 4) using:
-       - Primary criterion: Mesh topology provenance (face sharing)
+       - Primary criterion: Real mesh topology face adjacency and shared cut edges
        - Secondary criterion: Tangent continuity (outward dot product ~ -1.0)
        - Strict rejection if ambiguous or odd degree (NonManifoldContourError).
     7. Closed cycle traversal using explicit node coordinates (no modulo lookup).
@@ -269,18 +297,26 @@ def stitch_segments_into_loops(
     # Collect and flatten all endpoints, preserving provenance
     endpoints_list: List[np.ndarray] = []
     seg_face_indices: List[Optional[int]] = []
+    seg_start_edges: List[Optional[Tuple[int, int]]] = []
+    seg_end_edges: List[Optional[Tuple[int, int]]] = []
 
     for item in segments:
         if isinstance(item, IntersectionSegment):
             s_start, s_end = item.start_point, item.end_point
             f_idx = item.face_index
+            se = item.start_edge
+            ee = item.end_edge
         else:
             s_start, s_end = item[0], item[1]
             f_idx = None
+            se = None
+            ee = None
 
         endpoints_list.append(np.asarray(s_start, dtype=np.float64))
         endpoints_list.append(np.asarray(s_end, dtype=np.float64))
         seg_face_indices.append(f_idx)
+        seg_start_edges.append(se)
+        seg_end_edges.append(ee)
 
     all_points = np.vstack(endpoints_list)
     cluster_ids, centroids = cluster_endpoints(all_points, tolerance_m=tolerance_m)
@@ -291,9 +327,10 @@ def stitch_segments_into_loops(
     }
     next_node_id = len(centroids)
 
-    # Build unique undirected edges with face provenance
+    # Build unique undirected edges with face provenance and branch endpoint info
     unique_edges: Set[Tuple[int, int]] = set()
     edge_faces: Dict[Tuple[int, int], Set[int]] = {}
+    branch_info: Dict[Tuple[int, int], List[Dict[str, Any]]] = {}
     num_segs = len(segments)
 
     for s_i in range(num_segs):
@@ -307,6 +344,19 @@ def stitch_segments_into_loops(
         f_idx = seg_face_indices[s_i]
         if f_idx is not None:
             edge_faces.setdefault(edge, set()).add(f_idx)
+
+        se = seg_start_edges[s_i]
+        ee = seg_end_edges[s_i]
+        branch_info.setdefault((u, v), []).append({
+            "face_index": f_idx,
+            "mesh_feature_at_node": se,
+            "mesh_feature_at_neighbor": ee,
+        })
+        branch_info.setdefault((v, u), []).append({
+            "face_index": f_idx,
+            "mesh_feature_at_node": ee,
+            "mesh_feature_at_neighbor": se,
+        })
 
     if not unique_edges:
         return []
@@ -367,29 +417,42 @@ def stitch_segments_into_loops(
             ((0, 3), (1, 2)),
         ]
 
-        resolved_pairing: Optional[Tuple[Tuple[int, int], Tuple[int, int]]] = None
+        def eval_branch_pair_topology(idx_a: int, idx_b: int) -> Tuple[bool, int]:
+            b_list_a = branch_info.get((node, neighbors[idx_a]), [])
+            b_list_b = branch_info.get((node, neighbors[idx_b]), [])
+            max_score = 0
+            for b_a in b_list_a:
+                for b_b in b_list_b:
+                    f_a, f_b = b_a["face_index"], b_b["face_index"]
+                    feat_a, feat_b = b_a["mesh_feature_at_node"], b_b["mesh_feature_at_node"]
+                    score = 0
+                    # 1. Real mesh face adjacency across an original mesh edge
+                    if face_adjacency is not None and f_a is not None and f_b is not None:
+                        if f_b in face_adjacency.get(f_a, set()):
+                            score += 2
+                    # 2. Both branches cut from the exact same original mesh edge
+                    if feat_a is not None and feat_b is not None and feat_a == feat_b and feat_a[0] != feat_a[1]:
+                        score += 2
+                    # 3. Fallback for synthetic tests: shared face ID
+                    if f_a is not None and f_b is not None and f_a == f_b:
+                        score += 1
+                    if score > max_score:
+                        max_score = score
+            return (max_score > 0, max_score)
 
-        # PRIMARY CRITERION: Mesh topology face provenance
+        # PRIMARY CRITERION: Mesh topology face adjacency & cut edge sharing
         topology_matches = []
         for p1, p2 in pairings:
-            edge_1a = (min(node, neighbors[p1[0]]), max(node, neighbors[p1[0]]))
-            edge_1b = (min(node, neighbors[p1[1]]), max(node, neighbors[p1[1]]))
-            edge_2a = (min(node, neighbors[p2[0]]), max(node, neighbors[p2[0]]))
-            edge_2b = (min(node, neighbors[p2[1]]), max(node, neighbors[p2[1]]))
+            conn_1, s_1 = eval_branch_pair_topology(p1[0], p1[1])
+            conn_2, s_2 = eval_branch_pair_topology(p2[0], p2[1])
+            if conn_1 and conn_2:
+                topology_matches.append((s_1 + s_2, p1, p2))
 
-            faces_1a = edge_faces.get(edge_1a, set())
-            faces_1b = edge_faces.get(edge_1b, set())
-            faces_2a = edge_faces.get(edge_2a, set())
-            faces_2b = edge_faces.get(edge_2b, set())
-
-            # Check if each pair shares a common face
-            has_top_1 = bool(faces_1a and faces_1b and (faces_1a & faces_1b))
-            has_top_2 = bool(faces_2a and faces_2b and (faces_2a & faces_2b))
-            if has_top_1 and has_top_2:
-                topology_matches.append((p1, p2))
-
-        if len(topology_matches) == 1:
-            resolved_pairing = topology_matches[0]
+        resolved_pairing: Optional[Tuple[Tuple[int, int], Tuple[int, int]]] = None
+        if topology_matches:
+            topology_matches.sort(key=lambda x: x[0], reverse=True)
+            if len(topology_matches) == 1 or topology_matches[0][0] > topology_matches[1][0]:
+                resolved_pairing = (topology_matches[0][1], topology_matches[0][2])
 
         # SECONDARY CRITERION: Tangent continuity
         if resolved_pairing is None:

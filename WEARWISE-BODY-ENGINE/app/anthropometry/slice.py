@@ -68,6 +68,21 @@ def slice_mesh_with_plane(
         # Plane completely misses mesh bounding box
         return [], 0
 
+    # Build mesh face adjacency: two faces are adjacent if they share a mesh edge
+    edge_to_faces: Dict[Tuple[int, int], List[int]] = {}
+    for f_idx, (i0, i1, i2) in enumerate(faces):
+        for u, v in [(int(i0), int(i1)), (int(i1), int(i2)), (int(i0), int(i2))]:
+            e = (min(u, v), max(u, v))
+            edge_to_faces.setdefault(e, []).append(f_idx)
+
+    face_adjacency: Dict[int, Set[int]] = {i: set() for i in range(len(faces))}
+    for e, f_list in edge_to_faces.items():
+        if len(f_list) >= 2:
+            for f_a in f_list:
+                for f_b in f_list:
+                    if f_a != f_b:
+                        face_adjacency[f_a].add(f_b)
+
     all_segments: List[IntersectionSegment] = []
     intersected_count = 0
 
@@ -91,20 +106,24 @@ def slice_mesh_with_plane(
             plane_normal=normal,
             epsilon_plane_m=EPSILON_PLANE_M,
             epsilon_len_m=EPSILON_LEN_M,
+            return_edges=True,
+            vertex_indices=(int(i0), int(i1), int(i2)),
         )
         if segs:
             intersected_count += 1
-            for s_start, s_end in segs:
+            for s_start, s_end, e_start, e_end in segs:
                 all_segments.append(IntersectionSegment(
                     start_point=s_start,
                     end_point=s_end,
                     face_index=f_idx,
+                    start_edge=e_start,
+                    end_edge=e_end,
                 ))
 
     if not all_segments:
         return [], 0
 
-    loops = stitch_segments_into_loops(all_segments, tolerance_m=tolerance_m)
+    loops = stitch_segments_into_loops(all_segments, tolerance_m=tolerance_m, face_adjacency=face_adjacency)
     return loops, intersected_count
 
 

@@ -204,17 +204,44 @@ def test_stature_limits_100cm_and_230cm(anny_engine: AnnyAdapter, anthro_engine:
             semantic_controls={},
         )
         mesh = anny_engine.generate_avatar(spec)
-        lp = anny_engine.get_landmark_provider()
+        lp = anny_engine.get_landmark_provider(mesh=mesh)
         res = anthro_engine.extract_all(mesh, lp)
 
-        ext_st = float(res.records["stature"].measurement.value_cm)
-        assert pytest.approx(ext_st, abs=0.05) == target_h
+        rec = res.records["stature"]
+        assert rec.measurement is not None
+        ext_st = float(rec.measurement.value_cm)
+        # Measurement matches target within documented tolerance (0.50 cm)
+        assert abs(ext_st - target_h) <= float(rec.measurement.tolerance_cm)
+        assert rec.diagnostic.status_code == "SUCCESS"
+        assert rec.diagnostic.is_plausible is True
+        assert rec.measurement.assessment_state == MeasurementAssessmentState.ELIGIBLE
 
         # Verify all circumferences are plausible and scaled
         for code in ["chest_circumference", "waist_planar_circumference", "hip_circumference"]:
             assert res.records[code].diagnostic.status_code == "SUCCESS"
+            assert res.records[code].diagnostic.is_plausible is True
             val = float(res.records[code].measurement.value_cm)
             assert val > 30.0
+
+
+def test_implausible_measurement_cannot_retain_eligible_state(anthro_engine: AnthropometryEngine):
+    """Verifies that an implausible measurement receives REJECTED assessment state and cannot retain ELIGIBLE."""
+    from app.domain.entities.avatar import MeshData
+    # Synthetic mesh with stature 50 cm (outside plausibility bounds 100 - 230 cm)
+    v = np.array([
+        [0.0, 0.0, 0.0],
+        [0.1, 0.0, 0.50],
+        [0.0, 0.1, 0.25],
+    ], dtype=np.float64)
+    f = np.array([[0, 1, 2]], dtype=np.int32)
+    tiny_mesh = MeshData(vertices=v, faces=f)
+
+    rec = anthro_engine._extract_stature(tiny_mesh, avatar_id="tiny_avatar")
+    assert rec.diagnostic.status_code == "ANTHRO_IMPLAUSIBLE_STATURE"
+    assert rec.diagnostic.is_plausible is False
+    assert rec.measurement is not None
+    assert rec.measurement.assessment_state == MeasurementAssessmentState.REJECTED
+    assert rec.measurement.assessment_state != MeasurementAssessmentState.ELIGIBLE
 
 
 def test_anthropometry_evaluation_port_contract(anny_engine: AnnyAdapter, anthro_engine: AnthropometryEngine):

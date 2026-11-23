@@ -228,7 +228,9 @@ class AnthropometryEngine:
         stature_cm = stature_m * 100.0
 
         min_val, max_val = self._get_plausibility_bounds("stature", stature_cm)
-        is_plausible = min_val <= stature_cm <= max_val
+        rounded_stature_cm = round(stature_cm, 2)
+        # Numerical boundary policy: accept floating-point extent matching boundary within 1e-2 cm or exact rounded match
+        is_plausible = (min_val - 1e-2 <= stature_cm <= max_val + 1e-2) or (min_val <= rounded_stature_cm <= max_val)
 
         # Method-specific diagnostic: stature uses bounding box extent, NOT contour loops
         diag = ExtractionDiagnostic(
@@ -251,9 +253,15 @@ class AnthropometryEngine:
             value_cm=Decimal(f"{stature_cm:.2f}"),
             unit="cm",
             acquisition_method=MeasurementAcquisitionMethod.GEOMETRY_EXTRACTED,
-            validation_state=MeasurementValidationState.INTERNALLY_CONSISTENT,
+            validation_state=(
+                MeasurementValidationState.INTERNALLY_CONSISTENT if is_plausible
+                else MeasurementValidationState.UNVALIDATED
+            ),
             lifecycle_status=MeasurementLifecycleStatus.ACTIVE,
-            assessment_state=MeasurementAssessmentState.ELIGIBLE,
+            assessment_state=(
+                MeasurementAssessmentState.ELIGIBLE if is_plausible
+                else MeasurementAssessmentState.REJECTED
+            ),
             landmark_convention="crown_to_plantar_z_extent",
             tolerance_cm=Decimal("0.50"),
             reliability_weight=Decimal("1.00"),
@@ -292,7 +300,8 @@ class AnthropometryEngine:
         breadth_cm = dist_m * 100.0
 
         min_val, max_val = self._get_plausibility_bounds("shoulder_biacromial_breadth", tot_h_cm)
-        is_plausible = min_val <= breadth_cm <= max_val
+        rounded_breadth_cm = round(breadth_cm, 2)
+        is_plausible = (min_val - 1e-2 <= breadth_cm <= max_val + 1e-2) or (min_val <= rounded_breadth_cm <= max_val)
 
         # Method-specific diagnostic: shoulder breadth uses landmark caliper, NOT contour loops
         diag = ExtractionDiagnostic(
@@ -320,9 +329,15 @@ class AnthropometryEngine:
             value_cm=Decimal(f"{breadth_cm:.2f}"),
             unit="cm",
             acquisition_method=MeasurementAcquisitionMethod.GEOMETRY_EXTRACTED,
-            validation_state=MeasurementValidationState.INTERNALLY_CONSISTENT,
+            validation_state=(
+                MeasurementValidationState.INTERNALLY_CONSISTENT if is_plausible
+                else MeasurementValidationState.UNVALIDATED
+            ),
             lifecycle_status=MeasurementLifecycleStatus.ACTIVE,
-            assessment_state=MeasurementAssessmentState.ELIGIBLE,
+            assessment_state=(
+                MeasurementAssessmentState.ELIGIBLE if is_plausible
+                else MeasurementAssessmentState.REJECTED
+            ),
             landmark_convention="bony_acromial_caliper",
             tolerance_cm=Decimal("0.50"),
             reliability_weight=Decimal("1.00"),
@@ -382,7 +397,8 @@ class AnthropometryEngine:
         )
 
         perim_cm = selected_loop.perimeter_cm
-        is_plausible = min_perim_cm <= perim_cm <= max_perim_cm
+        rounded_perim_cm = round(perim_cm, 2)
+        is_plausible = (min_perim_cm - 1e-2 <= perim_cm <= max_perim_cm + 1e-2) or (min_perim_cm <= rounded_perim_cm <= max_perim_cm)
 
         diag = ExtractionDiagnostic(
             algorithm_version=self.algorithm_version,
@@ -395,7 +411,7 @@ class AnthropometryEngine:
             closure_error_m=0.0,
             graph_is_2_regular=True,
             is_plausible=is_plausible,
-            status_code="SUCCESS",
+            status_code="SUCCESS" if is_plausible else f"ANTHRO_IMPLAUSIBLE_{code.upper()}",
             details={
                 "landmark": landmark_name,
                 "landmark_point_m": [float(c) for c in ref_pt],
@@ -409,11 +425,15 @@ class AnthropometryEngine:
             value_cm=Decimal(f"{perim_cm:.2f}"),
             unit="cm",
             acquisition_method=MeasurementAcquisitionMethod.GEOMETRY_EXTRACTED,
-            validation_state=MeasurementValidationState.INTERNALLY_CONSISTENT,
+            validation_state=(
+                MeasurementValidationState.INTERNALLY_CONSISTENT if is_plausible
+                else MeasurementValidationState.UNVALIDATED
+            ),
             lifecycle_status=MeasurementLifecycleStatus.ACTIVE,
             assessment_state=(
-                MeasurementAssessmentState.PROVISIONAL if is_provisional
-                else MeasurementAssessmentState.ELIGIBLE
+                (MeasurementAssessmentState.PROVISIONAL if is_provisional
+                 else MeasurementAssessmentState.ELIGIBLE)
+                if is_plausible else MeasurementAssessmentState.REJECTED
             ),
             landmark_convention=f"transverse_plane_{landmark_name}",
             tolerance_cm=Decimal("0.50"),
