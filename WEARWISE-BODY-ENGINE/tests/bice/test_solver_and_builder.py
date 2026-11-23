@@ -103,23 +103,39 @@ def test_solver_generate_candidate_valid():
 
 def test_solver_rejects_candidate_exceeding_provisional_bounds():
     """
-    Verify candidate is rejected when mapped regional scales violate provisional bounds.
-    E.g. thigh_fullness safe range is [0.20, 0.80]. At 0.80, normalized is +1.0.
-    With direct mapping, thighs.scale_x is 1.0, but provisional bound for thighs is [-0.50, +0.50]!
-    Candidate should be rejected by bounds check!
+    Verify candidate is rejected when injected candidate regional scales violate provisional bounds.
+    E.g. thighs.scale_x is 0.75, which exceeds provisional bound [-0.50, +0.50].
+    Candidate must be rejected by solver bounds check with diagnostic record.
     """
     solver = BICEShapeSolver()
     candidate = solver.generate_candidate(
         presentation="neutral",
         stature_cm=170.0,
         measurements={},
-        controls={"thigh_fullness": 0.80},  # normalized = 1.0, exceeds provisional bound 0.50
+        controls={"shoulder_width": 0.50},
+        candidate_regional_scales={
+            "thighs": RegionalShapeScale(scale_x=0.75, scale_y=0.0, scale_z=0.0)
+        },
     )
 
     assert candidate.is_accepted is False
     assert "Bounds violation" in candidate.rejection_reason
     assert candidate.bounds_report.is_valid is False
     assert candidate.bounds_report.violations_count >= 1
+
+
+def test_build_avatar_shape_spec_rejects_out_of_bounds_scales():
+    """Verify build_avatar_shape_spec raises BICEBoundsExceededError when explicit scales exceed bounds."""
+    with pytest.raises(BICEBoundsExceededError):
+        build_avatar_shape_spec(
+            presentation="neutral",
+            stature_cm=170.0,
+            measurements={},
+            controls=BodyShapeControls(),
+            regional_scales={
+                "thighs": RegionalShapeScale(scale_x=0.75, scale_y=0.0, scale_z=0.0)
+            },
+        )
 
 
 def test_solver_with_locality_port_rejection():

@@ -78,6 +78,10 @@ def denormalize_control(control_name: str, normalized_val: float) -> float:
     min_val, max_val = SEMANTIC_CONTROL_SAFE_RANGES[control_name]
     if normalized_val == 0.0:
         return NEUTRAL_CONTROL_VALUE
+    if normalized_val == -1.0:
+        return min_val
+    if normalized_val == 1.0:
+        return max_val
 
     if normalized_val > 0.0:
         raw = NEUTRAL_CONTROL_VALUE + normalized_val * (max_val - NEUTRAL_CONTROL_VALUE)

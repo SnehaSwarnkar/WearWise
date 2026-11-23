@@ -96,3 +96,17 @@ def test_invalid_types():
 
     with pytest.raises(BICEValidationError):
         normalize_controls("invalid_input")  # type: ignore
+
+
+@pytest.mark.parametrize("control_name,bounds", SEMANTIC_CONTROL_SAFE_RANGES.items())
+def test_float_precision_roundtrip_arbitrary(control_name, bounds):
+    """
+    Verify that arbitrary valid floating point inputs within safe range
+    roundtrip without loss of precision (|c - denorm(norm(c))| < 1e-6).
+    """
+    min_v, max_v = bounds
+    for i in range(51):
+        c = min_v + (max_v - min_v) * (i / 50.0)
+        norm = normalize_control(control_name, c)
+        denorm = denormalize_control(control_name, norm)
+        assert abs(c - denorm) < 1e-6

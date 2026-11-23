@@ -83,10 +83,9 @@ def test_validate_measurements_input_edges():
     res = validate_measurements_input({"stature": bm})
     assert res["stature"] == 175.0
 
-    # Non-cm unit on BodyMeasurement (constructed by bypassing post-init or object with unit != 'cm')
+    # Invalid measurement object (neither BodyMeasurement nor numeric)
     class DummyMeasurement:
-        value_cm = 175.0
-        unit = "inches"
+        pass
     with pytest.raises(BICEValidationError):
         validate_measurements_input({"stature": DummyMeasurement()})  # type: ignore
 
@@ -108,9 +107,10 @@ def test_validate_measurements_input_edges():
     with pytest.raises(BICEValidationError):
         validate_measurements_input({"waist_circumference": 230.0})
 
-    # Chest exceeding 150% of stature
-    with pytest.raises(BICEValidationError):
+    # Chest exceeding 150% of stature (stature=100.0 cm, chest=150.1 cm, passes [30, 220] circumference bound)
+    with pytest.raises(BICEValidationError) as exc_info:
         validate_measurements_input({
-            "stature": 150.0,
-            "chest_circumference": 230.0,  # 230 > 150 * 1.5 (225)
+            "stature": 100.0,
+            "chest_circumference": 150.1,  # 150.1 > 100 * 1.5 (150.0)
         })
+    assert "exceeds 150% of stature" in str(exc_info.value)
