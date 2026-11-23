@@ -2,7 +2,7 @@
 
 **Project:** WearWise AI Fashion & Honest Fit Platform  
 **Document:** System Architecture Specification (SAS-001)  
-**Revision:** 1.2 (Engine-Isolated Modular Monolith & Evaluation Port)  
+**Revision:** 1.2.1 (Engine-Isolated Modular Monolith, Evaluation Port & Atomic Storage Safety)  
 **Date:** 2026-11-23  
 **Status:** Approved Technical Architecture  
 
@@ -227,3 +227,10 @@ sequenceDiagram
 - **Status:** Approved (Revision 1.2).
 - **Context:** Coupling BICE or Anthropometry to Anny creates severe vendor lock-in. Avatar Engine must not orchestrate measurement extraction.
 - **Decision:** `AvatarOrchestrationService` coordinates the workflow. BICE outputs `AvatarShapeSpec` and accesses displacement feedback through `ShapeEvaluationPort`. AnnyAdapter translates `AvatarShapeSpec` to Anny parameters and provides `LandmarkProvider`. Anthropometry operates strictly on neutral meshes and landmark coordinates.
+
+### ADR-05: Atomic Content-Addressable Blob Deletion Synchronization
+- **Status:** Approved (Revision 1.2.1).
+- **Context:** Content-addressable storage (`/data/assets/glb/{sha256}.glb`) allows multiple avatars to share identical blobs. A Time-of-Check to Time-of-Use race condition could allow an outbox cleanup worker to delete a blob while another process registers a live reference to the same digest.
+- **Decision:** Enforce mutual exclusion during asset registration and blob deletion:
+  - Production (PostgreSQL): Scoped transactional advisory locks (`SELECT pg_advisory_xact_lock(hashtext(:sha256_checksum));`).
+  - Development (SQLite): Serialized write transactions via `BEGIN IMMEDIATE`.
