@@ -19,6 +19,7 @@ from app.domain.entities.avatar import (
     ShapeEvaluationResult,
     RegionalShapeScale,
 )
+from app.domain.taxonomies.garment import PresentationGender
 from app.domain.interfaces.avatar import ShapeEvaluationPort
 
 
@@ -115,7 +116,7 @@ def test_near_zero_signal_policy_and_maximal_penalty():
 
     spec = AvatarShapeSpec(
         spec_version="1.2.1",
-        presentation="neutral",
+        presentation=PresentationGender.NEUTRAL,
         target_stature_cm=175.0,
         target_measurements={"stature": 175.0},
         regional_scales={"shoulders": RegionalShapeScale(0.1, 0.0, 0.0)},
@@ -146,7 +147,7 @@ def test_successful_locality_evaluation_and_max_spillover():
 
     spec = AvatarShapeSpec(
         spec_version="1.2.1",
-        presentation="masculine",
+        presentation=PresentationGender.MASCULINE,
         target_stature_cm=180.0,
         target_measurements={"stature": 180.0},
         regional_scales={
@@ -179,7 +180,7 @@ def test_implausible_geometry_rejection():
 
     spec = AvatarShapeSpec(
         spec_version="1.2.1",
-        presentation="neutral",
+        presentation=PresentationGender.NEUTRAL,
         target_stature_cm=170.0,
         target_measurements={"stature": 170.0},
         regional_scales={"shoulders": RegionalShapeScale(0.0, 0.0, 0.0)},

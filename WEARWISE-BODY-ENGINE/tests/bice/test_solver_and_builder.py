@@ -17,6 +17,7 @@ from app.bice.exceptions import (
 )
 from app.domain.entities.avatar import AvatarShapeSpec, RegionalShapeScale
 from app.domain.entities.body import BodyShapeControls, BodyMeasurement
+from app.domain.taxonomies.garment import PresentationGender
 from tests.bice.test_locality import MockDeterministicEvaluationPort
 
 
@@ -38,7 +39,7 @@ def test_build_avatar_shape_spec_success():
         ),
     )
     assert isinstance(spec, AvatarShapeSpec)
-    assert spec.presentation == "feminine"
+    assert spec.presentation == PresentationGender.FEMININE
     assert spec.target_stature_cm == 165.5
     assert spec.target_measurements["chest_circumference"] == 92.0
     assert spec.target_measurements["stature"] == 165.5
