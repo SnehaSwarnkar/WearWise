@@ -102,8 +102,8 @@ Rather than silently averaging conflicting figures or carrying ambiguity into ca
 
 | Metric Name | Mathematical Definition | Historical Status in Phase 0 | Architectural Role in Phase 1 |
 |---|---|---|---|
-| **Regional Mean Spillover Ratio (RMSR)** | $\text{RMSR}_R(p) = \frac{\bar{\Delta}_R(p)}{\bar{\Delta}_{R_{\text{target}}}(p) + \epsilon}$ | **Empirically Measured** in `exp_b_parameter_behaviour.py` across 20 parameters. | Primary metric in `ShapeEvaluationPort` and BICE loss $\mathcal{L}_{\text{locality}}$. |
-| **Peak Vertex Spillover Ratio (PVSR)** | $\text{PVSR}(p) = \frac{\max_{v \notin \mathcal{R}_{\text{target}}} \|\Delta \mathbf{x}_v\|}{\max_{v \in \mathcal{R}_{\text{target}}} \|\Delta \mathbf{x}_v\| + \epsilon}$ | Formulated mathematically in reports; **NOT empirically logged for all vertices** in Phase 0 JSON. | Secondary metric reserved for vertex-level boundary testing in Phase 3. |
+| **Regional Mean Spillover Ratio (RMSR)** | $\text{RMSR}_R(p) = \frac{\bar{\Delta}_R(p)}{\bar{\Delta}_{R_{\text{target}}}(p)}$ | **Empirically Measured** in `exp_b_parameter_behaviour.py` across 20 parameters. | Primary metric in `ShapeEvaluationPort` and BICE loss $\mathcal{L}_{\text{locality}}$. Arithmetic mean ratio, **dimensionless**. |
+| **Peak Vertex Spillover Ratio (PVSR)** | $\text{PVSR}(p) = \frac{\max_{v \notin \mathcal{R}_{\text{target}}} \|\Delta \mathbf{x}_v\|}{\max_{v \in \mathcal{R}_{\text{target}}} \|\Delta \mathbf{x}_v\|}$ | Formulated mathematically in reports; **NOT empirically logged for all vertices** in Phase 0 JSON. | Secondary metric reserved for vertex-level boundary testing in Phase 3. Extreme value ratio, **dimensionless**. |
 
 #### Investigation & Clarifications:
 - **Historical Implementation:** `experiments/anny/exp_b_parameter_behaviour.py` (lines 274–278) computed **RMSR**:
@@ -113,7 +113,12 @@ Rather than silently averaging conflicting figures or carrying ambiguity into ca
   max_other = max(other_disps) if other_disps else 0.0
   row["spillover_ratio"] = float(max_other / (t_disp + 1e-8))
   ```
-- **Near-Zero Target Safeguard:** An epsilon term $\epsilon = 10^{-6}\text{ m}$ is required to prevent division instability when target displacement is near zero.
+- **Metric Terminology & Units:**
+  - **RMSR stands strictly for Regional Mean Spillover Ratio.** It is an arithmetic mean ratio across region vertices. It is **NOT** Root Mean Square Residual ($L_2$ error).
+  - Regional displacement magnitudes $\bar{\Delta}_R$ and $\bar{\Delta}_{R_{\text{target}}}$ are strictly in **METERS ($m$)**.
+  - Spillover ratios ($\text{RMSR}_R$ and $\text{PVSR}_R$) are strictly **DIMENSIONLESS** ($[0.0, \infty)$).
+- **Near-Zero Target Signal Safeguard:**
+  When target displacement is below $\epsilon_{\text{threshold}} = 10^{-4}\text{ m}$ ($0.1\text{ mm}$), the locality signal is undefined. Rather than computing an artificial zero penalty or dividing by epsilon, the evaluation contract returns `evaluation_status: "insufficient_target_signal"`, which the BICE solver treats as an uninformative gradient candidate and rejects.
 - **Regional Aggregation in BICE:** The BICE locality objective evaluates the **maximum regional ratio** rather than an unweighted sum:
   $$\mathcal{L}_{\text{locality}}(\mathbf{s}) = \max_{R \neq R_{\text{target}}} \text{RMSR}_R(\mathbf{s})$$
 - **Regional Mask Definitions:** Anny vertex subsets defined by anatomical bounds:
