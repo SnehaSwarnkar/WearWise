@@ -2,7 +2,7 @@
 
 **Project:** WearWise AI Fashion & Honest Fit Platform  
 **Document:** API Contracts Specification (API-001)  
-**Revision:** 1.2 (Private No-Store GLB Delivery, Complete Catalog & Merchant Authorization)  
+**Revision:** 1.2.1 (Explicit Ownership Enforcement, Canonical Stature Creation & Lifecycle Labeling)  
 **Date:** 2026-11-23  
 **Status:** Approved Technical Architecture  
 
@@ -14,12 +14,19 @@
 - **Authentication & Ownership Boundary:**
   - Clients authenticate via standard Bearer Token (`Authorization: Bearer <token>`) or secure session cookie (`Set-Cookie: session_id=...; HttpOnly; Secure; SameSite=Lax`).
   - For Three.js / React Three Fiber asset loading, `GLTFLoader` must be configured with `credentials: 'include'` / `withCredentials = true` (or use a custom loader setting the `Authorization` header).
-  - Profile ownership is derived **strictly from the authenticated principal** (`request.state.current_user_id`).
-  - Request payloads must **never accept `user_id` as a client-supplied field**. Cross-user access returns `403 Forbidden` (or `404 Not Found` to prevent profile enumeration).
+  - Profile and resource ownership is derived **strictly from the authenticated principal** (`request.state.current_user_id`).
+  - Request payloads must **never accept `user_id` as a client-supplied field**.
+  - **Explicit Ownership Enforcement Policy:**
+    Every endpoint accessing private anthropometric data, avatar assets, or personalized fit evaluations verifies resource ownership against `request.state.current_user_id`:
+    1. **Profile Access (`GET /profiles/{id}`, `PATCH /profiles/{id}`):** Caller must equal `body_profiles.user_id`.
+    2. **Measurement Queries (`GET /profiles/{id}/measurements`, `GET /profiles/{id}/measurements/history`):** Caller must equal `body_profiles.user_id`.
+    3. **Avatar Status & GLB Retrieval (`GET /avatar/{id}/status`, `GET /avatar/assets/{id}.glb`):** Caller must own the profile associated with the avatar configuration.
+    4. **Fit Recommendation Creation & Query (`POST /fit/recommend`, `GET /fit/recommendations/{id}`):** Caller must own the target `profile_id` and resulting recommendation.
+    Cross-user access returns `403 Forbidden` (or `404 Not Found` to prevent identity enumeration).
   - Merchant endpoints (`/api/v1/garments`) derive `brand_id` **strictly from the authenticated merchant principal**. Clients cannot supply an arbitrary `brand_id`.
 - **GLB Privacy & Caching Policy:**
   - 3D avatar files represent personal physical data. Shared public CDN caching is **strictly forbidden**.
-  - All GLB endpoints require user authorization **before** checking conditional headers.
+  - All GLB endpoints require user authorization **before** checking conditional headers (`If-None-Match`).
   - Response headers returned:
     `Cache-Control: private, no-store`
     `ETag: "<sha256_content_checksum>"`
@@ -57,7 +64,23 @@ Every $4xx$ and $5xx$ error returns a structured, machine-readable envelope:
 ### 3.1 Body Profiles (`/api/v1/profiles`)
 
 #### `POST /api/v1/profiles` — Create Body Profile
-- **Auth:** Required (Ownership set to `current_user_id`).
+- **Auth:** Required (Ownership set strictly to `current_user_id` from authenticated token).
+- **Atomic Creation Lifecycle:**
+  When invoked, the Profile Service executes an atomic database transaction:
+  1. Inserts parent record in `body_profiles` (`id`, `user_id = current_user_id`, `current_revision = 1`).
+  2. Inserts initial revision row in `profile_revisions` (`revision_number = 1`).
+  3. **Canonical Stature Creation:** Automatically inserts the initial canonical `stature` record in `body_measurements`:
+     - `measurement_code`: `"stature"`
+     - `value_cm`: `payload.stature_cm`
+     - `unit`: `"cm"`
+     - `acquisition_method`: `"user_reported"`
+     - `validation_state`: `"unvalidated"`
+     - `lifecycle_status`: `"active"`
+     - `assessment_state`: `"eligible"`
+     - `landmark_convention`: `"plantar_to_vertex_bounding_box"`
+     - `tolerance_cm`: `1.00`
+     - `reliability_weight`: `1.00`
+  4. Inserts normalized slider values in `body_shape_controls`.
 - **Request:**
 ```json
 {
@@ -284,6 +307,10 @@ Invokes `AvatarOrchestrationService` synchronously (target latency $<150\text{ m
 
 #### `GET /api/v1/garments/{garment_id}/revisions` — Retrieve Garment Revisions
 - **Response (200 OK):** Historical revisions of garment specifications.
+
+#### Merchant Garment Mutation & Lifecycle Operations (Deferred)
+> [!NOTE]
+> **Catalogue Lifecycle Scope:** In Phase 1, the garment catalogue defines ingestion (`POST /garments`, `POST /garments/{id}/sizes`) and read contracts (`GET`). Modification and deletion operations (`PUT /api/v1/garments/{id}` and `DELETE /api/v1/garments/{id}`) are **Deferred to Phase 5 (Merchant Portal)** when seller authentication and multi-tenant inventory permissions are implemented. Partial catalogue support is intentionally labeled as such; it is not represented as full CRUD.
 
 ---
 
