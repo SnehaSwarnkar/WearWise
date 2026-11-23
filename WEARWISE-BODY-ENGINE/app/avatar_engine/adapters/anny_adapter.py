@@ -51,12 +51,16 @@ ALL_ANATOMICAL_REGIONS: Tuple[str, ...] = (
 )
 
 # Canonical landmark vertex index mapping on Anny topology (13,718 vertices)
+# Reconciled per Anthropometry Specification Rev 1.2.1 Landmark Compatibility Audit
 ANNY_CANONICAL_LANDMARKS: Dict[str, Tuple[int, str]] = {
-    "acromion_left": (9957, "shoulders"),
-    "acromion_right": (3305, "shoulders"),
+    "acromion_left": (8260, "shoulders"),
+    "acromion_right": (1604, "shoulders"),
     "cervicale_c7": (1402, "torso_chest"),
     "suprasternale": (1600, "torso_chest"),
+    "sternum_lower": (3930, "torso_chest"),
+    "umbilicus": (4044, "waist_abdomen"),
     "waist_level": (4198, "waist_abdomen"),
+    "sacrum_mid": (4313, "hips"),
     "trochanterion_left": (11025, "hips"),
     "trochanterion_right": (4423, "hips"),
 }
