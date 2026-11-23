@@ -58,17 +58,53 @@ Where:
 
 ### 4.1 Target Anthropometric Measurement Loss ($\mathcal{L}_{\text{meas}}$)
 
+#### Candidate Anthropometric Measurement Acquisition & Interface Contract
+**Critical Architectural Boundary:** The existing geometric evaluation port (`ShapeEvaluationPort`) returns **mean vertex displacement magnitudes in meters ($\bar{\Delta}_R$)**. It does **NOT** compute or return physical anthropometric tape circumferences or linear segment lengths ($\hat{m}_k$). Geometric mesh displacement cannot and must not be conflated with anthropometric measurement residuals.
+
+To obtain candidate physical dimensions $\hat{m}_k(\mathbf{s})$ in centimeters during iterative optimization without coupling BICE to 3D geometry processing, we propose a dedicated domain evaluation port: **`AnthropometryEvaluationPort`**.
+
+```python
+from typing import Protocol, List, Dict
+from app.domain.entities.avatar import AvatarShapeSpec
+
+class AnthropometryEvaluationPort(Protocol):
+    """
+    Abstract domain port for extracting physical anthropometric measurements
+    from a candidate AvatarShapeSpec.
+    
+    Architecture Relationship:
+    - Injected into BICE solver alongside ShapeEvaluationPort.
+    - Implemented in Phase 4 by AnthropometryEngine (which performs exact 
+      triangle-plane slicing, landmark loop perimeter calculation, and 
+      linear caliper extraction).
+    - Status: Proposed design contract only; NOT implemented in Phase 3.
+    """
+    def extract_candidate_measurements(
+        self,
+        shape_spec: AvatarShapeSpec,
+        measurement_codes: List[str]
+    ) -> Dict[str, float]:
+        """
+        Computes physical dimensions in CENTIMETERS for the requested canonical codes.
+        """
+        ...
+```
+
+#### Mathematical Residual Formulation
 Let $\mathcal{M}$ denote the set of active physical measurements provided for the body profile. For each measurement $k \in \mathcal{M}$:
-- $m_k^*$: Target physical value in centimeters.
-- $\hat{m}_k(\mathbf{s})$: Estimated physical dimension extracted from candidate shape $\mathbf{s}$ (in cm).
-- $\sigma_k$: Measurement uncertainty tolerance in centimeters (`tolerance_cm`, $\sigma_k \ge 0.1\text{ cm}$).
+- $m_k^*$: Target physical dimension in **centimeters ($cm$)**.
+- $\hat{m}_k(\mathbf{s})$: Candidate physical dimension extracted in **centimeters ($cm$)** via `AnthropometryEvaluationPort`.
+- $\sigma_k$: Measurement uncertainty tolerance in **centimeters ($cm$)** (`tolerance_cm`, $\sigma_k \ge 0.1\text{ cm}$).
 - $w_k$: Reliability policy weight ($w_k \in [0.0, 1.0]$, default $1.00$).
 
 The measurement loss is defined as a normalized, dimensionless squared residual:
 
 $$\mathcal{L}_{\text{meas}}(\mathbf{s}; \mathbf{m}^*) = \frac{1}{|\mathcal{M}|} \sum_{k \in \mathcal{M}} w_k \cdot \left( \frac{\hat{m}_k(\mathbf{s}) - m_k^*}{\sigma_k} \right)^2$$
 
-**Justification:** Dividing by tolerance $\sigma_k$ ensures that measurements with tight verification (e.g. professional tailor tape, $\pm 0.5\text{ cm}$) have four-fold higher gradient pull than unverified self-estimates ($\pm 2.0\text{ cm}$), preventing coarse estimates from overwhelming exact data.
+**Justification & Tolerances Rationale:**
+- Dividing the residual by tolerance $\sigma_k$ ensures that measurements captured with high precision (e.g. professional tailor tape with $\sigma = \pm 0.5\text{ cm}$) exert four-fold higher gradient pull than loose self-estimates (e.g. user-reported with $\sigma = \pm 2.0\text{ cm}$).
+- Measurement codes strictly follow canonical definitions: `stature`, `chest_circumference`, `waist_circumference`, `hip_circumference`, `shoulder_breadth`, etc. (all in $cm$).
+- If `AnthropometryEvaluationPort` is unavailable or measurement extraction fails for a candidate, $\mathcal{L}_{\text{meas}}$ cannot be computed. Under such conditions, the solver records status `measurement_signal_unavailable`, assigns maximal penalty $\mathcal{L}_{\text{meas}} = 10.0$, and aborts the update step.
 
 ### 4.2 Semantic Control Preservation Loss ($\mathcal{L}_{\text{ctrl}}$)
 
