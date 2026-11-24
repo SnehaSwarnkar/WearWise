@@ -94,8 +94,13 @@ export class WearWiseApiClient {
   private authProvider: AuthHeaderProvider;
 
   constructor(baseUrl?: string, authProvider?: AuthHeaderProvider) {
-    // If not supplied, prefer empty string (relative to vite proxy) or localhost:8000
-    this.baseUrl = baseUrl ?? (import.meta.env?.VITE_API_BASE_URL !== undefined ? import.meta.env.VITE_API_BASE_URL : 'http://127.0.0.1:8000');
+    // Prefer explicit VITE_BODY_API_URL or VITE_API_URL, then legacy VITE_API_BASE_URL, defaulting to localhost:8000
+    this.baseUrl = baseUrl ?? (
+      import.meta.env?.VITE_BODY_API_URL ||
+      import.meta.env?.VITE_API_URL ||
+      import.meta.env?.VITE_API_BASE_URL ||
+      'http://127.0.0.1:8000'
+    );
     this.authProvider = authProvider ?? devAuthHeaderProvider;
   }
 

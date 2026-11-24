@@ -10,5 +10,5 @@ cd "$SCRIPT_DIR"
 # Activate the FastAPI virtual environment
 source fastapi_env/bin/activate
 
-# Start uvicorn with auto-reload
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# Start uvicorn on port 8001 for commerce backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
