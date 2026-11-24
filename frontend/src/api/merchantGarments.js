@@ -1,5 +1,6 @@
 /**
- * WearWise Merchant Digital Garment Studio API Client
+ * WearWise Merchant Digital Garment Studio API Client (Part 1 Platform)
+ * Base URL: http://localhost:8000/api/v1/merchant/garments
  */
 
 const BASE_URL = 'http://localhost:8000/api/v1/merchant/garments';
@@ -23,30 +24,80 @@ export async function createGarmentIdentity(payload) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error('Failed to create garment identity');
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to create garment identity');
+  }
   return res.json();
 }
 
-export async function uploadViewpointImage(garmentId, viewpoint, file) {
+export async function uploadViewpointImage(garmentId, viewpoint, file, role = 'both') {
   const formData = new FormData();
   formData.append('viewpoint', viewpoint);
+  formData.append('role', role);
   formData.append('file', file);
 
   const res = await fetch(`${BASE_URL}/${garmentId}/images`, {
     method: 'POST',
     body: formData,
   });
-  if (!res.ok) throw new Error(`Failed to upload ${viewpoint} image`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `Failed to upload ${viewpoint} image`);
+  }
   return res.json();
 }
 
-export async function savePatternSpec(garmentId, payload) {
-  const res = await fetch(`${BASE_URL}/${garmentId}/pattern`, {
+export async function deleteGarmentImage(garmentId, imageId) {
+  const res = await fetch(`${BASE_URL}/${garmentId}/images/${imageId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `Failed to delete image ${imageId}`);
+  }
+  return res.json();
+}
+
+export async function uploadCADPattern(garmentId, file, units = 'mm') {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('units', units);
+
+  const res = await fetch(`${BASE_URL}/${garmentId}/pattern/upload`, {
+    method: 'POST',
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to upload CAD pattern');
+  }
+  return res.json();
+}
+
+export async function saveGuidedPattern(garmentId, payload) {
+  const res = await fetch(`${BASE_URL}/${garmentId}/pattern/guided`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error('Failed to save pattern specification');
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to generate guided parametric pattern');
+  }
+  return res.json();
+}
+
+export async function requestAIRepairPattern(garmentId, payload = {}) {
+  const res = await fetch(`${BASE_URL}/${garmentId}/pattern/ai-reconstruct`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to trigger AI pattern reconstruction');
+  }
   return res.json();
 }
 
@@ -56,7 +107,16 @@ export async function saveMeasurements(garmentId, payload) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error('Failed to save size measurements');
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to save size measurements');
+  }
+  return res.json();
+}
+
+export async function fetchFabricPresets() {
+  const res = await fetch(`${BASE_URL}/presets/fabrics`);
+  if (!res.ok) throw new Error('Failed to fetch fabric presets');
   return res.json();
 }
 
@@ -66,7 +126,10 @@ export async function saveFabricProps(garmentId, payload) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error('Failed to save fabric properties');
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to save fabric properties');
+  }
   return res.json();
 }
 
@@ -74,23 +137,59 @@ export async function trigger3DGeneration(garmentId) {
   const res = await fetch(`${BASE_URL}/${garmentId}/generate`, {
     method: 'POST',
   });
-  if (!res.ok) throw new Error('Failed to trigger 3D generation');
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to trigger 3D generation');
+  }
   return res.json();
 }
 
-export async function approveGarment(garmentId, principalId = 'brand_director_demo', notes = 'Physically verified boxy fit and ISO 8559-2 grading.') {
-  const res = await fetch(`${BASE_URL}/${garmentId}/approve?principal_id=${encodeURIComponent(principalId)}&approval_notes=${encodeURIComponent(notes)}`, {
+export async function fetchQAReport(garmentId) {
+  const res = await fetch(`${BASE_URL}/${garmentId}/qa-report`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to fetch QA report');
+  }
+  return res.json();
+}
+
+export async function approveGarment(garmentId, principalId = 'brand_director_demo', notes = 'Physically verified boxy fit, seam stitching, and ISO 8559-2 grading.') {
+  const res = await fetch(`${BASE_URL}/${garmentId}/approve`, {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      principal_id: principalId,
+      approval_notes: notes,
+    }),
   });
-  if (!res.ok) throw new Error('Failed to approve digital garment');
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to approve digital garment');
+  }
   return res.json();
 }
 
 export async function publishGarment(garmentId, publisherId = 'catalog_admin_demo') {
-  const res = await fetch(`${BASE_URL}/${garmentId}/publish?publisher_id=${encodeURIComponent(publisherId)}`, {
+  const res = await fetch(`${BASE_URL}/${garmentId}/publish`, {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      publisher_id: publisherId,
+    }),
   });
-  if (!res.ok) throw new Error('Failed to publish digital garment');
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to publish digital garment');
+  }
+  return res.json();
+}
+
+export async function fetchGarmentManifest(garmentId) {
+  const res = await fetch(`${BASE_URL}/${garmentId}/manifest`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to fetch package manifest');
+  }
   return res.json();
 }
 
