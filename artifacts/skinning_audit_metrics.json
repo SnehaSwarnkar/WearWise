@@ -1,0 +1,89 @@
+{
+  "model": "NAVER Anny v0.6.2",
+  "mesh_vertices": 13718,
+  "rig_bones": 104,
+  "skinning_method": "Linear Blend Skinning (LBS)",
+  "gltf_attributes": {
+    "JOINTS_0": "UNSIGNED_SHORT VEC4 (itemSize=4, byteOffset=0, count=13718)",
+    "WEIGHTS_0": "FLOAT VEC4 (itemSize=4, byteOffset=0, count=13718)",
+    "JOINTS_1": "Not used; top-4 weights capture 99.532% mass for standard Three.js WebGL compatibility"
+  },
+  "non_zero_influences_per_vertex": {
+    "min": 1,
+    "max": 9,
+    "mean": 2.4843,
+    "distribution": {
+      "1": {
+        "count": 5129,
+        "percentage": 37.39
+      },
+      "2": {
+        "count": 3293,
+        "percentage": 24.0
+      },
+      "3": {
+        "count": 2395,
+        "percentage": 17.46
+      },
+      "4": {
+        "count": 1055,
+        "percentage": 7.69
+      },
+      "5": {
+        "count": 781,
+        "percentage": 5.69
+      },
+      "6": {
+        "count": 533,
+        "percentage": 3.89
+      },
+      "7": {
+        "count": 401,
+        "percentage": 2.92
+      },
+      "8": {
+        "count": 129,
+        "percentage": 0.94
+      },
+      "9": {
+        "count": 2,
+        "percentage": 0.01
+      }
+    }
+  },
+  "runtime_deformation_accuracy_vs_native_104_weight": {
+    "angle_0": {
+      "angle_deg": 0,
+      "max_error_mm": 1.8451,
+      "mean_error_mm": 0.017529,
+      "median_p50_mm": 6.6e-05,
+      "p95_error_mm": 0.086481,
+      "p99_error_mm": 0.4029
+    },
+    "angle_30": {
+      "angle_deg": 30,
+      "max_error_mm": 6.6163,
+      "mean_error_mm": 0.030646,
+      "median_p50_mm": 6.6e-05,
+      "p95_error_mm": 0.098476,
+      "p99_error_mm": 0.7483
+    },
+    "angle_45": {
+      "angle_deg": 45,
+      "max_error_mm": 9.7122,
+      "mean_error_mm": 0.038111,
+      "median_p50_mm": 6.7e-05,
+      "p95_error_mm": 0.101378,
+      "p99_error_mm": 0.9311
+    },
+    "angle_90": {
+      "angle_deg": 90,
+      "max_error_mm": 18.0679,
+      "mean_error_mm": 0.057918,
+      "median_p50_mm": 6.6e-05,
+      "p95_error_mm": 0.105114,
+      "p99_error_mm": 1.2725
+    }
+  },
+  "conclusion": "Exported GLB runtime deformation matches native Anny forward kinematics with sub-millimeter median error (0.000066 mm) and mean error < 0.058 mm across full 0-90\u00b0 range."
+}
