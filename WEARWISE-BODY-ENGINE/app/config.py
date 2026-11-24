@@ -6,12 +6,25 @@ Centralizes runtime configuration, security policies, token parameters, and CORS
 import os
 from pathlib import Path
 from typing import List
-
+from dotenv import load_dotenv
 
 # Base directories
 REPO_ROOT = Path(__file__).resolve().parent.parent
+MONOREPO_ROOT = REPO_ROOT.parent
 DATA_DIR = REPO_ROOT / "data"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+# Load root .env or local .env
+for candidate in [MONOREPO_ROOT / ".env", REPO_ROOT / ".env", Path(".env")]:
+    if candidate.is_file():
+        load_dotenv(candidate, override=False)
+        break
+
+# MongoDB Configuration
+MONGODB_URI = os.getenv("MONGODB_URI", "")
+MONGODB_BODY_ENGINE_DB = os.getenv("MONGODB_BODY_ENGINE_DB", "wearwise_body_engine")
+MONGODB_COMMERCE_DB = os.getenv("MONGODB_COMMERCE_DB", "wearwise_commerce")
+MONGODB_SERVER_SELECTION_TIMEOUT_MS = int(os.getenv("MONGODB_SERVER_SELECTION_TIMEOUT_MS", "5000"))
 
 # Environment mode: 'development', 'test', 'production'
 WEARWISE_ENV = os.getenv("WEARWISE_ENV", os.getenv("ENVIRONMENT", "development")).lower()

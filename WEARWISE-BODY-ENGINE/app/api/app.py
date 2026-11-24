@@ -18,6 +18,7 @@ from app.api.errors import (
     http_exception_handler,
 )
 from app.db.session import init_db
+from app.db import mongo
 
 
 @asynccontextmanager
@@ -84,11 +85,14 @@ def create_app() -> FastAPI:
     @app.get("/health", tags=["System"])
     @app.get("/api/v1/health", tags=["System"])
     def health_check():
+        mongo_status = mongo.ping()
+        is_healthy = mongo_status.get("ok", False) or not mongo.MONGODB_URI
         return {
-            "status": "healthy",
-            "phase": "6A",
-            "service": "WearWise Backend API",
+            "status": "healthy" if is_healthy else "degraded",
+            "phase": "Phase 8 Integrated",
+            "service": "WearWise Body Engine API",
             "storage_mode": "content_addressable_local",
+            "mongodb": mongo_status,
         }
 
     # 5. Include Versioned v1 Router
