@@ -162,8 +162,28 @@ def test_merchant_studio_api():
         assert res["status"] == "needs_review"
         log("3D mesh generation completed (status: needs_review).")
 
-    # 7. Publish
-    req = urllib.request.Request(f"{BODY_URL}/api/v1/merchant/garments/{gid}/publish", data=b"")
+    # 7. Approve (Item 5: Explicit Merchant Principal Sign-Off)
+    approve_payload = {
+        "principal_id": "brand_director_automated_test",
+        "approval_notes": "Physically verified boxy fit and ISO 8559-2 grading in automated suite."
+    }
+    req = urllib.request.Request(
+        f"{BODY_URL}/api/v1/merchant/garments/{gid}/approve",
+        data=json.dumps(approve_payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"}
+    )
+    with urllib.request.urlopen(req) as resp:
+        res = json.loads(resp.read())
+        assert res["status"] == "approved"
+        log("Garment formally approved by merchant principal (status: approved).")
+
+    # 8. Publish to Storefront Catalog
+    publish_payload = {"publisher_id": "catalog_admin_automated_test"}
+    req = urllib.request.Request(
+        f"{BODY_URL}/api/v1/merchant/garments/{gid}/publish",
+        data=json.dumps(publish_payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"}
+    )
     with urllib.request.urlopen(req) as resp:
         res = json.loads(resp.read())
         assert res["status"] == "published"
