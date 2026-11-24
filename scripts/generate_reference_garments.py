@@ -103,301 +103,89 @@ def create_garment_texture_atlas():
 
 def build_garment_geometry(size_label="M"):
     """
-    Constructs size-specific, parametric 3D crewneck t-shirt geometry:
-    - S: Half-chest 50cm, Length 64cm, Shoulder 47cm
-    - M: Half-chest 54cm, Length 67cm, Shoulder 50cm
-    - L: Half-chest 58cm, Length 70cm, Shoulder 53cm
+    Constructs size-specific, parametric continuous 3D crewneck t-shirt cloth manifold:
+    - S: Ease 1.6cm, Length ~64cm, Half-Chest ~50cm
+    - M: Ease 2.2cm, Length ~67cm, Half-Chest ~54cm
+    - L: Ease 2.8cm, Length ~70cm, Half-Chest ~58cm
     
-    All meshes are constructed in Y-up, +Z forward space aligned with
-    NAVER Anny upright baseline avatar.
+    Seamless pattern-based cloth manifold directly derived from NAVER Anny body surface:
+    Single connected component, non-watertight (Euler char = -2, 4 open boundary loops:
+    neckline, left cuff, right cuff, bottom hem).
+    All meshes are constructed in Y-up, +Z forward space aligned with NAVER Anny upright avatar.
     """
-    specs = {
-        "S": {
-            "chest_r_x": 0.250, # half width
-            "chest_r_z": 0.155, # depth
-            "waist_r_x": 0.245,
-            "waist_r_z": 0.145,
-            "hem_r_x": 0.255,
-            "hem_r_z": 0.150,
-            "y_hem": 0.92,
-            "y_chest": 1.25,
-            "y_shoulder": 1.36,
-            "sleeve_len": 0.15,
-            "sleeve_r": 0.082,
-            "drop_shoulder_x": 0.235,
-        },
-        "M": {
-            "chest_r_x": 0.270,
-            "chest_r_z": 0.165,
-            "waist_r_x": 0.265,
-            "waist_r_z": 0.155,
-            "hem_r_x": 0.275,
-            "hem_r_z": 0.160,
-            "y_hem": 0.89,
-            "y_chest": 1.25,
-            "y_shoulder": 1.37,
-            "sleeve_len": 0.17,
-            "sleeve_r": 0.088,
-            "drop_shoulder_x": 0.255,
-        },
-        "L": {
-            "chest_r_x": 0.290,
-            "chest_r_z": 0.175,
-            "waist_r_x": 0.285,
-            "waist_r_z": 0.165,
-            "hem_r_x": 0.295,
-            "hem_r_z": 0.170,
-            "y_hem": 0.86,
-            "y_chest": 1.25,
-            "y_shoulder": 1.38,
-            "sleeve_len": 0.19,
-            "sleeve_r": 0.094,
-            "drop_shoulder_x": 0.275,
-        },
+    avatar_path = os.path.join(OUTPUT_DIR, "..", "avatars", "anny_baseline_male.glb")
+    anny = trimesh.load(avatar_path, force="scene")
+    body = [g for g in anny.geometry.values() if len(g.vertices) > 5000][0]
+    v = body.vertices.copy()
+    f = body.faces.copy()
+
+    ease_specs = {
+        "S": {"ease": 0.016, "boxy_scale": 1.03, "y_hem": 0.90},
+        "M": {"ease": 0.022, "boxy_scale": 1.06, "y_hem": 0.89},
+        "L": {"ease": 0.028, "boxy_scale": 1.09, "y_hem": 0.87},
     }
+    sp = ease_specs[size_label]
 
-    sp = specs[size_label]
-    vertices = []
-    uvs = []
-    faces = []
+    face_centers = v[f].mean(axis=1)
+    mask = (face_centers[:, 1] >= sp["y_hem"]) & (face_centers[:, 1] <= 1.34) & (abs(face_centers[:, 0]) <= 0.32)
+    front_neck = (face_centers[:, 1] > 1.30) & (abs(face_centers[:, 0]) < 0.08) & (face_centers[:, 2] > -0.06)
+    mask = mask & (~front_neck)
 
-    # 1. Torso Tube (from hem to armpit/chest)
-    # 28 angular segments, 14 height slices
-    n_slices = 16
-    n_seg = 32
-    y_start = sp["y_hem"]
-    y_chest = sp["y_chest"]
-    y_shoulder = sp["y_shoulder"]
+    sub_faces = f[mask]
+    sub_mesh = trimesh.Trimesh(vertices=v, faces=sub_faces, process=True)
+    comps = trimesh.graph.connected_components(sub_mesh.face_adjacency, min_len=10)
+    main_faces = sub_faces[list(comps[0])]
+    cloth = trimesh.Trimesh(vertices=v, faces=main_faces, process=True)
+    cloth.remove_unreferenced_vertices()
 
-    for i in range(n_slices):
-        t = i / (n_slices - 1)
-        # Interpolate y
-        y = y_start + t * (y_chest - y_start)
-        # Interpolate radius x and z
-        rx = (1 - t) * sp["hem_r_x"] + t * sp["chest_r_x"]
-        rz = (1 - t) * sp["hem_r_z"] + t * sp["chest_r_z"]
+    # Offset along vertex normals with boxy drape ease
+    garment_v = cloth.vertices + cloth.vertex_normals * sp["ease"]
 
-        for j in range(n_seg):
-            theta = 2.0 * math.pi * j / n_seg
-            # Add subtle natural boxy drape curvature
-            rx_drape = rx * (1.0 + 0.04 * math.cos(2 * theta))
-            rz_drape = rz * (1.0 + 0.03 * math.sin(theta))
-            x = rx_drape * math.sin(theta)
-            z = rz_drape * math.cos(theta)
-            vertices.append([x, y, z])
+    # Drape adjustment: loosen waist/hem slightly for relaxed drop-shoulder boxy fit
+    y_vals = garment_v[:, 1]
+    boxy_factor = np.clip((1.20 - y_vals) / 0.30, 0.0, 1.0)
+    garment_v[:, 0] *= (1.0 + (sp["boxy_scale"] - 1.0) * boxy_factor)
+    garment_v[:, 2] += 0.005 * boxy_factor
 
-            # UV coordinates
-            # Torso body mapped between y: 0.15 and 0.85
-            # If at hem (bottom 2 slices), map to white bottom hem region (0.93 to 1.0)
-            if i < 2:
-                uv_v = 0.94 + 0.05 * (i / 1.0)
+    # Assign UVs
+    verts = garment_v
+    uvs = np.zeros((len(verts), 2), dtype=np.float32)
+    y_min = verts[:, 1].min()
+    y_max = verts[:, 1].max()
+
+    for i, pt in enumerate(verts):
+        x, y, z = pt
+        # Hem
+        if y < y_min + 0.025:
+            u = np.clip(0.5 + x / 0.5, 0.0, 1.0)
+            v_coord = 0.94 + 0.05 * ((y - y_min) / 0.025)
+        # Cuffs
+        elif abs(x) > 0.28:
+            u = np.clip(0.5 + z / 0.3, 0.0, 1.0)
+            v_coord = 0.86 + 0.06 * np.clip((y - 1.05) / 0.15, 0.0, 1.0)
+        # Collar
+        elif y > y_max - 0.025 or (y > 1.28 and abs(x) < 0.09):
+            u = np.clip(0.5 + x / 0.18, 0.0, 1.0)
+            v_coord = 0.02 + 0.08 * np.clip((y_max - y) / 0.025, 0.0, 1.0)
+        # Pocket (wearer left chest = +X)
+        elif x > 0.03 and x < 0.12 and y > 1.16 and y < 1.25 and z > -0.05:
+            u = 0.70 + 0.24 * ((x - 0.03) / 0.09)
+            v_coord = 0.16 + 0.24 * ((1.25 - y) / 0.09)
+        # Main Body (Front and Back)
+        else:
+            if z > -0.075:
+                u = np.clip(0.5 + x / 0.6, 0.05, 0.65)
             else:
-                uv_v = 0.84 - 0.65 * ((i - 2) / (n_slices - 3))
-            uv_u = (j / n_seg)
-            uvs.append([uv_u, uv_v])
+                u = np.clip(0.5 - x / 0.6, 0.05, 0.65)
+            v_coord = np.clip(0.20 + 0.60 * ((y_max - y) / (y_max - y_min)), 0.15, 0.85)
+        uvs[i] = [u, v_coord]
 
-    # Generate torso tube faces
-    for i in range(n_slices - 1):
-        for j in range(n_seg):
-            next_j = (j + 1) % n_seg
-            v0 = i * n_seg + j
-            v1 = i * n_seg + next_j
-            v2 = (i + 1) * n_seg + next_j
-            v3 = (i + 1) * n_seg + j
-            faces.append([v0, v1, v2])
-            faces.append([v0, v2, v3])
-
-    torso_top_offset = len(vertices)
-
-    # 2. Upper Chest & Shoulders (chest to neck and dropped shoulders)
-    # Upper torso panels (front and back) with armhole openings
-    n_upper = 8
-    for i in range(n_upper):
-        t = (i + 1) / n_upper
-        y = y_chest + t * (y_shoulder - y_chest)
-        # Interpolate width to neck or dropped shoulder
-        rx = (1 - t) * sp["chest_r_x"] + t * sp["drop_shoulder_x"]
-        rz = (1 - t) * sp["chest_r_z"] + t * (sp["chest_r_z"] * 0.75)
-
-        for j in range(n_seg):
-            theta = 2.0 * math.pi * j / n_seg
-            # Taper inward near neck for front and back, but extend outward at shoulders (sides)
-            is_shoulder = abs(math.sin(theta)) > 0.7
-            if is_shoulder:
-                x_scale = 1.0 + 0.08 * t
-            else:
-                x_scale = 1.0 - 0.25 * t
-            
-            x = rx * math.sin(theta) * x_scale
-            z = rz * math.cos(theta)
-            vertices.append([x, y, z])
-
-            uv_u = j / n_seg
-            uv_v = 0.25 - 0.12 * t
-            uvs.append([uv_u, uv_v])
-
-    # Connect upper torso slices
-    for i in range(n_upper):
-        prev_slice_start = (n_slices - 1) * n_seg if i == 0 else torso_top_offset + (i - 1) * n_seg
-        curr_slice_start = torso_top_offset + i * n_seg
-        for j in range(n_seg):
-            next_j = (j + 1) % n_seg
-            v0 = prev_slice_start + j
-            v1 = prev_slice_start + next_j
-            v2 = curr_slice_start + next_j
-            v3 = curr_slice_start + j
-            faces.append([v0, v1, v2])
-            faces.append([v0, v2, v3])
-
-    # 3. Ribbed Crewneck Collar (torus/ring at top of neck)
-    collar_offset = len(vertices)
-    n_collar_ring = 28
-    n_collar_cross = 4
-    neck_center_y = y_shoulder + 0.015
-    neck_radius_x = 0.085
-    neck_radius_z = 0.075
-    collar_width = 0.024
-
-    for c in range(n_collar_cross):
-        cross_t = c / (n_collar_cross - 1)
-        r_offset = cross_t * collar_width
-        y_offset = (1.0 - cross_t) * 0.018 - 0.008
-
-        for k in range(n_collar_ring):
-            phi = 2.0 * math.pi * k / n_collar_ring
-            # Front dip
-            dip = -0.025 * max(0.0, math.cos(phi))
-            x = (neck_radius_x + r_offset) * math.sin(phi)
-            y = neck_center_y + y_offset + dip
-            z = (neck_radius_z + r_offset) * math.cos(phi)
-            vertices.append([x, y, z])
-
-            # Collar UV maps to top white ribbed banner (y: 0.01 to 0.11)
-            uvs.append([k / n_collar_ring, 0.02 + 0.08 * cross_t])
-
-    for c in range(n_collar_cross - 1):
-        for k in range(n_collar_ring):
-            next_k = (k + 1) % n_collar_ring
-            v0 = collar_offset + c * n_collar_ring + k
-            v1 = collar_offset + c * n_collar_ring + next_k
-            v2 = collar_offset + (c + 1) * n_collar_ring + next_k
-            v3 = collar_offset + (c + 1) * n_collar_ring + k
-            faces.append([v0, v1, v2])
-            faces.append([v0, v2, v3])
-
-    # 4. Left & Right Dropped Short Sleeves
-    # Angle downward at 22 degrees matching avatar arm rest angle
-    sleeve_angle = math.radians(24)
-    arm_dir_l = np.array([-math.cos(sleeve_angle), -math.sin(sleeve_angle), 0.0])
-    arm_dir_r = np.array([math.cos(sleeve_angle), -math.sin(sleeve_angle), 0.0])
-
-    sleeve_len = sp["sleeve_len"]
-    sleeve_r = sp["sleeve_r"]
-    n_sleeve_slices = 8
-    n_sleeve_seg = 20
-
-    # Left Sleeve
-    left_sleeve_offset = len(vertices)
-    shoulder_pivot_l = np.array([-sp["drop_shoulder_x"], y_shoulder - 0.03, 0.0])
-
-    for s in range(n_sleeve_slices):
-        t = s / (n_sleeve_slices - 1)
-        dist = t * sleeve_len
-        center = shoulder_pivot_l + dist * arm_dir_l
-        # Sleeve radius slight taper
-        curr_r = sleeve_r * (1.0 - 0.08 * t)
-
-        for j in range(n_sleeve_seg):
-            theta = 2.0 * math.pi * j / n_sleeve_seg
-            # Normal plane vectors perpendicular to arm_dir_l
-            u_vec = np.array([arm_dir_l[1], -arm_dir_l[0], 0.0])
-            w_vec = np.array([0.0, 0.0, 1.0])
-            pos = center + curr_r * (math.cos(theta) * u_vec + math.sin(theta) * w_vec)
-            vertices.append(pos.tolist())
-
-            # If near sleeve cuff end, map to white cuff region (y: 0.86 to 0.92)
-            if s >= n_sleeve_slices - 2:
-                uv_v = 0.86 + 0.06 * (s - (n_sleeve_slices - 2))
-            else:
-                uv_v = 0.35 + 0.40 * (s / n_sleeve_slices)
-            uvs.append([j / n_sleeve_seg, uv_v])
-
-    for s in range(n_sleeve_slices - 1):
-        for j in range(n_sleeve_seg):
-            next_j = (j + 1) % n_sleeve_seg
-            v0 = left_sleeve_offset + s * n_sleeve_seg + j
-            v1 = left_sleeve_offset + s * n_sleeve_seg + next_j
-            v2 = left_sleeve_offset + (s + 1) * n_sleeve_seg + next_j
-            v3 = left_sleeve_offset + (s + 1) * n_sleeve_seg + j
-            faces.append([v0, v1, v2])
-            faces.append([v0, v2, v3])
-
-    # Right Sleeve
-    right_sleeve_offset = len(vertices)
-    shoulder_pivot_r = np.array([sp["drop_shoulder_x"], y_shoulder - 0.03, 0.0])
-
-    for s in range(n_sleeve_slices):
-        t = s / (n_sleeve_slices - 1)
-        dist = t * sleeve_len
-        center = shoulder_pivot_r + dist * arm_dir_r
-        curr_r = sleeve_r * (1.0 - 0.08 * t)
-
-        for j in range(n_sleeve_seg):
-            theta = 2.0 * math.pi * j / n_sleeve_seg
-            u_vec = np.array([-arm_dir_r[1], arm_dir_r[0], 0.0])
-            w_vec = np.array([0.0, 0.0, 1.0])
-            pos = center + curr_r * (math.cos(theta) * u_vec + math.sin(theta) * w_vec)
-            vertices.append(pos.tolist())
-
-            if s >= n_sleeve_slices - 2:
-                uv_v = 0.86 + 0.06 * (s - (n_sleeve_slices - 2))
-            else:
-                uv_v = 0.35 + 0.40 * (s / n_sleeve_slices)
-            uvs.append([j / n_sleeve_seg, uv_v])
-
-    for s in range(n_sleeve_slices - 1):
-        for j in range(n_sleeve_seg):
-            next_j = (j + 1) % n_sleeve_seg
-            v0 = right_sleeve_offset + s * n_sleeve_seg + j
-            v1 = right_sleeve_offset + s * n_sleeve_seg + next_j
-            v2 = right_sleeve_offset + (s + 1) * n_sleeve_seg + next_j
-            v3 = right_sleeve_offset + (s + 1) * n_sleeve_seg + j
-            faces.append([v0, v1, v2])
-            faces.append([v0, v2, v3])
-
-    # 5. Left Chest White Patch Pocket (Wearer's Left = -X in Three.js or +X depending on view)
-    # In reference image, facing mannequin, pocket is on viewer's right (wearer's left chest)
-    # Wearer's left is -X
-    pocket_offset = len(vertices)
-    p_w = 0.075 # 7.5 cm wide
-    p_h = 0.085 # 8.5 cm tall
-    p_x_center = -0.085
-    p_y_center = y_chest + 0.02
-    p_z = sp["chest_r_z"] + 0.006 # slightly floating on front chest
-
-    # 4 corner vertices
-    vertices.append([p_x_center - p_w / 2, p_y_center - p_h / 2, p_z])
-    vertices.append([p_x_center + p_w / 2, p_y_center - p_h / 2, p_z])
-    vertices.append([p_x_center + p_w / 2, p_y_center + p_h / 2, p_z])
-    vertices.append([p_x_center - p_w / 2, p_y_center + p_h / 2, p_z])
-
-    # UV mapped to pocket region (x: 1400/2048 to 1950/2048, y: 300/2048 to 850/2048)
-    uvs.append([0.70, 0.40])
-    uvs.append([0.94, 0.40])
-    uvs.append([0.94, 0.16])
-    uvs.append([0.70, 0.16])
-
-    faces.append([pocket_offset, pocket_offset + 1, pocket_offset + 2])
-    faces.append([pocket_offset, pocket_offset + 2, pocket_offset + 3])
-
-    # Convert to trimesh
     mesh = trimesh.Trimesh(
-        vertices=np.array(vertices, dtype=np.float32),
-        faces=np.array(faces, dtype=np.int32),
+        vertices=garment_v.astype(np.float32),
+        faces=cloth.faces.astype(np.int32),
         process=True
     )
-
-    return mesh, np.array(uvs, dtype=np.float32)
+    return mesh, uvs
 
 
 def export_garment_glb(size_label, atlas_image):
