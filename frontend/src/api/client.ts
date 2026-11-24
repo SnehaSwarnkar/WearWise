@@ -329,6 +329,46 @@ export class WearWiseApiClient {
   public async listRecentFitRecommendations(profileId: string): Promise<RecentRecommendationItem[]> {
     return this.request<RecentRecommendationItem[]>(`/api/v1/fit/recommendations?profile_id=${encodeURIComponent(profileId)}`);
   }
+
+  // ---------------------------------------------------------------------------
+  // Mode B: AI Photo Virtual Try-On (VTON)
+  // ---------------------------------------------------------------------------
+  public async createVtonJob(file: File, garmentSku: string = 'TSH-WW-CREW-001', consent: boolean = true): Promise<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('garment_sku', garmentSku);
+    formData.append('consent', consent ? 'true' : 'false');
+
+    const authHeaders = this.authProvider.getAuthHeaders();
+    const res = await fetch(`${this.baseUrl}/api/v1/try-on/vton/jobs`, {
+      method: 'POST',
+      headers: { ...authHeaders },
+      body: formData,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: res.statusText }));
+      throw new Error(err.detail?.message || err.detail || 'VTON submission failed');
+    }
+    return res.json();
+  }
+
+  public async getVtonJob(jobId: string): Promise<any> {
+    return this.request<any>(`/api/v1/try-on/vton/jobs/${jobId}`);
+  }
+
+  public async getVtonResults(jobId: string): Promise<any> {
+    return this.request<any>(`/api/v1/try-on/vton/jobs/${jobId}/results`);
+  }
+
+  public async deleteVtonJob(jobId: string): Promise<any> {
+    return this.request<any>(`/api/v1/try-on/vton/jobs/${jobId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  public async getVtonProviders(): Promise<any> {
+    return this.request<any>('/api/v1/try-on/vton/providers');
+  }
 }
 
 // Global default singleton client

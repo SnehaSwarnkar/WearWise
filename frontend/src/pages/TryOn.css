@@ -1,0 +1,392 @@
+/* ==============================================================================
+   WearWise Dual-Mode Virtual Try-On Styles
+   Integrates Mode A (3D Avatar) & Mode B (AI Photo 3-View VTON)
+   Cream Editorial Design System: #fff8f1, #151515, #ff3d9a, #d8ff3f, #8d6bff
+   ============================================================================== */
+
+.tryon-mode-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 24px 0 32px;
+}
+
+.tryon-mode-toggle {
+  display: inline-flex;
+  background: rgba(21, 21, 21, 0.06);
+  border: 2px solid var(--black, #151515);
+  padding: 4px;
+  border-radius: 999px;
+  box-shadow: 4px 4px 0 var(--black, #151515);
+}
+
+.mode-toggle-btn {
+  padding: 10px 24px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  color: var(--black, #151515);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mode-toggle-btn.active {
+  background: var(--black, #151515);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.mode-toggle-btn:hover:not(.active) {
+  background: rgba(255, 61, 154, 0.15);
+}
+
+/* ── Mode A Layout ─────────────────────────────────────────────────────────── */
+.mode-a-stage {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 32px;
+  align-items: start;
+  margin-bottom: 48px;
+}
+
+.mode-a-viewer-card {
+  background: #0a0e17;
+  border: 2px solid var(--black, #151515);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 8px 8px 0 var(--black, #151515);
+  position: relative;
+}
+
+.mode-a-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.editorial-garment-card {
+  background: #ffffff;
+  border: 2px solid var(--black, #151515);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 6px 6px 0 var(--black, #151515);
+}
+
+.garment-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1.5px solid rgba(21, 21, 21, 0.12);
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+}
+
+.garment-card-title {
+  font-family: "Archivo Black", sans-serif;
+  font-size: 20px;
+  margin: 0;
+  color: var(--black, #151515);
+  line-height: 1.15;
+}
+
+.garment-card-price {
+  font-family: "Archivo Black", sans-serif;
+  font-size: 20px;
+  color: var(--pink, #ff3d9a);
+}
+
+.size-selector-row {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.size-pill-btn {
+  flex: 1;
+  padding: 10px 0;
+  text-align: center;
+  border: 2px solid var(--black, #151515);
+  background: #ffffff;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.size-pill-btn.active {
+  background: var(--black, #151515);
+  color: #ffffff;
+}
+
+.size-pill-btn:hover:not(.active) {
+  background: #fff0f7;
+  border-color: var(--pink, #ff3d9a);
+}
+
+.honest-fit-badge-box {
+  background: #fdfaf3;
+  border: 1.5px dashed #e0c885;
+  border-radius: 10px;
+  padding: 14px;
+  margin: 16px 0;
+}
+
+.honest-fit-score {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 14px;
+  color: #2b7a0b;
+}
+
+.honest-fit-ease {
+  font-size: 12px;
+  color: #666;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.add-to-cart-hero-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--pink, #ff3d9a);
+  color: #ffffff;
+  border: 2px solid var(--black, #151515);
+  border-radius: 10px;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 15px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 var(--black, #151515);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.add-to-cart-hero-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--black, #151515);
+}
+
+/* ── Mode B Layout ─────────────────────────────────────────────────────────── */
+.mode-b-hero {
+  margin-bottom: 48px;
+}
+
+.vton-consent-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 16px 0 20px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #333;
+}
+
+.vton-consent-box input[type="checkbox"] {
+  margin-top: 3px;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--pink, #ff3d9a);
+}
+
+.generate-vton-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--black, #151515);
+  color: var(--lime, #d8ff3f);
+  border: 2px solid var(--black, #151515);
+  border-radius: 10px;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 15px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 var(--pink, #ff3d9a);
+  transition: all 0.2s ease;
+}
+
+.generate-vton-btn:hover:not(:disabled) {
+  background: var(--pink, #ff3d9a);
+  color: #ffffff;
+  box-shadow: 4px 4px 0 var(--black, #151515);
+}
+
+.generate-vton-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Progress Bar ─────────────────────────────────────────────────────────── */
+.vton-progress-card {
+  background: #ffffff;
+  border: 2px solid var(--black, #151515);
+  border-radius: 14px;
+  padding: 32px;
+  margin: 24px 0;
+  text-align: center;
+  box-shadow: 6px 6px 0 var(--black, #151515);
+}
+
+.progress-track {
+  width: 100%;
+  height: 16px;
+  background: #f0ede8;
+  border: 1.5px solid var(--black, #151515);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 20px 0 12px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--orange, #ff633d), var(--pink, #ff3d9a));
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* ── 3-Column Results Gallery ──────────────────────────────────────────────── */
+.vton-gallery-section {
+  margin: 36px 0;
+}
+
+.vton-gallery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--black, #151515);
+}
+
+.vton-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.vton-view-card {
+  background: #ffffff;
+  border: 2px solid var(--black, #151515);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 6px 6px 0 var(--black, #151515);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+}
+
+.vton-view-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 8px 8px 0 var(--pink, #ff3d9a);
+}
+
+.vton-view-header {
+  padding: 12px 16px;
+  background: #fcf9f5;
+  border-bottom: 1.5px solid var(--black, #151515);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vton-view-label {
+  font-family: "Archivo Black", sans-serif;
+  font-size: 13px;
+  color: var(--black, #151515);
+}
+
+.vton-inferred-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--black, #151515);
+  background: var(--lime, #d8ff3f);
+  color: var(--black, #151515);
+  letter-spacing: 0.5px;
+}
+
+.vton-inferred-badge.inferred {
+  background: #ffecb3;
+  color: #8c5d00;
+  border-color: #d4a017;
+}
+
+.vton-view-image-container {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: #0d1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.vton-view-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vton-view-footer {
+  padding: 14px 16px;
+  background: #ffffff;
+  border-top: 1.5px solid rgba(21, 21, 21, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vton-view-desc {
+  font-size: 11px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.vton-download-btn {
+  padding: 8px;
+  background: #f4efe9;
+  border: 1.5px solid var(--black, #151515);
+  border-radius: 6px;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  color: var(--black, #151515);
+  transition: background 0.15s;
+}
+
+.vton-download-btn:hover {
+  background: var(--lime, #d8ff3f);
+}
+
+.vton-disclaimer-box {
+  margin-top: 24px;
+  padding: 16px 20px;
+  background: #fff8f0;
+  border: 1.5px dashed #f0b070;
+  border-radius: 10px;
+  font-size: 12px;
+  color: #704010;
+  line-height: 1.5;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+@media (max-width: 960px) {
+  .mode-a-stage {
+    grid-template-columns: 1fr;
+  }
+  .vton-gallery-grid {
+    grid-template-columns: 1fr;
+  }
+}
