@@ -79,12 +79,13 @@ async function main() {
     await page.evaluate(() => {
       const slider = document.querySelector('.tryon-arm-slider');
       if (slider) {
-        slider.value = '45';
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+        nativeSetter.call(slider, '45');
         slider.dispatchEvent(new Event('input', { bubbles: true }));
         slider.dispatchEvent(new Event('change', { bubbles: true }));
       }
     });
-    await new Promise((r) => setTimeout(r, 2000));
+    await new Promise((r) => setTimeout(r, 2500));
     await page.screenshot({ path: path.join(screenshotsDir, '08_tryon_mode_a_arm_raised.png') });
   } catch (e) {
     console.log('Arm elevation capture note:', e.message);
