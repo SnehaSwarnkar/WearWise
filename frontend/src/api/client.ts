@@ -89,6 +89,51 @@ class DefaultDevAuthHeaderProvider implements AuthHeaderProvider {
 
 export const devAuthHeaderProvider = new DefaultDevAuthHeaderProvider();
 
+// ── Store API Support (for Commerce endpoints on Port 8001) ─────────────────
+export const STORE_API_BASE = import.meta.env?.VITE_STORE_API_URL || 'http://127.0.0.1:8001';
+
+export function getSessionId(): string {
+  let id = sessionStorage.getItem('ww-session-id');
+  if (!id) {
+    id = 'sess_' + Math.random().toString(36).slice(2, 11);
+    sessionStorage.setItem('ww-session-id', id);
+  }
+  return id;
+}
+
+async function storeRequest(method: string, path: string, body: any = null, isFormData: boolean = false, customHeaders: Record<string, string> = {}) {
+  const headers: Record<string, string> = { ...customHeaders };
+  if (body && !isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  const res = await fetch(`${STORE_API_BASE}${path}`, {
+    method,
+    headers,
+    body: body
+      ? isFormData
+        ? body
+        : JSON.stringify(body)
+      : undefined,
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || 'Request failed');
+  }
+
+  return res.json();
+}
+
+export const api = {
+  get: (path: string, headers: Record<string, string> = {}) => storeRequest('GET', path, null, false, headers),
+  post: (path: string, body: any, headers: Record<string, string> = {}) => storeRequest('POST', path, body, false, headers),
+  put: (path: string, body: any, headers: Record<string, string> = {}) => storeRequest('PUT', path, body, false, headers),
+  patch: (path: string, body: any, headers: Record<string, string> = {}) => storeRequest('PATCH', path, body, false, headers),
+  delete: (path: string, headers: Record<string, string> = {}) => storeRequest('DELETE', path, null, false, headers),
+  form: (path: string, formData: FormData, headers: Record<string, string> = {}) => storeRequest('POST', path, formData, true, headers),
+};
+
 export class WearWiseApiClient {
   private baseUrl: string;
   private authProvider: AuthHeaderProvider;
