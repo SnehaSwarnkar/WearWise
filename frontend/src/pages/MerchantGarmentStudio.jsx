@@ -690,7 +690,7 @@ export default function MerchantGarmentStudio() {
               {/* Left Column: 3D Studio Canvas */}
               <div>
                 <AvatarViewer
-                  assetUrl="/avatars/anny_baseline_male.glb"
+                  assetUrl="/avatars/anny_skinned_male.glb"
                   garmentUrl={`/garments/TSH-WW-CREW-001_${previewSize}.glb`}
                   showGarment={true}
                   armAngle={armAngle}

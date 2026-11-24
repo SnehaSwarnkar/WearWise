@@ -184,8 +184,8 @@ function TryOn() {
   const currentFit = SIZE_FIT_DATA[selectedSize] || SIZE_FIT_DATA["M"];
   const currentAvatarUrl =
     mannequinGender === "female"
-      ? "/avatars/anny_baseline_female.glb"
-      : "/avatars/anny_baseline_male.glb";
+      ? "/avatars/anny_skinned_female.glb"
+      : "/avatars/anny_skinned_male.glb";
 
   return (
     <div className="tryon-page">

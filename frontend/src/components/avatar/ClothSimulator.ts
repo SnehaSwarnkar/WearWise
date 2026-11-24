@@ -49,6 +49,8 @@ interface Edge {
 export class ClothSimulator {
   private avatarMesh: THREE.Mesh | null = null;
   private avatarOriginalPositions: Float32Array | null = null;
+  private armBoneL: THREE.Object3D | null = null;
+  private armBoneR: THREE.Object3D | null = null;
 
   private garmentMesh: THREE.Mesh | null = null;
   private garmentOriginalPositions: Float32Array | null = null;
@@ -68,6 +70,9 @@ export class ClothSimulator {
    * Registers avatar mannequin mesh and saves rest positions
    */
   public bindAvatar(avatarGroup: THREE.Group) {
+    this.armBoneL = avatarGroup.getObjectByName('upperarm01.L') || avatarGroup.getObjectByName('upperarm_l') || null;
+    this.armBoneR = avatarGroup.getObjectByName('upperarm01.R') || avatarGroup.getObjectByName('upperarm_r') || null;
+
     avatarGroup.traverse((child) => {
       if ((child as THREE.Mesh).isMesh && !this.avatarMesh) {
         this.avatarMesh = child as THREE.Mesh;
@@ -184,7 +189,16 @@ export class ClothSimulator {
     const rad = (this.currentArmAngleDeg * Math.PI) / 180.0;
 
     // 1. Deform Avatar Mannequin Arms
-    if (this.avatarMesh && this.avatarOriginalPositions) {
+    if (this.armBoneL || this.armBoneR) {
+      if (this.armBoneL) {
+        this.armBoneL.rotation.z = -rad;
+        this.armBoneL.updateMatrixWorld(true);
+      }
+      if (this.armBoneR) {
+        this.armBoneR.rotation.z = rad;
+        this.armBoneR.updateMatrixWorld(true);
+      }
+    } else if (this.avatarMesh && this.avatarOriginalPositions) {
       const pos = this.avatarMesh.geometry.attributes.position;
       const count = pos.count;
       const orig = this.avatarOriginalPositions;
