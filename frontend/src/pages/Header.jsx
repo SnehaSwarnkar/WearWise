@@ -252,6 +252,15 @@ function Header() {
                 <span className="nav-dropdown-gender-label">Merchant Garments</span>
                 <span className="nav-dropdown-chevron" style={{ color: "var(--orange)", fontSize: "11px" }}>[MERCHANT]</span>
               </Link>
+              <Link
+                to="/merchant/garment-studio"
+                className="nav-dropdown-gender"
+                onClick={() => setMyFitOpen(false)}
+                style={{ background: 'rgba(255, 61, 154, 0.08)' }}
+              >
+                <span className="nav-dropdown-gender-label">Digital Garment Studio</span>
+                <span className="nav-dropdown-chevron" style={{ color: "var(--pink)", fontSize: "11px" }}>[STUDIO]</span>
+              </Link>
             </div>
           )}
         </div>

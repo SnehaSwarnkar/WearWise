@@ -1,0 +1,358 @@
+/* WearWise Merchant Digital Garment Studio Styles */
+
+.merchant-studio-page {
+  min-height: 100vh;
+  background-color: var(--cream, #fff8f1);
+  color: var(--black, #151515);
+  display: flex;
+  flex-direction: column;
+}
+
+.merchant-studio-main {
+  flex: 1;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+  width: 100%;
+}
+
+.merchant-studio-header {
+  margin-bottom: 28px;
+}
+
+.merchant-studio-pretitle {
+  display: inline-block;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--purple, #8d6bff);
+  background: #ede9fe;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.merchant-studio-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 32px;
+  letter-spacing: -0.5px;
+  margin: 0 0 8px;
+}
+
+.merchant-studio-desc {
+  font-size: 14px;
+  color: #555;
+  max-width: 680px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* 6-Step Wizard Navigation */
+.merchant-steps-nav {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.step-nav-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 2px solid var(--black, #151515);
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 2px 2px 0 var(--black, #151515);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.step-nav-pill:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--black, #151515);
+}
+
+.step-nav-pill.active {
+  background: var(--lime, #d8ff3f);
+  box-shadow: 3px 3px 0 var(--black, #151515);
+  border-color: var(--black, #151515);
+}
+
+.step-nav-pill.completed {
+  border-color: var(--black, #151515);
+  background: #f0fdf4;
+}
+
+.step-num {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 14px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--black, #151515);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.step-nav-pill.active .step-num {
+  background: var(--black, #151515);
+  color: var(--lime, #d8ff3f);
+}
+
+.step-nav-pill.completed .step-num {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.step-label-group {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.step-label-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.step-label-sub {
+  font-size: 10px;
+  color: #666;
+}
+
+/* Form Cards */
+.merchant-card {
+  background: #ffffff;
+  border: 2px solid var(--black, #151515);
+  border-radius: 14px;
+  box-shadow: 4px 4px 0 var(--black, #151515);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+
+.merchant-card-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+
+.merchant-card-subtitle {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 20px;
+}
+
+/* Grid Forms */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.form-input, .form-select, .form-textarea {
+  padding: 10px 14px;
+  border: 2px solid var(--black, #151515);
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  background: #ffffff;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 61, 154, 0.25);
+}
+
+/* Image Upload Slots */
+.image-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.upload-slot-card {
+  border: 2px dashed var(--black, #151515);
+  border-radius: 10px;
+  padding: 16px 10px;
+  text-align: center;
+  background: #fafafa;
+  cursor: pointer;
+  position: relative;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+
+.upload-slot-card:hover {
+  background: #f5f5f5;
+  border-color: var(--pink, #ff3d9a);
+}
+
+.upload-slot-card.filled {
+  border-style: solid;
+  background: #ffffff;
+  padding: 8px;
+}
+
+.slot-preview-img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.slot-view-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Table styling for measurements */
+.measurements-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 13px;
+}
+
+.measurements-table th {
+  background: #151515;
+  color: #ffffff;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  text-align: left;
+}
+
+.measurements-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.measurements-table tr:hover td {
+  background: #fafafa;
+}
+
+/* Buttons */
+.btn-primary-merchant {
+  background: var(--pink, #ff3d9a);
+  color: #ffffff;
+  border: 2px solid var(--black, #151515);
+  border-radius: 8px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 13px;
+  padding: 12px 24px;
+  box-shadow: 3px 3px 0 var(--black, #151515);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary-merchant:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--black, #151515);
+}
+
+.btn-secondary-merchant {
+  background: #ffffff;
+  color: var(--black, #151515);
+  border: 2px solid var(--black, #151515);
+  border-radius: 8px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 13px;
+  padding: 12px 20px;
+  box-shadow: 3px 3px 0 var(--black, #151515);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-secondary-merchant:hover {
+  background: #f5f5f5;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--black, #151515);
+}
+
+.actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #eee;
+}
+
+/* Step 6 Preview Layout */
+.preview-stage-layout {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 24px;
+}
+
+.motion-control-card {
+  background: #f8fafc;
+  border: 1.5px solid var(--black, #151515);
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.arm-motion-slider {
+  width: 100%;
+  accent-color: var(--pink, #ff3d9a);
+  height: 8px;
+  cursor: pointer;
+}
+
+@media (max-width: 1024px) {
+  .merchant-steps-nav {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .preview-stage-layout {
+    grid-template-columns: 1fr;
+  }
+  .image-slots-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
