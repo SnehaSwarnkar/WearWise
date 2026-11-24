@@ -5,10 +5,10 @@
     "measured_frames": 300,
     "test_duration_seconds": 3,
     "cloth_solver_ms": {
-      "median": 0.3,
-      "p95": 0.4,
-      "p99": 0.5,
-      "mean": 0.27
+      "median": 0.2,
+      "p95": 0.3,
+      "p99": 0.4,
+      "mean": 0.2
     },
     "body_collision_ms": {
       "median": 0,
@@ -30,11 +30,11 @@
     },
     "total_browser_frame_ms": {
       "median": 2.4,
-      "p95": 2.6,
+      "p95": 2.5,
       "p99": 2.6,
-      "mean": 2.42
+      "mean": 2.36
     },
-    "sim_updates_per_second": 3333.3,
+    "sim_updates_per_second": 5000,
     "actual_raf_fps": 60,
     "interactive_verdict": "Acceptably Smooth (Interactive Standard Sustained)"
   },
@@ -44,55 +44,16 @@
     "measured_frames": 300,
     "test_duration_seconds": 3,
     "cloth_solver_ms": {
-      "median": 0.4,
-      "p95": 0.6,
-      "p99": 0.7,
-      "mean": 0.43
+      "median": 0.3,
+      "p95": 0.5,
+      "p99": 0.6,
+      "mean": 0.34
     },
     "body_collision_ms": {
       "median": 0,
       "p95": 0.1,
       "p99": 0.1,
-      "mean": 0.02
-    },
-    "vertex_buffer_update_ms": {
-      "median": 0,
-      "p95": 0.1,
-      "p99": 0.1,
-      "mean": 0.04
-    },
-    "render_time_ms": {
-      "median": 2.1,
-      "p95": 2.1,
-      "p99": 2.1,
-      "mean": 2.1
-    },
-    "total_browser_frame_ms": {
-      "median": 2.6,
-      "p95": 2.8,
-      "p99": 2.8,
-      "mean": 2.59
-    },
-    "sim_updates_per_second": 2500,
-    "actual_raf_fps": 60,
-    "interactive_verdict": "Acceptably Smooth (Interactive Standard Sustained)"
-  },
-  "10_substeps": {
-    "substeps": 10,
-    "warmup_frames": 60,
-    "measured_frames": 300,
-    "test_duration_seconds": 3,
-    "cloth_solver_ms": {
-      "median": 0.7,
-      "p95": 1,
-      "p99": 1,
-      "mean": 0.71
-    },
-    "body_collision_ms": {
-      "median": 0,
-      "p95": 0.1,
-      "p99": 0.1,
-      "mean": 0.02
+      "mean": 0.01
     },
     "vertex_buffer_update_ms": {
       "median": 0,
@@ -107,12 +68,51 @@
       "mean": 2.1
     },
     "total_browser_frame_ms": {
-      "median": 2.9,
-      "p95": 3.1,
-      "p99": 3.2,
-      "mean": 2.86
+      "median": 2.5,
+      "p95": 2.7,
+      "p99": 2.8,
+      "mean": 2.49
     },
-    "sim_updates_per_second": 1428.6,
+    "sim_updates_per_second": 3333.3,
+    "actual_raf_fps": 60,
+    "interactive_verdict": "Acceptably Smooth (Interactive Standard Sustained)"
+  },
+  "10_substeps": {
+    "substeps": 10,
+    "warmup_frames": 60,
+    "measured_frames": 300,
+    "test_duration_seconds": 3,
+    "cloth_solver_ms": {
+      "median": 0.5,
+      "p95": 0.7,
+      "p99": 0.8,
+      "mean": 0.52
+    },
+    "body_collision_ms": {
+      "median": 0,
+      "p95": 0.1,
+      "p99": 0.1,
+      "mean": 0.02
+    },
+    "vertex_buffer_update_ms": {
+      "median": 0,
+      "p95": 0.1,
+      "p99": 0.2,
+      "mean": 0.03
+    },
+    "render_time_ms": {
+      "median": 2.1,
+      "p95": 2.1,
+      "p99": 2.1,
+      "mean": 2.1
+    },
+    "total_browser_frame_ms": {
+      "median": 2.7,
+      "p95": 2.8,
+      "p99": 3,
+      "mean": 2.67
+    },
+    "sim_updates_per_second": 2000,
     "actual_raf_fps": 60,
     "interactive_verdict": "Acceptably Smooth (Interactive Standard Sustained)"
   }
