@@ -1,6 +1,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
+  /* Light mode bridged tokens to WearWise original design system */
+  --bg-primary: var(--bg, #fff8f1);
+  --bg-surface: var(--bg-alt, #ffffff);
+  --bg-surface-raised: var(--bg-raised, #f5efe6);
+  --bg-surface-hover: var(--bg-sunken, #ede6da);
+  --border-subtle: var(--border-soft, #d5cfc7);
+  --border-medium: var(--border, #151515);
+  --border-highlight: var(--border, #151515);
+  
+  --text-main: var(--text, #151515);
+  --text-muted: var(--text-soft, #707482);
+  --text-dim: var(--text-xsoft, #9a9aa4);
+
+  --accent-cyan: #ff3d9a;
+  --accent-indigo: #8d6bff;
+  --accent-emerald: #10b981;
+  --accent-amber: #ff633d;
+  --accent-rose: #f43f5e;
+
+  --font-sans: 'DM Sans', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --shadow-sm: 2px 2px 0 var(--border, #151515);
+  --shadow-md: 4px 4px 0 var(--border, #151515);
+  --shadow-lg: 8px 8px 0 var(--border, #151515);
+}
+
+[data-theme="negative"] {
   --bg-primary: #07090e;
   --bg-surface: #0d121d;
   --bg-surface-raised: #151d2e;
@@ -13,18 +41,15 @@
   --text-muted: #94a3b8;
   --text-dim: #64748b;
 
-  --accent-cyan: #38bdf8;
-  --accent-indigo: #6366f1;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-rose: #f43f5e;
-
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --accent-cyan: #00E5C3;
+  --accent-indigo: #818cf8;
+  --accent-emerald: #34d399;
+  --accent-amber: #fbbf24;
+  --accent-rose: #fb7185;
 
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -4px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7);
 }
 
 * {
