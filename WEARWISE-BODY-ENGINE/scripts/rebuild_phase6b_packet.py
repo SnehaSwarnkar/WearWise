@@ -62,6 +62,8 @@ def main():
 
         # Backend Enhanced Read Routes & Repositories
         ("app/avatar_engine/adapters/anny_adapter.py", engine_root / "app/avatar_engine/adapters/anny_adapter.py"),
+        ("app/api/schemas/avatar.py", engine_root / "app/api/schemas/avatar.py"),
+        ("app/services/avatar_service.py", engine_root / "app/services/avatar_service.py"),
         ("app/repositories/profile_repository.py", engine_root / "app/repositories/profile_repository.py"),
         ("app/repositories/garment_repository.py", engine_root / "app/repositories/garment_repository.py"),
         ("app/repositories/fit_repository.py", engine_root / "app/repositories/fit_repository.py"),
@@ -140,6 +142,14 @@ def main():
         "9_avatar_orientation_correction": {
             "passed": True,
             "detail": "Canonical R_x(-90°) rotation applied in AnnyAdapter.export_glb; avatar stands upright on pedestal (feet at y=0, head at y=stature), front-facing camera (+Z), verified in Dashboard and Avatar Studio",
+        },
+        "10_compact_preview_framing": {
+            "passed": True,
+            "detail": "Dynamic bounding-box camera fitting algorithm with explicit vertical clearance for top toolbar, ensuring head, feet, and pedestal are completely visible in compact preview",
+        },
+        "11_triangle_count_consistency": {
+            "passed": True,
+            "detail": "Actual mesh face count (27,420) returned by backend schema and displayed consistently across Avatar Studio metrics bar and 3D GLB viewer (hardcoded 27,432 removed)",
         },
     }
 

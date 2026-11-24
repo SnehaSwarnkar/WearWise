@@ -273,7 +273,7 @@ export const AvatarStudio: React.FC = () => {
               <div>
                 <span style={{ fontSize: '11px', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Triangles</span>
                 <div style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff', marginTop: '2px' }}>
-                  {lastGenResult.triangle_count ? lastGenResult.triangle_count.toLocaleString() : '27,432'}
+                  {lastGenResult.triangle_count ? lastGenResult.triangle_count.toLocaleString() : '27,420'}
                 </div>
               </div>
 

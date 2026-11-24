@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -53,6 +53,54 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
   const resolvedAvatarId =
     avatarId ||
     (assetUrl ? assetUrl.replace('/api/v1/avatar/assets/', '').replace('.glb', '') : null);
+
+  // Fits camera to model bounding box considering container dimensions and overlay clearances
+  const fitCameraToModel = useCallback((model: THREE.Object3D) => {
+    if (!cameraRef.current || !controlsRef.current || !containerRef.current) return;
+
+    const bbox = new THREE.Box3().setFromObject(model);
+    const size = new THREE.Vector3();
+    bbox.getSize(size);
+
+    const w = containerRef.current.clientWidth || 400;
+    const h = containerRef.current.clientHeight || 380;
+    const aspect = w / h;
+
+    const fovRad = (cameraRef.current.fov * Math.PI) / 180;
+    const tanHalfFov = Math.tan(fovRad / 2);
+
+    // Height includes model stature and pedestal thickness (0.04m)
+    const hModel = Math.max(size.y + 0.04, 1.0);
+    // Width includes arm span and pedestal diameter (1.8m)
+    const wModel = Math.max(size.x, 1.80);
+
+    // Reserved pixel padding for overlay toolbars and floor margin
+    // In compact mode (h < 450), reserve sufficient top padding (72px) so head is never obscured by toolbars
+    const mTop = h < 450 ? 72.0 : 64.0;
+    const mBottom = h < 450 ? 28.0 : 36.0;
+    const mLeft = 24.0;
+    const mRight = 24.0;
+
+    const fy = Math.max(0.4, (h - mTop - mBottom) / h);
+    const fx = Math.max(0.4, (w - mLeft - mRight) / w);
+
+    const vSpan = hModel / fy;
+    const dY = (vSpan / 2) / tanHalfFov;
+
+    const hSpan = wModel / fx;
+    const dX = (hSpan / 2) / (aspect * tanHalfFov);
+
+    const d = Math.max(dY, dX) * 1.06;
+
+    // Shift target up so the mannequin is vertically centered in the usable space below the top overlay
+    const deltaY = ((mTop - mBottom) / (2 * h)) * (2 * d * tanHalfFov);
+    const modelCenterY = (size.y - 0.04) / 2;
+    const targetY = modelCenterY + deltaY;
+
+    cameraRef.current.position.set(0, targetY + 0.05, d);
+    controlsRef.current.target.set(0, targetY, 0);
+    controlsRef.current.update();
+  }, []);
 
   // Initialize Three.js scene once
   useEffect(() => {
@@ -153,6 +201,9 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
+      if (currentModelRef.current) {
+        fitCameraToModel(currentModelRef.current);
+      }
     };
     window.addEventListener('resize', handleResize);
 
@@ -256,12 +307,8 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
 
             sceneRef.current.add(model);
 
-            // Adjust camera target and framing to upright torso center
-            if (controlsRef.current && cameraRef.current) {
-              controlsRef.current.target.set(0, size.y * 0.52, 0);
-              cameraRef.current.position.set(0, size.y * 0.58, 3.2);
-              controlsRef.current.update();
-            }
+            // Dynamically fit camera framing to model bounding box & overlay clearance
+            fitCameraToModel(model);
 
             setMeshMetrics({
               vertexCount: totalVertices,
@@ -314,14 +361,8 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
 
   // Reset Camera View
   const handleResetCamera = () => {
-    if (cameraRef.current && controlsRef.current && currentModelRef.current) {
-      const bbox = new THREE.Box3().setFromObject(currentModelRef.current);
-      const size = new THREE.Vector3();
-      bbox.getSize(size);
-
-      cameraRef.current.position.set(0, size.y * 0.58, 3.2);
-      controlsRef.current.target.set(0, size.y * 0.52, 0);
-      controlsRef.current.update();
+    if (currentModelRef.current) {
+      fitCameraToModel(currentModelRef.current);
     }
   };
 

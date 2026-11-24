@@ -21,6 +21,7 @@ class AvatarGenerationResponse(BaseModel):
     sha256_checksum: str
     generation_duration_ms: float
     vertex_count: int
+    triangle_count: Optional[int] = None
     is_valid_manifold: bool
     status: str = "completed"
     extracted_measurements: Dict[str, Any]
@@ -34,6 +35,7 @@ class AvatarStatusResponse(BaseModel):
     sha256_checksum: str
     generation_duration_ms: float
     vertex_count: int
+    triangle_count: Optional[int] = None
     is_valid_manifold: bool
     status: str
     engine_metadata: Dict[str, Any]

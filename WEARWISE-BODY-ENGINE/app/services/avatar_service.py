@@ -222,6 +222,7 @@ class AvatarOrchestrationService:
             "sha256_checksum": sha256_checksum,
             "generation_duration_ms": float(duration_ms),
             "vertex_count": len(mesh.vertices),
+            "triangle_count": len(mesh.faces),
             "is_valid_manifold": validation_report.is_valid,
             "extracted_measurements": extracted_summary,
             "status": "completed",
