@@ -2,7 +2,7 @@
   "manifest_version": "1.0.0",
   "phase": "6A",
   "git_branch": "noTouch",
-  "base_commit": "a6748c4720c38979b563292dae0ad4cef0918d03",
+  "base_commit": "9bb6e74ae6a35660e9713a397f1fecc322dea320",
   "review_criteria_verifications": {
     "1_database_and_repositories": {
       "passed": true,
@@ -35,9 +35,21 @@
     "8_api_integration_tests": {
       "passed": true,
       "detail": "Complete integration test suite in tests/api/test_api_workflow.py covering all workflow stages"
+    },
+    "9_production_auth_hardening": {
+      "passed": true,
+      "detail": "Standard JWT Bearer authentication with signature/issuer/audience/expiry validation, development fallback isolation, and OpenAPI BearerAuth declaration"
+    },
+    "10_alembic_database_migrations": {
+      "passed": true,
+      "detail": "Versioned Alembic migration baseline (001_initial_schema.py) covering all 12 authoritative tables with SQLite WAL mode and PostgreSQL compatibility"
     }
   },
   "files": {
+    "app/config.py": {
+      "sha256": "f9d3653902bd30a6fdda26c3c9c43dc76289dd37201b167418461f0716b7a227",
+      "size_bytes": 1789
+    },
     "app/db/base.py": {
       "sha256": "471e204a988047c4f77b86efe74fd7e7760cc093b81a2be4d38ffb4bd25f922b",
       "size_bytes": 239
@@ -47,12 +59,28 @@
       "size_bytes": 15879
     },
     "app/db/session.py": {
-      "sha256": "10c06e58bfc675f5b6e59b00adb1fb47faa2a192d3ec8f7cdaeb11ad719fe930",
-      "size_bytes": 2135
+      "sha256": "6481a9c8270d336eef402f7fb9d99628bff8d9259506e41884f4dba78ed305df",
+      "size_bytes": 2881
     },
     "app/db/__init__.py": {
       "sha256": "2d3051d4d80b6f208c1b952aedf876c58cfd7d8d35e2d7541ab1be9113eea74f",
       "size_bytes": 908
+    },
+    "alembic.ini": {
+      "sha256": "768c18b9ca6379d4f333bae5a77cfa0bcaef322de54462b75137d31af80684c4",
+      "size_bytes": 658
+    },
+    "alembic/env.py": {
+      "sha256": "b6cd4f24b376d52a499082471ec107515b4d00b7fb65eb1f46943993137ecfb8",
+      "size_bytes": 1929
+    },
+    "alembic/script.py.mako": {
+      "sha256": "304a8bfb6a804e5493f5300e79882c70c9f5bb2e87512f4d16f0e097dddd323f",
+      "size_bytes": 635
+    },
+    "alembic/versions/001_initial_schema.py": {
+      "sha256": "527ccd2cf77ebd6102c887cf50796b42a6007c60261b5d2eb39be669b87ecedb",
+      "size_bytes": 14010
     },
     "app/storage/local.py": {
       "sha256": "0071a9e80268e363dd526f4ca82c8ebbb08780e498b5089ba9da77255486f5f9",
@@ -107,12 +135,12 @@
       "size_bytes": 645
     },
     "app/api/auth.py": {
-      "sha256": "06e7ca201866280e74934f645d8ee1e881362eee4e4444179ea2b1e1e38a01f7",
-      "size_bytes": 2883
+      "sha256": "80df432d4c6efa110860e137042513f2ef22ec76fe75693abad9dda055e5638b",
+      "size_bytes": 11329
     },
     "app/api/errors.py": {
-      "sha256": "2e0ae8bea429e47d86c7ae8bc2b8467ce391ded2d9f588114fd2053013107d88",
-      "size_bytes": 2456
+      "sha256": "a5c2410b18cf387a7936c70fcab08d794a69c9f7ea45505e2c09415fca670ec9",
+      "size_bytes": 3627
     },
     "app/api/schemas/profiles.py": {
       "sha256": "67487cd0a267e2ad8e3c13b4d326420e238e4a590fb936724c990dd9270b5bd7",
@@ -155,28 +183,36 @@
       "size_bytes": 516
     },
     "app/api/app.py": {
-      "sha256": "c3a9b6ced1dc3ac3ccad9694f7b86c04f69c90dd237909ebcfa68c7991191498",
-      "size_bytes": 1894
+      "sha256": "7a087eb35a7ab6e7046d455dd4ffdae68645697aef3bc293b113279bcb206246",
+      "size_bytes": 3271
     },
     "app/api/__init__.py": {
       "sha256": "652cded48d4fe5144b0cae0869b9c34fb3297083c5ea15b86ff4cc3fc9ae196f",
       "size_bytes": 103
     },
     "tests/api/test_api_workflow.py": {
-      "sha256": "078db33bdf9e361ba68575ae2f1036e2a6d8e3ea9d0863d25a18934f507eb621",
-      "size_bytes": 14371
+      "sha256": "c5fd5c9a786e6f39942819aa329fbc208d03a795f55e97b35b5184212012176d",
+      "size_bytes": 14934
+    },
+    "tests/api/test_auth_security.py": {
+      "sha256": "4eec217eaf9ea8a99a21748f5a8ccaaabd0f0e0659eb6a9439ff288dfecb4969",
+      "size_bytes": 9909
+    },
+    "tests/db/test_migrations.py": {
+      "sha256": "0d29c2d3587b6d52799c85251f9733bbbe9bd20fcada2439d15c362903ad89fe",
+      "size_bytes": 4322
     },
     "scripts/demo_phase6a_backend.py": {
-      "sha256": "c5841f05b0348c68ce52ad2cdba0da435881e3fe73dbc76d310108f1430c12a0",
-      "size_bytes": 12687
+      "sha256": "73137976fafe1283b5ef6ae5a9bddce89d8be5338127f09266f4c3e0b1046846",
+      "size_bytes": 12928
     },
     "artifacts/phase6a/openapi.json": {
-      "sha256": "3d512dd43e46e56f8586e36b2863c975e532de3304f085a29c56f4a282db4a2a",
-      "size_bytes": 55848
+      "sha256": "cf15b30864c7398cc246d52faf21f7115bcbc0d93c8c8fca44342127d9ff7a45",
+      "size_bytes": 51575
     },
     "artifacts/phase6a/phase6a_e2e_demo_report.json": {
-      "sha256": "6f2bde24b7ecc4bf1c9edd721ca5721e06b26abf79b9b38da22ecf9b38ea3846",
-      "size_bytes": 7618
+      "sha256": "aa4752382672ee61cd752b81b0cbe89d55a43113e765e4406e9407efd8f5dfae",
+      "size_bytes": 7619
     }
   }
 }
