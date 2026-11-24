@@ -39,6 +39,8 @@ function TryOn() {
   const [mannequinGender, setMannequinGender] = useState("male");
   const [selectedSize, setSelectedSize] = useState("M");
   const [showGarmentMesh, setShowGarmentMesh] = useState(true);
+  const [armAngle, setArmAngle] = useState(0);
+  const [fabricProfile, setFabricProfile] = useState("knit");
   const [cartAdding, setCartAdding] = useState(false);
   const [cartSuccess, setCartSuccess] = useState(false);
 
@@ -278,11 +280,49 @@ function TryOn() {
 
               <AvatarViewer
                 assetUrl={currentAvatarUrl}
-                garmentUrl="/garments/TSH-WW-CREW-001.glb"
+                garmentUrl={`/garments/TSH-WW-CREW-001_${['S', 'M', 'L'].includes(selectedSize) ? selectedSize : 'M'}.glb`}
                 garmentScale={SIZE_SCALES[selectedSize]}
                 showGarment={showGarmentMesh}
+                armAngle={armAngle}
+                studioBackground="#720e2c"
+                fabricProfile={fabricProfile}
                 height="560px"
               />
+
+              {/* Interactive Arm Elevation & XPBD Cloth Deformation Panel */}
+              <div className="mode-a-motion-panel">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: "12px", fontFamily: "Archivo Black, sans-serif", letterSpacing: "0.5px" }}>
+                    ✦ AVATAR MOTION & ARM ELEVATION SIMULATION
+                  </span>
+                  <span style={{ fontFamily: "Archivo Black, sans-serif", fontSize: "14px", color: "var(--pink, #ff3d9a)" }}>
+                    {armAngle}° {armAngle === 0 ? "· REST POSE" : armAngle === 90 ? "· T-POSE MAX" : "· ELEVATED"}
+                  </span>
+                </div>
+
+                <div className="motion-slider-row">
+                  <input
+                    type="range"
+                    min="0"
+                    max="90"
+                    step="5"
+                    value={armAngle}
+                    onChange={(e) => setArmAngle(parseInt(e.target.value, 10))}
+                    className="tryon-arm-slider"
+                  />
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", color: "#666" }}>
+                    <button type="button" onClick={() => setArmAngle(0)} style={{ border: "none", background: "none", cursor: "pointer", fontWeight: armAngle === 0 ? 800 : 400 }}>0° (Rest / A-Pose)</button>
+                    <button type="button" onClick={() => setArmAngle(30)} style={{ border: "none", background: "none", cursor: "pointer", fontWeight: armAngle === 30 ? 800 : 400 }}>30° (Relaxed)</button>
+                    <button type="button" onClick={() => setArmAngle(45)} style={{ border: "none", background: "none", cursor: "pointer", fontWeight: armAngle === 45 ? 800 : 400 }}>45° (Mid Stretch)</button>
+                    <button type="button" onClick={() => setArmAngle(90)} style={{ border: "none", background: "none", cursor: "pointer", fontWeight: armAngle === 90 ? 800 : 400 }}>90° (T-Pose Max)</button>
+                  </div>
+                </div>
+
+                <div style={{ fontSize: "11px", color: "#555", lineHeight: 1.4 }}>
+                  Driven by real-time client-side XPBD cloth solver: As the avatar's arms elevate, underarm cloth stretches,
+                  folds develop along the shoulder ridge, and the torso side hem lifts naturally according to fabric tensile compliance.
+                </div>
+              </div>
             </div>
 
             {/* Mode A Sidebar: Garment, Sizing & Honest Fit */}
@@ -291,7 +331,7 @@ function TryOn() {
                 <div className="garment-card-header">
                   <div>
                     <span style={{ fontSize: "11px", letterSpacing: "1px", fontWeight: 900, color: "var(--purple, #8d6bff)" }}>
-                      PROTOTYPE GARMENT 01
+                      MERCHANT DIGITAL GARMENT
                     </span>
                     <h2 className="garment-card-title">Signature Boxy Crew Tee</h2>
                     <span style={{ fontSize: "12px", color: "#666" }}>SKU: TSH-WW-CREW-001 · 100% Combed Cotton</span>
@@ -321,9 +361,12 @@ function TryOn() {
 
                 {/* Size Selector */}
                 <div>
-                  <span style={{ fontSize: "12px", fontWeight: 900, letterSpacing: "0.5px" }}>
-                    SELECT SIZE (SCALE OVERLAY):
-                  </span>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: "12px", fontWeight: 900, letterSpacing: "0.5px" }}>
+                      SELECT SIZE (GRADED GEOMETRY):
+                    </span>
+                    <span style={{ fontSize: "10px", color: "#888" }}>ISO 8559-2</span>
+                  </div>
                   <div className="size-selector-row">
                     {["XS", "S", "M", "L", "XL"].map((size) => (
                       <button
@@ -335,6 +378,49 @@ function TryOn() {
                         {size}
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                {/* Fabric Mechanical Profile Toggle */}
+                <div style={{ margin: "16px 0" }}>
+                  <span style={{ fontSize: "12px", fontWeight: 900, letterSpacing: "0.5px", display: "block", marginBottom: "6px" }}>
+                    FABRIC SIMULATION PROFILE:
+                  </span>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      type="button"
+                      style={{
+                        flex: 1,
+                        padding: "8px",
+                        borderRadius: "6px",
+                        border: "1.5px solid var(--black)",
+                        fontFamily: "Archivo Black",
+                        fontSize: "10px",
+                        background: fabricProfile === "knit" ? "var(--pink)" : "#f8fafc",
+                        color: fabricProfile === "knit" ? "#ffffff" : "var(--black)",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => setFabricProfile("knit")}
+                    >
+                      COTTON WAFFLE (240 GSM)
+                    </button>
+                    <button
+                      type="button"
+                      style={{
+                        flex: 1,
+                        padding: "8px",
+                        borderRadius: "6px",
+                        border: "1.5px solid var(--black)",
+                        fontFamily: "Archivo Black",
+                        fontSize: "10px",
+                        background: fabricProfile === "rigid" ? "var(--pink)" : "#f8fafc",
+                        color: fabricProfile === "rigid" ? "#ffffff" : "var(--black)",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => setFabricProfile("rigid")}
+                    >
+                      RIGID POPLIN (140 GSM)
+                    </button>
                   </div>
                 </div>
 
@@ -381,9 +467,18 @@ function TryOn() {
               {/* Provenance Metadata */}
               <div style={{ background: "#ffffff", border: "2px solid var(--black)", borderRadius: "14px", padding: "16px 20px", boxShadow: "4px 4px 0 var(--black)", fontSize: "11px", color: "#555", lineHeight: 1.6 }}>
                 <strong style={{ color: "var(--black)", display: "block", marginBottom: "4px" }}>
-                  ✦ 3D MESH PROVENANCE (ISO 8559-2 / BS 4952)
+                  ✦ 3D DIGITAL GARMENT PROVENANCE (ISO 8559-2 / BS 4952 / ASTM D1777)
                 </strong>
-                Sample ID: <code>WW-3D-TSHIRT-TSH-WW-CREW-001</code>. Watertight manifold mesh conforming to upright NAVER Anny torso. Sized with calibrated dimensional ease. Does not claim dynamic cloth drape physics.
+                Sample ID: <code>WW-3D-TSHIRT-TSH-WW-CREW-001-REV2</code>. Textured boxy crewneck tee with ribbed "CLASSY" collar text, white piping, and chest pocket. Sized with graded dimensional ease ({selectedSize}: {currentFit.chestEase}). Physically responsive deformation powered by client-side XPBD cloth simulation.
+                <div style={{ marginTop: "10px" }}>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/merchant/garment-studio")}
+                    style={{ background: "none", border: "none", color: "var(--purple, #8d6bff)", fontSize: "11px", fontWeight: 900, cursor: "pointer", textDecoration: "underline", padding: 0 }}
+                  >
+                    Open Merchant Digital Garment Studio →
+                  </button>
+                </div>
               </div>
             </div>
           </section>

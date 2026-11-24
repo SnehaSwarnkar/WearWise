@@ -57,12 +57,35 @@
 }
 
 .mode-a-viewer-card {
-  background: #0a0e17;
+  background: #720e2c;
   border: 2px solid var(--black, #151515);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 8px 8px 0 var(--black, #151515);
   position: relative;
+}
+
+.mode-a-motion-panel {
+  background: #ffffff;
+  border: 2px solid var(--black, #151515);
+  border-radius: 14px;
+  padding: 16px 20px;
+  box-shadow: 4px 4px 0 var(--black, #151515);
+  margin-top: 16px;
+}
+
+.motion-slider-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.tryon-arm-slider {
+  width: 100%;
+  accent-color: var(--pink, #ff3d9a);
+  height: 8px;
+  cursor: pointer;
 }
 
 .mode-a-sidebar {
