@@ -68,19 +68,44 @@ async function main() {
   await page.screenshot({ path: path.join(screenshotsDir, '06_checkout.png') });
 
   // 7. Dual-Mode Try-On (Mode A: 3D Avatar)
-  console.log('Capturing Try-On Mode A (3D Avatar)...');
+  console.log('Capturing Try-On Mode A (3D Avatar - Rest Pose)...');
   await page.goto('http://127.0.0.1:3000/try-on', { waitUntil: 'networkidle0' });
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 3000));
   await page.screenshot({ path: path.join(screenshotsDir, '07_tryon_mode_a.png') });
 
-  // 8. Dual-Mode Try-On (Mode B: AI Photo)
+  // 8. Try-On Mode A with Arm Elevation (45 degrees motion & cloth deformation)
+  console.log('Capturing Try-On Mode A with Arm Elevation...');
+  try {
+    await page.evaluate(() => {
+      const slider = document.querySelector('.tryon-arm-slider');
+      if (slider) {
+        slider.value = '45';
+        slider.dispatchEvent(new Event('input', { bubbles: true }));
+        slider.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+    await new Promise((r) => setTimeout(r, 2000));
+    await page.screenshot({ path: path.join(screenshotsDir, '08_tryon_mode_a_arm_raised.png') });
+  } catch (e) {
+    console.log('Arm elevation capture note:', e.message);
+  }
+
+  // 9. Merchant Garment Studio
+  console.log('Capturing Merchant Garment Studio...');
+  await page.goto('http://127.0.0.1:3000/merchant/garment-studio', { waitUntil: 'networkidle0' });
+  await new Promise((r) => setTimeout(r, 1500));
+  await page.screenshot({ path: path.join(screenshotsDir, '09_merchant_studio.png') });
+
+  // 10. Dual-Mode Try-On (Mode B: AI Photo)
   console.log('Capturing Try-On Mode B (AI Photo VTON)...');
+  await page.goto('http://127.0.0.1:3000/try-on', { waitUntil: 'networkidle0' });
+  await new Promise((r) => setTimeout(r, 1500));
   const btns = await page.$$('.mode-toggle-btn');
   if (btns.length > 1) {
     await btns[1].click();
     await new Promise((r) => setTimeout(r, 1200));
   }
-  await page.screenshot({ path: path.join(screenshotsDir, '08_tryon_mode_b.png') });
+  await page.screenshot({ path: path.join(screenshotsDir, '10_tryon_mode_b.png') });
 
   await browser.close();
   console.log('All screenshots captured successfully.');
