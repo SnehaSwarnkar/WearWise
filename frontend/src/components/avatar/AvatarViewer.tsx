@@ -17,6 +17,9 @@ import {
 interface AvatarViewerProps {
   avatarId?: string | null;
   assetUrl?: string | null;
+  garmentUrl?: string | null;
+  garmentScale?: number;
+  showGarment?: boolean;
   height?: string | number;
   initialWireframe?: boolean;
   initialAutoRotate?: boolean;
@@ -25,6 +28,9 @@ interface AvatarViewerProps {
 export const AvatarViewer: React.FC<AvatarViewerProps> = ({
   avatarId,
   assetUrl,
+  garmentUrl,
+  garmentScale = 1.0,
+  showGarment = true,
   height = '560px',
   initialWireframe = false,
   initialAutoRotate = false,
@@ -35,6 +41,7 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const controlsRef = useRef<OrbitControls | null>(null);
   const currentModelRef = useRef<THREE.Group | null>(null);
+  const currentGarmentRef = useRef<THREE.Group | null>(null);
   const animFrameIdRef = useRef<number | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -223,25 +230,27 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
     }
   }, [autoRotate]);
 
-  // Load avatar GLB when resolvedAvatarId changes
+  // Load avatar GLB when resolvedAvatarId or assetUrl changes
   useEffect(() => {
-    if (!resolvedAvatarId) {
-      if (currentModelRef.current && sceneRef.current) {
-        sceneRef.current.remove(currentModelRef.current);
-        currentModelRef.current = null;
-      }
-      setMeshMetrics(null);
-      return;
-    }
-
     let isMounted = true;
     setLoading(true);
     setLoadError(null);
 
     const loadAvatarGlb = async () => {
       try {
-        // Fetch binary data directly via authenticated API client
-        const arrayBuffer = await apiClient.fetchGlbArrayBuffer(resolvedAvatarId);
+        let arrayBuffer: ArrayBuffer;
+        if (assetUrl && (assetUrl.startsWith('/') || assetUrl.startsWith('http'))) {
+          const res = await fetch(assetUrl);
+          if (!res.ok) throw new Error(`Failed to load 3D avatar asset from ${assetUrl}`);
+          arrayBuffer = await res.arrayBuffer();
+        } else if (resolvedAvatarId) {
+          arrayBuffer = await apiClient.fetchGlbArrayBuffer(resolvedAvatarId);
+        } else {
+          // Fallback to local baseline Anny mannequin
+          const res = await fetch('/avatars/anny_baseline_male.glb');
+          if (!res.ok) throw new Error('Baseline avatar mesh not found');
+          arrayBuffer = await res.arrayBuffer();
+        }
 
         if (!isMounted) return;
 
@@ -337,7 +346,60 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [resolvedAvatarId]);
+  }, [resolvedAvatarId, assetUrl]);
+
+  // Load and overlay 3D Garment Mesh
+  useEffect(() => {
+    if (!sceneRef.current) return;
+
+    if (!garmentUrl || showGarment === false) {
+      if (currentGarmentRef.current) {
+        sceneRef.current.remove(currentGarmentRef.current);
+        currentGarmentRef.current = null;
+      }
+      return;
+    }
+
+    let isMounted = true;
+    const loader = new GLTFLoader();
+    loader.load(
+      garmentUrl,
+      (gltf) => {
+        if (!isMounted || !sceneRef.current) return;
+        if (currentGarmentRef.current) {
+          sceneRef.current.remove(currentGarmentRef.current);
+        }
+
+        const garment = gltf.scene;
+        currentGarmentRef.current = garment;
+
+        const scale = garmentScale || 1.0;
+        garment.scale.set(scale, scale, scale);
+
+        if (currentModelRef.current) {
+          garment.position.copy(currentModelRef.current.position);
+        }
+
+        sceneRef.current.add(garment);
+      },
+      undefined,
+      (err) => {
+        console.warn('Could not load 3D garment mesh:', err);
+      }
+    );
+
+    return () => {
+      isMounted = false;
+    };
+  }, [garmentUrl, showGarment]);
+
+  // Adjust garment scaling dynamically on size changes
+  useEffect(() => {
+    if (currentGarmentRef.current) {
+      const scale = garmentScale || 1.0;
+      currentGarmentRef.current.scale.set(scale, scale, scale);
+    }
+  }, [garmentScale]);
 
   // Apply wireframe toggle to active model
   useEffect(() => {
