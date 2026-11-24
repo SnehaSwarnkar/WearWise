@@ -21,6 +21,23 @@ import trimesh
 logger = logging.getLogger("wearwise.garment_platform.qa")
 
 
+def _to_serializable(val: Any) -> Any:
+    """Recursively converts numpy types to standard Python primitives for BSON/JSON."""
+    if isinstance(val, (np.bool_, bool)):
+        return bool(val)
+    if isinstance(val, (np.integer, int)):
+        return int(val)
+    if isinstance(val, (np.floating, float)):
+        return float(val)
+    if isinstance(val, np.ndarray):
+        return val.tolist()
+    if isinstance(val, dict):
+        return {k: _to_serializable(v) for k, v in val.items()}
+    if isinstance(val, (list, tuple)):
+        return [_to_serializable(v) for v in val]
+    return val
+
+
 class GarmentQAEngine:
     """Automated Quality Assurance inspector for digital garment packages."""
 
@@ -75,7 +92,7 @@ class GarmentQAEngine:
             },
         }
 
-        return {
+        result = {
             "sku": garment_doc.get("sku", "TSH-WW-CREW-001"),
             "overall_status": raw_report.get("overall_status", "PASSED"),
             "confidence_level": raw_report.get("confidence_level", "PARAMETRIC_TEMPLATE"),
@@ -84,6 +101,7 @@ class GarmentQAEngine:
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "summary": f"Full automated QA audit: Geometry ({checks['geometry_qa']['status']}), Measurements ({checks['measurement_qa']['status']}), Textures ({checks['texture_qa']['status']}), Variants ({checks['variant_qa']['status']}).",
         }
+        return _to_serializable(result)
 
     @classmethod
     def evaluate_garment(
