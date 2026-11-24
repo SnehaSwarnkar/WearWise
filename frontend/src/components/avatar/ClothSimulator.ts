@@ -58,8 +58,8 @@ export class ClothSimulator {
   private garmentWeights: Float32Array | null = null; // 0 = fixed/kinematic, 1 = simulated
 
   // Left & Right shoulder pivots on upright NAVER Anny baseline
-  private shoulderLeft = new THREE.Vector3(-0.19, 1.34, 0.0);
-  private shoulderRight = new THREE.Vector3(0.19, 1.34, 0.0);
+  private shoulderLeft = new THREE.Vector3(-0.19, 1.26, -0.08);
+  private shoulderRight = new THREE.Vector3(0.19, 1.26, -0.08);
 
   private currentArmAngleDeg = 0;
   private activeFabric: FabricProperties = FABRIC_PROFILES.knit;
@@ -212,8 +212,8 @@ export class ClothSimulator {
         const oz = orig[i * 3 + 2];
 
         // Left arm (wearer's left = negative X)
-        if (ox < -0.16 && oy < 1.38) {
-          const skinWeight = Math.min(1.0, Math.max(0.0, (1.36 - oy) / 0.10));
+        if (ox < -0.16 && oy < 1.34 && oy > 1.02) {
+          const skinWeight = Math.min(1.0, Math.max(0.0, (1.28 - oy) / 0.12));
           const dx = ox - this.shoulderLeft.x;
           const dy = oy - this.shoulderLeft.y;
 
@@ -227,9 +227,9 @@ export class ClothSimulator {
             oy + skinWeight * (this.shoulderLeft.y + rotY - oy),
             oz
           );
-        } else if (ox > 0.16 && oy < 1.38) {
+        } else if (ox > 0.16 && oy < 1.34 && oy > 1.02) {
           // Right arm (wearer's right = positive X)
-          const skinWeight = Math.min(1.0, Math.max(0.0, (1.36 - oy) / 0.10));
+          const skinWeight = Math.min(1.0, Math.max(0.0, (1.28 - oy) / 0.12));
           const dx = ox - this.shoulderRight.x;
           const dy = oy - this.shoulderRight.y;
 
@@ -343,17 +343,17 @@ export class ClothSimulator {
           }
         }
 
-        // Collision projection against torso cylinder and arm capsules
+        // Collision projection against torso elliptical boundary
         for (let i = 0; i < count; i++) {
-          // Torso collision boundary (radius ~ 0.165m)
-          if (curY[i] < 1.32 && Math.abs(curX[i]) < 0.20) {
-            const rx = curX[i];
-            const rz = curZ[i];
-            const r = Math.sqrt(rx * rx + rz * rz);
-            const minTorsoRadius = 0.155;
-            if (r < minTorsoRadius && r > 0.001) {
-              curX[i] = (rx / r) * minTorsoRadius;
-              curZ[i] = (rz / r) * minTorsoRadius;
+          if (curY[i] < 1.30 && Math.abs(curX[i]) < 0.22) {
+            const dx = curX[i];
+            const dz = curZ[i] - (-0.08);
+            // Torso cross section: Rx=0.19m, Rz=0.085m
+            const ellipDist = (dx / 0.19) ** 2 + (dz / 0.085) ** 2;
+            if (ellipDist < 1.0 && ellipDist > 0.001) {
+              const scale = 1.0 / Math.sqrt(ellipDist);
+              curX[i] = dx * scale;
+              curZ[i] = -0.08 + dz * scale;
             }
           }
         }
