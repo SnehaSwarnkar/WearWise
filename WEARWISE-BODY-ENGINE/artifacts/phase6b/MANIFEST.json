@@ -2,7 +2,7 @@
   "manifest_version": "1.0.0",
   "phase": "6B",
   "git_branch": "noTouch",
-  "base_commit": "7cbd75d2f469f13d15f019fa5513f4eaeca2c5d0",
+  "base_commit": "9f2656475c55f48dd1547849ac5f64761f5682a9",
   "review_criteria_verifications": {
     "1_dashboard_module": {
       "passed": true,
@@ -35,6 +35,10 @@
     "8_backend_read_routes": {
       "passed": true,
       "detail": "Versioned FastAPI endpoints for listing profiles, garments, and fit recommendations with eager relationships and 403 ownership enforcement (403/403 backend tests passed)"
+    },
+    "9_avatar_orientation_correction": {
+      "passed": true,
+      "detail": "Canonical R_x(-90\u00b0) rotation applied in AnnyAdapter.export_glb; avatar stands upright on pedestal (feet at y=0, head at y=stature), front-facing camera (+Z), verified in Dashboard and Avatar Studio"
     }
   },
   "files": {
@@ -91,8 +95,8 @@
       "size_bytes": 3569
     },
     "frontend/src/components/avatar/AvatarViewer.tsx": {
-      "sha256": "011b7019f726fac565c3a680305f5cc6f64f3072618e3543541bb44b01a15308",
-      "size_bytes": 18893
+      "sha256": "04507a1c701a5400dd4f1ea1edf983e548ec78326341a81773c3aee7471d10f5",
+      "size_bytes": 19004
     },
     "frontend/src/pages/Dashboard.tsx": {
       "sha256": "5bde7751350f6960b3bd24eaee24ddad948b00e56e038b86d9dbe3072d2c88b3",
@@ -125,6 +129,10 @@
     "frontend/src/__tests__/honest_fit_display.test.tsx": {
       "sha256": "ffb3877acd2cf81334b0a6146f9bba305a8c12aa90ff933bc55b44124d7446d3",
       "size_bytes": 846
+    },
+    "app/avatar_engine/adapters/anny_adapter.py": {
+      "sha256": "4a43dbadf56bf6ec67f636d2b0edb20b0fb903d7f12a25289d712df78073489f",
+      "size_bytes": 26468
     },
     "app/repositories/profile_repository.py": {
       "sha256": "63f5f0892f07a7b0fed6ba339e6cd62cc3e6072364c588bd9bee609da1466209",
@@ -162,37 +170,49 @@
       "sha256": "3d7a93dff6d6e2df1fa4b4e6d29bfbc56816752fccf306ba7134852b8124a04d",
       "size_bytes": 2058
     },
+    "tests/avatar_engine/test_anny_adapter.py": {
+      "sha256": "ba3e0aa215339d53c53bf3a2561966ae85f48fd37369c3ad7da9a3f5f11a5e4a",
+      "size_bytes": 12090
+    },
     "tests/api/test_api_workflow.py": {
       "sha256": "29b3afd345898c9321fa13b2a346c19321545f2fa6863078a39f47dbe0a52c8d",
       "size_bytes": 17202
     },
     "scripts/demo_phase6b_frontend.py": {
-      "sha256": "6cadc15b68d216d95e52c7c3a0443c40ca4c206c51f6034c2c5a5db01f65a525",
+      "sha256": "8701f987cc5f90e6130ae1bc9a70760655863c56a1c2db55076476d7dc8540ed",
       "size_bytes": 11732
     },
     "artifacts/phase6b/phase6b_e2e_demo_report.json": {
-      "sha256": "02d66762c398d6519fb2209cda41cbb7018d0b10b4ae8999715581364a12ca68",
-      "size_bytes": 1515
+      "sha256": "204955dae7cfe9212a8ec5382eb777c52fdfa5bf9ee6d6185345805c714448e8",
+      "size_bytes": 1514
     },
-    "artifacts/phase6b/screenshot_01_dashboard.png": {
+    "artifacts/phase6b/before_screenshot_01_dashboard.png": {
       "sha256": "1ee482a9bccaef63f87f4db5652847a4f2d907f863397cda21a8e6f9d16d8d64",
       "size_bytes": 219303
     },
-    "artifacts/phase6b/screenshot_02_body_profile.png": {
-      "sha256": "531b0dfad83bdc73dd40ce599d2fba82dfd149dfaa78d6bd725208ebb0dc4a63",
-      "size_bytes": 185315
-    },
-    "artifacts/phase6b/screenshot_03_avatar_studio.png": {
+    "artifacts/phase6b/before_screenshot_03_avatar_studio.png": {
       "sha256": "94b3ac54124dc59919dec728d554ea71ca2fd1e5ffb18d05947da922317b3b91",
       "size_bytes": 172278
     },
+    "artifacts/phase6b/screenshot_01_dashboard.png": {
+      "sha256": "0c3d73653e2bd7d050c0168d1eb4ee7ef9f68b80f0264cbb02928b411046409b",
+      "size_bytes": 224133
+    },
+    "artifacts/phase6b/screenshot_02_body_profile.png": {
+      "sha256": "2155f0e5f95a6a45c4162764a79f566a3b9755a40256ef7f6e87e45d06cc26f7",
+      "size_bytes": 184940
+    },
+    "artifacts/phase6b/screenshot_03_avatar_studio.png": {
+      "sha256": "c2fe0f847d3b6e7323e023de8844486b314f76881e7468c3cdac58d92a644ef4",
+      "size_bytes": 189535
+    },
     "artifacts/phase6b/screenshot_04_garment_studio.png": {
-      "sha256": "e2147bbeff928980e40684d314e158ac96870f5a0fec80f9debd4fab8f561195",
-      "size_bytes": 104984
+      "sha256": "1d499c21f57f92b0484ec6e815d86ebb265a94412811072f53e3f1ab4503e8d0",
+      "size_bytes": 104891
     },
     "artifacts/phase6b/screenshot_05_honest_fit.png": {
-      "sha256": "a0d2281aeb6f5ad333fad3ef80496e2c81b9f4bcf986f644677c4ac2ebc9e8ee",
-      "size_bytes": 262570
+      "sha256": "d21ab18c9e231db1378e520a1e0d4cd99383cd95de6101453020d84c9d384c5d",
+      "size_bytes": 262542
     }
   }
 }

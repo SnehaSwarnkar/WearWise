@@ -2,7 +2,7 @@
 
 - **Phase:** 6B (WearWise Frontend Integration)
 - **Branch:** `noTouch`
-- **Base Commit:** `7cbd75d2f469f13d15f019fa5513f4eaeca2c5d0`
+- **Base Commit:** `9f2656475c55f48dd1547849ac5f64761f5682a9`
 
 ## Review Criteria Verifications
 
@@ -14,6 +14,7 @@
 - **[PASS] 6_authentication_and_dev_switching**: Replaceable auth provider supporting dev principal switching (Shopper User vs Merchant Brand), Bearer header propagation, and RFC 7807 error envelope handling
 - **[PASS] 7_frontend_test_suite**: Vitest test suite covering API client, auth context, and Honest Fit display (8/8 passed, 0 failures)
 - **[PASS] 8_backend_read_routes**: Versioned FastAPI endpoints for listing profiles, garments, and fit recommendations with eager relationships and 403 ownership enforcement (403/403 backend tests passed)
+- **[PASS] 9_avatar_orientation_correction**: Canonical R_x(-90°) rotation applied in AnnyAdapter.export_glb; avatar stands upright on pedestal (feet at y=0, head at y=stature), front-facing camera (+Z), verified in Dashboard and Avatar Studio
 
 ## Archived Files and Checksums
 
@@ -32,7 +33,7 @@
 | `frontend/src/context/AuthContext.tsx` | `573247536241264555646407e319423c8542098261332f1e459bde082484464e` | 4,939 |
 | `frontend/src/components/layout/Navbar.tsx` | `7c4fee81678a38c3701832ce5060e16c29721547d674183e6f8562fb3a826742` | 16,328 |
 | `frontend/src/components/layout/AppLayout.tsx` | `e6aa758b6d3bad5fa21774f2d470b82b205ab43124adb0346b2b0d045d264d3b` | 3,569 |
-| `frontend/src/components/avatar/AvatarViewer.tsx` | `011b7019f726fac565c3a680305f5cc6f64f3072618e3543541bb44b01a15308` | 18,893 |
+| `frontend/src/components/avatar/AvatarViewer.tsx` | `04507a1c701a5400dd4f1ea1edf983e548ec78326341a81773c3aee7471d10f5` | 19,004 |
 | `frontend/src/pages/Dashboard.tsx` | `5bde7751350f6960b3bd24eaee24ddad948b00e56e038b86d9dbe3072d2c88b3` | 17,116 |
 | `frontend/src/pages/BodyProfile.tsx` | `f31d648c050f9ea1669f4b1dcbba343a2d4aa780d0c7e6c1fc6fe07b67761fff` | 21,381 |
 | `frontend/src/pages/AvatarStudio.tsx` | `c10ccacff90ae4ffa5d4e8f53a1f689b3f95d1fcf21f1d32bd3f28a9596ecf8b` | 14,673 |
@@ -41,6 +42,7 @@
 | `frontend/src/__tests__/api_client.test.ts` | `0234d38c994027a000d29f8f4ae506f9e19034950604afb7780a3f0f7d7e4b47` | 2,803 |
 | `frontend/src/__tests__/auth_context.test.tsx` | `dbf8ffa8f4cc2b561f5f0916770baf72806bd2a61ee5eee12e44ba8d01349233` | 2,503 |
 | `frontend/src/__tests__/honest_fit_display.test.tsx` | `ffb3877acd2cf81334b0a6146f9bba305a8c12aa90ff933bc55b44124d7446d3` | 846 |
+| `app/avatar_engine/adapters/anny_adapter.py` | `4a43dbadf56bf6ec67f636d2b0edb20b0fb903d7f12a25289d712df78073489f` | 26,468 |
 | `app/repositories/profile_repository.py` | `63f5f0892f07a7b0fed6ba339e6cd62cc3e6072364c588bd9bee609da1466209` | 14,232 |
 | `app/repositories/garment_repository.py` | `ca7a3867fc16b6256b44f370653ce9728d68eaab310c16365637636882fd079d` | 6,077 |
 | `app/repositories/fit_repository.py` | `d274ed4db1ebf11f3516064c6bd4e0bef3e83fd0d2954230e771404b0a65595b` | 2,553 |
@@ -50,11 +52,14 @@
 | `app/api/v1/profiles.py` | `11264a8bcfb9739f4337d2360eacdb7ba6051fc8da8e4f605700332b92433357` | 12,994 |
 | `app/api/v1/garments.py` | `599ec68304b0b6ea9740e97ebabb89dc4f00f75f70db066e4b1dedf5c5ea938b` | 5,428 |
 | `app/api/v1/fit.py` | `3d7a93dff6d6e2df1fa4b4e6d29bfbc56816752fccf306ba7134852b8124a04d` | 2,058 |
+| `tests/avatar_engine/test_anny_adapter.py` | `ba3e0aa215339d53c53bf3a2561966ae85f48fd37369c3ad7da9a3f5f11a5e4a` | 12,090 |
 | `tests/api/test_api_workflow.py` | `29b3afd345898c9321fa13b2a346c19321545f2fa6863078a39f47dbe0a52c8d` | 17,202 |
-| `scripts/demo_phase6b_frontend.py` | `6cadc15b68d216d95e52c7c3a0443c40ca4c206c51f6034c2c5a5db01f65a525` | 11,732 |
-| `artifacts/phase6b/phase6b_e2e_demo_report.json` | `02d66762c398d6519fb2209cda41cbb7018d0b10b4ae8999715581364a12ca68` | 1,515 |
-| `artifacts/phase6b/screenshot_01_dashboard.png` | `1ee482a9bccaef63f87f4db5652847a4f2d907f863397cda21a8e6f9d16d8d64` | 219,303 |
-| `artifacts/phase6b/screenshot_02_body_profile.png` | `531b0dfad83bdc73dd40ce599d2fba82dfd149dfaa78d6bd725208ebb0dc4a63` | 185,315 |
-| `artifacts/phase6b/screenshot_03_avatar_studio.png` | `94b3ac54124dc59919dec728d554ea71ca2fd1e5ffb18d05947da922317b3b91` | 172,278 |
-| `artifacts/phase6b/screenshot_04_garment_studio.png` | `e2147bbeff928980e40684d314e158ac96870f5a0fec80f9debd4fab8f561195` | 104,984 |
-| `artifacts/phase6b/screenshot_05_honest_fit.png` | `a0d2281aeb6f5ad333fad3ef80496e2c81b9f4bcf986f644677c4ac2ebc9e8ee` | 262,570 |
+| `scripts/demo_phase6b_frontend.py` | `8701f987cc5f90e6130ae1bc9a70760655863c56a1c2db55076476d7dc8540ed` | 11,732 |
+| `artifacts/phase6b/phase6b_e2e_demo_report.json` | `204955dae7cfe9212a8ec5382eb777c52fdfa5bf9ee6d6185345805c714448e8` | 1,514 |
+| `artifacts/phase6b/before_screenshot_01_dashboard.png` | `1ee482a9bccaef63f87f4db5652847a4f2d907f863397cda21a8e6f9d16d8d64` | 219,303 |
+| `artifacts/phase6b/before_screenshot_03_avatar_studio.png` | `94b3ac54124dc59919dec728d554ea71ca2fd1e5ffb18d05947da922317b3b91` | 172,278 |
+| `artifacts/phase6b/screenshot_01_dashboard.png` | `0c3d73653e2bd7d050c0168d1eb4ee7ef9f68b80f0264cbb02928b411046409b` | 224,133 |
+| `artifacts/phase6b/screenshot_02_body_profile.png` | `2155f0e5f95a6a45c4162764a79f566a3b9755a40256ef7f6e87e45d06cc26f7` | 184,940 |
+| `artifacts/phase6b/screenshot_03_avatar_studio.png` | `c2fe0f847d3b6e7323e023de8844486b314f76881e7468c3cdac58d92a644ef4` | 189,535 |
+| `artifacts/phase6b/screenshot_04_garment_studio.png` | `1d499c21f57f92b0484ec6e815d86ebb265a94412811072f53e3f1ab4503e8d0` | 104,891 |
+| `artifacts/phase6b/screenshot_05_honest_fit.png` | `d21ab18c9e231db1378e520a1e0d4cd99383cd95de6101453020d84c9d384c5d` | 262,542 |
