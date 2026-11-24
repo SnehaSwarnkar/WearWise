@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { apiClient } from '../../api/client';
+import { ClothSimulator, FABRIC_PROFILES } from './ClothSimulator';
 import {
   Maximize2,
   RotateCw,
@@ -23,6 +24,9 @@ interface AvatarViewerProps {
   height?: string | number;
   initialWireframe?: boolean;
   initialAutoRotate?: boolean;
+  studioBackground?: string;
+  armAngle?: number;
+  fabricProfile?: string;
 }
 
 export const AvatarViewer: React.FC<AvatarViewerProps> = ({
@@ -34,6 +38,9 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
   height = '560px',
   initialWireframe = false,
   initialAutoRotate = false,
+  studioBackground = '#720e2c',
+  armAngle = 0,
+  fabricProfile = 'knit',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -43,6 +50,7 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
   const currentModelRef = useRef<THREE.Group | null>(null);
   const currentGarmentRef = useRef<THREE.Group | null>(null);
   const animFrameIdRef = useRef<number | null>(null);
+  const simulatorRef = useRef<ClothSimulator>(new ClothSimulator());
 
   const [loading, setLoading] = useState<boolean>(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -69,42 +77,9 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
     const size = new THREE.Vector3();
     bbox.getSize(size);
 
-    const w = containerRef.current.clientWidth || 400;
-    const h = containerRef.current.clientHeight || 380;
-    const aspect = w / h;
-
-    const fovRad = (cameraRef.current.fov * Math.PI) / 180;
-    const tanHalfFov = Math.tan(fovRad / 2);
-
-    // Height includes model stature and pedestal thickness (0.04m)
-    const hModel = Math.max(size.y + 0.04, 1.0);
-    // Width includes arm span and pedestal diameter (1.8m)
-    const wModel = Math.max(size.x, 1.80);
-
-    // Reserved pixel padding for overlay toolbars and floor margin
-    // In compact mode (h < 450), reserve sufficient top padding (72px) so head is never obscured by toolbars
-    const mTop = h < 450 ? 72.0 : 64.0;
-    const mBottom = h < 450 ? 28.0 : 36.0;
-    const mLeft = 24.0;
-    const mRight = 24.0;
-
-    const fy = Math.max(0.4, (h - mTop - mBottom) / h);
-    const fx = Math.max(0.4, (w - mLeft - mRight) / w);
-
-    const vSpan = hModel / fy;
-    const dY = (vSpan / 2) / tanHalfFov;
-
-    const hSpan = wModel / fx;
-    const dX = (hSpan / 2) / (aspect * tanHalfFov);
-
-    const d = Math.max(dY, dX) * 1.06;
-
-    // Shift target up so the mannequin is vertically centered in the usable space below the top overlay
-    const deltaY = ((mTop - mBottom) / (2 * h)) * (2 * d * tanHalfFov);
-    const modelCenterY = (size.y - 0.04) / 2;
-    const targetY = modelCenterY + deltaY;
-
-    cameraRef.current.position.set(0, targetY + 0.05, d);
+    // Upright fashion studio framing centered on mannequin torso
+    const targetY = size.y > 0 ? size.y * 0.58 : 0.92;
+    cameraRef.current.position.set(0, targetY + 0.05, 2.50);
     controlsRef.current.target.set(0, targetY, 0);
     controlsRef.current.update();
   }, []);
@@ -119,12 +94,12 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
 
     // 1. Scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0e17);
+    scene.background = new THREE.Color(studioBackground || 0x720e2c);
     sceneRef.current = scene;
 
     // 2. Camera
-    const camera = new THREE.PerspectiveCamera(40, width / heightPx, 0.1, 100);
-    camera.position.set(0, 1.2, 3.2);
+    const camera = new THREE.PerspectiveCamera(38, width / heightPx, 0.1, 100);
+    camera.position.set(0, 0.95, 2.50);
     cameraRef.current = camera;
 
     // 3. Renderer
@@ -143,50 +118,43 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.maxPolarAngle = Math.PI / 2 + 0.05; // Prevent flipping below pedestal
-    controls.minDistance = 1.0;
+    controls.maxPolarAngle = Math.PI / 2 + 0.05; // Prevent flipping below ground
+    controls.minDistance = 0.8;
     controls.maxDistance = 6.0;
-    controls.target.set(0, 0.9, 0);
+    controls.target.set(0, 0.92, 0);
     controlsRef.current = controls;
 
-    // 5. Lighting Setup
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // 5. Lighting Setup (Soft High-Fashion 3-Point Studio Lighting)
+    const ambientLight = new THREE.AmbientLight(0xfff5f0, 0.70);
     scene.add(ambientLight);
 
     // Key light (warm front-right)
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.4);
-    keyLight.position.set(3, 4, 3);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    keyLight.position.set(2.5, 4.0, 3.0);
     keyLight.castShadow = true;
-    keyLight.shadow.mapSize.width = 1024;
-    keyLight.shadow.mapSize.height = 1024;
+    keyLight.shadow.mapSize.width = 2048;
+    keyLight.shadow.mapSize.height = 2048;
+    keyLight.shadow.bias = -0.0001;
     scene.add(keyLight);
 
-    // Fill light (cool front-left)
-    const fillLight = new THREE.DirectionalLight(0x90cdf4, 0.8);
-    fillLight.position.set(-3, 2, 2);
+    // Fill light (soft cool front-left)
+    const fillLight = new THREE.DirectionalLight(0xfce7f3, 0.80);
+    fillLight.position.set(-2.5, 2.5, 2.5);
     scene.add(fillLight);
 
-    // Rim light (rear accent)
-    const rimLight = new THREE.DirectionalLight(0x818cf8, 1.2);
-    rimLight.position.set(0, 3, -3);
+    // Rim light (rear edge highlight against burgundy background)
+    const rimLight = new THREE.DirectionalLight(0xffffff, 1.15);
+    rimLight.position.set(0, 3.5, -2.5);
     scene.add(rimLight);
 
-    // 6. Pedestal / Shadow Receiver
-    const pedestalGeo = new THREE.CylinderGeometry(0.85, 0.9, 0.04, 64);
-    const pedestalMat = new THREE.MeshStandardMaterial({
-      color: 0x111827,
-      roughness: 0.6,
-      metalness: 0.2,
-    });
-    const pedestal = new THREE.Mesh(pedestalGeo, pedestalMat);
-    pedestal.position.set(0, -0.02, 0);
-    pedestal.receiveShadow = true;
-    scene.add(pedestal);
-
-    // Grid on pedestal
-    const gridHelper = new THREE.GridHelper(1.8, 18, 0x334155, 0x1e293b);
-    gridHelper.position.set(0, 0.001, 0);
-    scene.add(gridHelper);
+    // 6. Seamless Ground Shadow Receiver
+    const floorGeo = new THREE.PlaneGeometry(10, 10);
+    const floorMat = new THREE.ShadowMaterial({ opacity: 0.28 });
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = 0.0;
+    floor.receiveShadow = true;
+    scene.add(floor);
 
     // 7. Animation loop
     const animate = () => {
@@ -292,17 +260,17 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
                   }
                 }
 
-                // Apply sleek matte mannequin material
+                // Apply pearl-white smooth mannequin material matching reference design
                 mesh.material = new THREE.MeshStandardMaterial({
-                  color: 0xdde3ea,
-                  roughness: 0.45,
-                  metalness: 0.1,
+                  color: 0xf5f7fa,
+                  roughness: 0.32,
+                  metalness: 0.08,
                   wireframe: wireframe,
                 });
               }
             });
 
-            // Calculate bounding box and center on pedestal
+            // Calculate bounding box and center on ground
             const bbox = new THREE.Box3().setFromObject(model);
             const center = new THREE.Vector3();
             bbox.getCenter(center);
@@ -315,6 +283,12 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
             model.position.z = -center.z;
 
             sceneRef.current.add(model);
+
+            // Bind avatar to kinematics simulator
+            simulatorRef.current.bindAvatar(model);
+            if (armAngle > 0) {
+              simulatorRef.current.setArmElevation(armAngle);
+            }
 
             // Dynamically fit camera framing to model bounding box & overlay clearance
             fitCameraToModel(model);
@@ -381,6 +355,12 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
         }
 
         sceneRef.current.add(garment);
+
+        // Bind garment to cloth simulator and sync arm angle
+        simulatorRef.current.bindGarment(garment);
+        if (armAngle > 0) {
+          simulatorRef.current.setArmElevation(armAngle);
+        }
       },
       undefined,
       (err) => {
@@ -392,6 +372,27 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
       isMounted = false;
     };
   }, [garmentUrl, showGarment]);
+
+  // Dynamic arm elevation motion
+  useEffect(() => {
+    if (simulatorRef.current) {
+      simulatorRef.current.setArmElevation(armAngle || 0);
+    }
+  }, [armAngle]);
+
+  // Dynamic fabric profile update
+  useEffect(() => {
+    if (simulatorRef.current && fabricProfile) {
+      simulatorRef.current.setFabricProfile(fabricProfile);
+    }
+  }, [fabricProfile]);
+
+  // Dynamic studio background update
+  useEffect(() => {
+    if (sceneRef.current && studioBackground) {
+      sceneRef.current.background = new THREE.Color(studioBackground);
+    }
+  }, [studioBackground]);
 
   // Adjust garment scaling dynamically on size changes
   useEffect(() => {
@@ -445,7 +446,7 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
         borderRadius: '12px',
         overflow: 'hidden',
         border: '1px solid var(--border-medium)',
-        background: '#0a0e17',
+        background: studioBackground || '#720e2c',
       }}
     >
       {/* Three.js canvas container */}
