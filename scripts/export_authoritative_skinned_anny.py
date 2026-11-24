@@ -54,17 +54,18 @@ def build_skinned_glb(model, gender_label="male"):
     #   Y_gltf = Z_blender - z_min (feet at Y=0)
     #   Z_gltf = -Y_blender
     z_min = float(v_rest_raw[:, 2].min())
+    z_center = float(((-v_rest_raw[:, 1]).min() + (-v_rest_raw[:, 1]).max()) / 2.0)
     v_rest_yup = np.zeros_like(v_rest_raw, dtype=np.float32)
     v_rest_yup[:, 0] = v_rest_raw[:, 0]
     v_rest_yup[:, 1] = v_rest_raw[:, 2] - z_min
-    v_rest_yup[:, 2] = -v_rest_raw[:, 1]
+    v_rest_yup[:, 2] = -v_rest_raw[:, 1] - z_center
 
     # Coordinate transformation matrix M_coord (4x4)
     # [x', y', z', 1]^T = M_coord * [x, y, z, 1]^T
     M_coord = np.array([
         [1.0,  0.0,  0.0,  0.0],
         [0.0,  0.0,  1.0, -z_min],
-        [0.0, -1.0,  0.0,  0.0],
+        [0.0, -1.0,  0.0, -z_center],
         [0.0,  0.0,  0.0,  1.0]
     ], dtype=np.float32)
 
