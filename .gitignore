@@ -1,7 +1,28 @@
+# ── Frontend ────────────────────────────────────────────
 frontend/node_modules/
 frontend/dist/
 frontend/dist-ssr/
 frontend/.env
 frontend/.vite/
+
+# ── Backend ─────────────────────────────────────────────
+backend/venv/
+backend/fastapi_env/
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/**/*.pyo
+backend/.env
+
+# ── Backend generated files (not in Git) ────────────────
+backend/data/*.json
+backend/uploads/
+
+# ── OS / editor ─────────────────────────────────────────
 .DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ── Logs ────────────────────────────────────────────────
 *.local
+npm-debug.log*
