@@ -183,9 +183,13 @@ def test_commerce_cart_graded_sizes():
             "quantity": 1,
             "brand": "WEARWISE EDIT"
         }
+        payload = {
+            "session_id": "verify-phase9-test-session",
+            "item": item
+        }
         req = urllib.request.Request(
-            f"{COMMERCE_URL}/api/v1/cart/items",
-            data=json.dumps(item).encode("utf-8"),
+            f"{COMMERCE_URL}/api/cart/add",
+            data=json.dumps(payload).encode("utf-8"),
             headers={"Content-Type": "application/json"}
         )
         with urllib.request.urlopen(req) as resp:
