@@ -11,6 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
 from app.routers import products, cart, orders, avatar, wardrobe, saved, assistant, tryon, auth, catalogue
+from app import database as db
 
 # ── App instance ──────────────────────────────────────────────────────────────
 
@@ -77,4 +78,11 @@ def root():
 
 @app.get("/health", tags=["Health"])
 def health():
-    return {"status": "healthy"}
+    db_status = db.ping()
+    is_healthy = db_status.get("ok", False) or db_status.get("engine") == "json_files"
+    return {
+        "status": "healthy" if is_healthy else "degraded",
+        "database": db_status,
+        "app": "WearWise API",
+        "version": "1.0.0",
+    }
