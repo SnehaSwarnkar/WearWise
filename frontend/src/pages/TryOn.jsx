@@ -13,20 +13,18 @@ import {
   getVtonProviders,
 } from "../api/tryon";
 
+const AVAILABLE_SIZES = ["S", "M", "L"];
+
 const SIZE_SCALES = {
-  XS: 0.95,
   S: 0.98,
   M: 1.0,
   L: 1.04,
-  XL: 1.08,
 };
 
 const SIZE_FIT_DATA = {
-  XS: { score: 78, status: "Snug Fit", chestEase: "-1.5 cm", note: "Tight across chest; reduced arm mobility." },
-  S: { score: 88, status: "Tailored Slim", chestEase: "+0.5 cm", note: "Close to body; recommended if you prefer a fitted look." },
-  M: { score: 98, status: "Recommended Regular Fit", chestEase: "+4.5 cm", note: "Optimal dimensional ease across chest and shoulders." },
-  L: { score: 91, status: "Relaxed Fit", chestEase: "+8.0 cm", note: "Slightly dropped shoulders and loose torso drape." },
-  XL: { score: 82, status: "Oversized Fit", chestEase: "+12.0 cm", note: "Generous street-style drape; longer hemline." },
+  S: { score: 76, status: "Fitted Slim", chestEase: "+2.5 cm", note: "Fitted silhouette (88.0 cm garment vs 85.5 cm body chest)." },
+  M: { score: 84, status: "Recommended Regular Fit", chestEase: "+7.5 cm", note: "Deterministic ease: 93.0 cm garment vs 85.5 cm body chest (Honest Fit Score: 83.7)." },
+  L: { score: 78, status: "Relaxed Fit", chestEase: "+13.5 cm", note: "Generous drape with dropped shoulders (99.0 cm garment vs 85.5 cm body chest)." },
 };
 
 function TryOn() {
@@ -258,7 +256,7 @@ function TryOn() {
                     cursor: "pointer",
                   }}
                 >
-                  MASCULINE BASELINE
+                  BASELINE MANNEQUIN (MALE · 162.6 CM)
                 </button>
                 <button
                   type="button"
@@ -274,7 +272,7 @@ function TryOn() {
                     cursor: "pointer",
                   }}
                 >
-                  FEMININE BASELINE
+                  BASELINE MANNEQUIN (FEMALE · 162.6 CM)
                 </button>
               </div>
 
@@ -368,7 +366,7 @@ function TryOn() {
                     <span style={{ fontSize: "10px", color: "#888" }}>ISO 8559-2</span>
                   </div>
                   <div className="size-selector-row">
-                    {["XS", "S", "M", "L", "XL"].map((size) => (
+                    {AVAILABLE_SIZES.map((size) => (
                       <button
                         key={size}
                         type="button"
