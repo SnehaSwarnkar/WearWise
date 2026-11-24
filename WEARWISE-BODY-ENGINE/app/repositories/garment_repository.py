@@ -67,6 +67,23 @@ class GarmentRepository:
         )
         return self.db.scalars(stmt).unique().first()
 
+    def list_garments(self, brand_id: Optional[uuid.UUID] = None, limit: int = 50) -> List[GarmentProfileModel]:
+        """Lists active garments with latest revisions and size tables."""
+        stmt = (
+            select(GarmentProfileModel)
+            .where(GarmentProfileModel.is_deleted == False)  # noqa: E712
+            .options(
+                joinedload(GarmentProfileModel.revisions)
+                .joinedload(GarmentRevisionModel.sizes)
+                .joinedload(GarmentSizeModel.measurements)
+            )
+            .order_by(GarmentProfileModel.created_at.desc())
+            .limit(limit)
+        )
+        if brand_id:
+            stmt = stmt.where(GarmentProfileModel.brand_id == brand_id)
+        return list(self.db.scalars(stmt).unique().all())
+
     def get_garment_by_sku(self, brand_id: uuid.UUID, sku: str) -> Optional[GarmentProfileModel]:
         """Retrieves garment by brand_id and unique SKU."""
         stmt = (

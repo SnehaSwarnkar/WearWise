@@ -19,6 +19,22 @@ from app.api.schemas.fit import (
 router = APIRouter(prefix="/fit", tags=["Honest Fit Recommendation"])
 
 
+@router.get("/recommendations")
+def list_recommendations(
+    profile_id: uuid.UUID,
+    limit: int = 10,
+    user_id: uuid.UUID = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """Lists recent fit recommendations for the profile."""
+    srv = FitEvaluationService(db)
+    return srv.list_recommendations_for_profile(
+        profile_id=profile_id,
+        requesting_user_id=user_id,
+        limit=limit,
+    )
+
+
 @router.post("/recommend", response_model=FitRecommendationResponse)
 def evaluate_fit(
     payload: FitRecommendationRequest,

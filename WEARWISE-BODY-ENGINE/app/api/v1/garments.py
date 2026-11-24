@@ -21,6 +21,42 @@ from app.api.schemas.garment import (
 router = APIRouter(prefix="/garments", tags=["Merchant Garment Catalog"])
 
 
+@router.get("", response_model=List[GarmentResponse])
+def list_garments(
+    db: Session = Depends(get_db),
+):
+    """Lists available garments in the catalog."""
+    srv = GarmentService(db)
+    garments = srv.list_garments()
+    results = []
+    for g in garments:
+        latest_rev = srv.repo.get_latest_revision(g.id)
+        sizes_resp = []
+        if latest_rev:
+            for s in latest_rev.sizes:
+                sizes_resp.append(
+                    GarmentSizeResponse(
+                        size_label=s.size_label,
+                        sort_order=s.sort_order,
+                        measurements={m.dimension_code: float(m.value_cm) for m in s.measurements},
+                    )
+                )
+        results.append(
+            GarmentResponse(
+                garment_id=str(g.id),
+                brand_id=str(g.brand_id),
+                sku=g.sku,
+                title=g.title,
+                category=g.category,
+                current_revision=g.current_revision,
+                fabric_properties=latest_rev.fabric_properties_json if latest_rev else {},
+                sizes=sizes_resp,
+                created_at=g.created_at.isoformat(),
+            )
+        )
+    return results
+
+
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=GarmentResponse)
 def create_garment(
     payload: CreateGarmentRequest,

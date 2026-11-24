@@ -242,3 +242,33 @@ class FitEvaluationService:
             "rulebook_version": rec.rulebook_version,
             "created_at": rec.created_at.isoformat(),
         }
+
+    def list_recommendations_for_profile(
+        self,
+        profile_id: uuid.UUID,
+        requesting_user_id: uuid.UUID,
+        limit: int = 10,
+    ) -> List[Dict[str, Any]]:
+        """Lists recent recommendations for a profile owned by requesting user."""
+        profile = self.profile_repo.get_profile(profile_id)
+        if not profile:
+            raise NotFoundError(f"Profile {profile_id} was not found.")
+        if profile.user_id != requesting_user_id:
+            raise ForbiddenError("Access denied: You do not own this profile.", code="OWNERSHIP_VIOLATION")
+
+        recs = self.fit_repo.get_recent_recommendations_for_profile(profile_id, limit=limit)
+        results = []
+        for r in recs:
+            exp = r.explanations_json or {}
+            results.append({
+                "recommendation_id": str(r.id),
+                "garment_id": str(r.garment_revision.garment_id),
+                "recommended_size": r.recommended_size,
+                "composite_fit_score": float(r.composite_score),
+                "status": exp.get("status", "recommended"),
+                "alternative_size": exp.get("alternative_size"),
+                "rulebook_version": r.rulebook_version,
+                "evaluated_at": r.created_at.isoformat(),
+                "created_at": r.created_at.isoformat(),
+            })
+        return results

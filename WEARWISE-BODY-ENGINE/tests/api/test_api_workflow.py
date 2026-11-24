@@ -428,3 +428,69 @@ def test_anatomical_bounds_validation(client):
     err_json = err_res.json()
     assert "error" in err_json
     assert err_json["error"]["status_code"] == 422
+
+
+def test_list_read_routes_for_frontend(client):
+    """
+    Verifies the frontend read routes:
+      - GET /api/v1/profiles
+      - GET /api/v1/garments
+      - GET /api/v1/fit/recommendations?profile_id=...
+    """
+    user_id = uuid.uuid4()
+    brand_id = uuid.uuid4()
+    user_token = create_token(user_id, principal_type="user")
+    brand_token = create_token(brand_id, principal_type="brand")
+    user_headers = {"Authorization": f"Bearer {user_token}"}
+    brand_headers = {"Authorization": f"Bearer {brand_token}"}
+
+    # 1. Initially no profiles
+    p_list_0 = client.get("/api/v1/profiles", headers=user_headers)
+    assert p_list_0.status_code == 200
+    assert p_list_0.json() == []
+
+    # 2. Create Profile
+    p_res = client.post(
+        "/api/v1/profiles",
+        headers=user_headers,
+        json={"presentation_gender": "neutral", "stature_cm": 172.0},
+    )
+    assert p_res.status_code == 201
+    profile_id = p_res.json()["profile_id"]
+
+    # 3. List profiles contains the created profile
+    p_list_1 = client.get("/api/v1/profiles", headers=user_headers)
+    assert p_list_1.status_code == 200
+    p_items = p_list_1.json()
+    assert len(p_items) == 1
+    assert p_items[0]["profile_id"] == profile_id
+
+    # 4. Register a garment and list garments
+    g_res = client.post(
+        "/api/v1/garments",
+        headers=brand_headers,
+        json={
+            "sku": "TSH-LIST-01",
+            "title": "List Test T-Shirt",
+            "category": "t_shirt",
+            "fabric_properties": {
+                "fibre_composition": {"cotton": 1.0},
+                "mechanical_stretch_pct": 0.05,
+                "stretch_recovery_pct": 0.95,
+                "stretch_direction": "two_way",
+            },
+        },
+    )
+    assert g_res.status_code == 201
+    garment_id = g_res.json()["garment_id"]
+
+    g_list = client.get("/api/v1/garments", headers=user_headers)
+    assert g_list.status_code == 200
+    g_items = g_list.json()
+    assert any(g["garment_id"] == garment_id for g in g_items)
+
+    # 5. List recommendations for profile (initially empty)
+    rec_list_0 = client.get(f"/api/v1/fit/recommendations?profile_id={profile_id}", headers=user_headers)
+    assert rec_list_0.status_code == 200
+    assert rec_list_0.json() == []
+

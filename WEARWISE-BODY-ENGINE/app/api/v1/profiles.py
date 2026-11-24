@@ -24,6 +24,63 @@ from app.api.schemas.profiles import (
 router = APIRouter(tags=["Profiles & Measurements"])
 
 
+@router.get("/profiles", response_model=List[ProfileResponse])
+def list_profiles(
+    user_id: uuid.UUID = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """Lists all body profiles owned by the authenticated user."""
+    srv = ProfileService(db)
+    avatar_repo = AvatarRepository(db)
+    profiles = srv.list_profiles(user_id)
+    results = []
+    for p in profiles:
+        latest_rev = srv.repo.get_latest_revision(p.id)
+        active_m = {
+            m.measurement_code: {
+                "value_cm": float(m.value_cm),
+                "acquisition_method": m.acquisition_method,
+                "validation_state": m.validation_state,
+                "lifecycle_status": m.lifecycle_status,
+                "assessment_state": m.assessment_state,
+                "tolerance_cm": float(m.tolerance_cm),
+            }
+            for m in (latest_rev.measurements if latest_rev else [])
+            if m.lifecycle_status == "active"
+        }
+        controls = {}
+        if latest_rev and latest_rev.shape_controls:
+            sc = latest_rev.shape_controls
+            controls = {
+                "shoulder_width": float(sc.shoulder_width),
+                "chest_fullness": float(sc.chest_fullness),
+                "belly_fullness": float(sc.belly_fullness),
+                "waist_definition": float(sc.waist_definition),
+                "arm_fullness": float(sc.arm_fullness),
+                "hip_fullness": float(sc.hip_fullness),
+                "thigh_fullness": float(sc.thigh_fullness),
+                "calf_fullness": float(sc.calf_fullness),
+            }
+        latest_asset = avatar_repo.get_latest_avatar_asset_for_profile(p.id)
+        asset_url = f"/api/v1/avatar/assets/{latest_asset.id}.glb" if latest_asset else None
+        results.append(
+            ProfileResponse(
+                profile_id=str(p.id),
+                user_id=str(p.user_id),
+                current_revision=p.current_revision,
+                presentation_gender=p.presentation_gender,
+                stature_cm=float(p.stature_cm),
+                reported_weight_kg=float(p.reported_weight_kg) if p.reported_weight_kg is not None else None,
+                active_measurements=active_m,
+                shape_controls=controls,
+                latest_asset_url=asset_url,
+                created_at=p.created_at.isoformat(),
+                updated_at=p.updated_at.isoformat(),
+            )
+        )
+    return results
+
+
 @router.post("/profiles", status_code=status.HTTP_201_CREATED, response_model=ProfileResponse)
 def create_profile(
     payload: CreateProfileRequest,

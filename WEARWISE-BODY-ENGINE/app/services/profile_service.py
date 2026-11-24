@@ -80,6 +80,10 @@ class ProfileService:
         self._verify_profile_owner(profile, requesting_user_id)
         return profile
 
+    def list_profiles(self, requesting_user_id: uuid.UUID) -> List[BodyProfileModel]:
+        """Lists all profiles owned by requesting user."""
+        return self.repo.get_profiles_by_user(requesting_user_id)
+
     def update_profile_metadata(
         self,
         profile_id: uuid.UUID,

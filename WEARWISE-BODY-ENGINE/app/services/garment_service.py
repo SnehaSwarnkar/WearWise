@@ -60,6 +60,10 @@ class GarmentService:
             raise NotFoundError(f"Garment {garment_id} not found.")
         return garment
 
+    def list_garments(self, brand_id: Optional[uuid.UUID] = None, limit: int = 50) -> List[GarmentProfileModel]:
+        """Lists available garments in the catalog."""
+        return self.repo.list_garments(brand_id=brand_id, limit=limit)
+
     def add_size_specification(
         self,
         garment_id: uuid.UUID,

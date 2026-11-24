@@ -51,3 +51,19 @@ class FitRepository:
             )
         )
         return self.db.scalars(stmt).unique().first()
+
+    def get_recent_recommendations_for_profile(self, profile_id: uuid.UUID, limit: int = 10):
+        """Lists recent fit recommendations for a given profile."""
+        from app.db.models import ProfileRevisionModel
+        stmt = (
+            select(FitRecommendationModel)
+            .join(ProfileRevisionModel, ProfileRevisionModel.id == FitRecommendationModel.profile_revision_id)
+            .where(ProfileRevisionModel.profile_id == profile_id)
+            .options(
+                joinedload(FitRecommendationModel.profile_revision),
+                joinedload(FitRecommendationModel.garment_revision),
+            )
+            .order_by(FitRecommendationModel.created_at.desc())
+            .limit(limit)
+        )
+        return list(self.db.scalars(stmt).unique().all())

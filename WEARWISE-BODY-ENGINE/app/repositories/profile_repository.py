@@ -108,6 +108,21 @@ class ProfileRepository:
         )
         return self.db.scalars(stmt).unique().first()
 
+    def get_profiles_by_user(self, user_id: uuid.UUID) -> List[BodyProfileModel]:
+        """Retrieves all active profiles for a given user."""
+        stmt = (
+            select(BodyProfileModel)
+            .where(and_(BodyProfileModel.user_id == user_id, BodyProfileModel.is_deleted == False))  # noqa: E712
+            .options(
+                joinedload(BodyProfileModel.revisions)
+                .joinedload(ProfileRevisionModel.measurements),
+                joinedload(BodyProfileModel.revisions)
+                .joinedload(ProfileRevisionModel.shape_controls),
+            )
+            .order_by(BodyProfileModel.created_at.desc())
+        )
+        return list(self.db.scalars(stmt).unique().all())
+
     def update_profile_metadata(
         self,
         profile_id: uuid.UUID,
