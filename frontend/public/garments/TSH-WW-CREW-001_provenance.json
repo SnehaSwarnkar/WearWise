@@ -1,39 +1,95 @@
 {
   "sku": "TSH-WW-CREW-001",
-  "title": "Cherry Baby Tee / Signature Boxy Crew Tee",
-  "sample_id": "WW-3D-TSHIRT-TSH-WW-CREW-001",
-  "file_format": "glTF 2.0 Binary (.glb)",
-  "mesh_metrics": {
-    "vertex_count": 864,
-    "triangle_count": 1656,
-    "is_watertight": false,
-    "bounds_meters": [
-      [
-        -0.36100900173187256,
-        -0.2191847860813141,
-        0.019999999552965164
-      ],
-      [
-        0.36100900173187256,
-        0.1291847825050354,
-        0.5400000214576721
-      ]
-    ]
+  "title": "Signature Boxy Crew Tee (Phase 9 Realistic Mesh)",
+  "sample_id": "WW-3D-TSHIRT-TSH-WW-CREW-001-REV2",
+  "file_format": "glTF 2.0 Binary (.glb) with embedded PBR Texture Atlas",
+  "fabric": {
+    "name": "Heavyweight Cotton Waffle Knit",
+    "composition": "100% Combed Organic Cotton",
+    "gsm": 240.0,
+    "thickness_mm": 1.15,
+    "stretch_percentage": {
+      "warp": 14.5,
+      "weft": 28.0
+    },
+    "elastic_recovery_percent": 88.0,
+    "bending_stiffness_micro_joules": 18.5,
+    "shear_stiffness_n_m": 22.0,
+    "poisson_ratio": 0.38
   },
-  "dimensional_specification": {
-    "size": "M",
-    "chest_circumference_cm": 104.0,
-    "shoulder_breadth_cm": 46.5,
-    "back_length_cm": 68.0,
-    "ease_over_masculine_baseline_cm": {
-      "chest": "+4.5 cm",
-      "shoulder": "+2.0 cm"
+  "construction_panels": [
+    {
+      "panel": "Front Torso Panel",
+      "features": "Drop-shoulder armhole cut, straight hem line"
+    },
+    {
+      "panel": "Back Torso Panel",
+      "features": "Reinforced upper yoke seam"
+    },
+    {
+      "panel": "Left Dropped Sleeve",
+      "features": "Drop shoulder sleeve head, white rib cuff"
+    },
+    {
+      "panel": "Right Dropped Sleeve",
+      "features": "Drop shoulder sleeve head, white rib cuff"
+    },
+    {
+      "panel": "Ribbed Crewneck Collar",
+      "features": "White 1x1 rib knit band with 'CLASSY' typography"
+    },
+    {
+      "panel": "Left Chest Patch Pocket",
+      "features": "Single-needle topstitched white pocket with graphic"
+    },
+    {
+      "panel": "Hem Band",
+      "features": "Clean 28mm white hem binding"
+    }
+  ],
+  "size_grading_cm": {
+    "S": {
+      "half_chest_width_cm": 50.0,
+      "back_length_cm": 64.0,
+      "shoulder_breadth_cm": 47.0,
+      "sleeve_length_cm": 15.0,
+      "collar_circumference_cm": 42.0,
+      "dimensional_ease_chest_cm": "+2.0 cm"
+    },
+    "M": {
+      "half_chest_width_cm": 54.0,
+      "back_length_cm": 67.0,
+      "shoulder_breadth_cm": 50.0,
+      "sleeve_length_cm": 17.0,
+      "collar_circumference_cm": 44.0,
+      "dimensional_ease_chest_cm": "+4.5 cm (Recommended)"
+    },
+    "L": {
+      "half_chest_width_cm": 58.0,
+      "back_length_cm": 70.0,
+      "shoulder_breadth_cm": 53.0,
+      "sleeve_length_cm": 19.0,
+      "collar_circumference_cm": 46.0,
+      "dimensional_ease_chest_cm": "+8.0 cm"
     }
   },
   "standards": [
     "ISO 8559-2: Garment construction and sizing designation",
-    "BS 4952: Finished dimensions under tabletop relaxation"
+    "BS 4952: Finished dimensions under tabletop relaxation",
+    "ASTM D1777: Standard test method for thickness of textile materials"
   ],
-  "disclaimer": "WearWise 3D reference garment geometry is intended for interactive fit visualization and sizing assistance. Does not represent dynamic finite-element cloth drape simulation.",
-  "created_at": "2026-11-24T17:15:00Z"
+  "physics_simulation": {
+    "solver": "Extended Position-Based Dynamics (XPBD)",
+    "stretch_compliance": 0.00015,
+    "bending_compliance": 0.012,
+    "collision_margins": {
+      "torso": 0.012,
+      "arm": 0.01
+    },
+    "kinematic_anchors": [
+      "collar_ring",
+      "torso_spine"
+    ]
+  },
+  "created_at": "2026-11-24T18:05:00Z"
 }
