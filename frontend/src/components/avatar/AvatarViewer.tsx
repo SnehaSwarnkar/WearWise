@@ -256,9 +256,10 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
 
             sceneRef.current.add(model);
 
-            // Adjust camera target to torso center
-            if (controlsRef.current) {
+            // Adjust camera target and framing to upright torso center
+            if (controlsRef.current && cameraRef.current) {
               controlsRef.current.target.set(0, size.y * 0.52, 0);
+              cameraRef.current.position.set(0, size.y * 0.58, 3.2);
               controlsRef.current.update();
             }
 
@@ -318,7 +319,7 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
       const size = new THREE.Vector3();
       bbox.getSize(size);
 
-      cameraRef.current.position.set(0, size.y * 0.6, 3.2);
+      cameraRef.current.position.set(0, size.y * 0.58, 3.2);
       controlsRef.current.target.set(0, size.y * 0.52, 0);
       controlsRef.current.update();
     }

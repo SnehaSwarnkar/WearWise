@@ -195,6 +195,11 @@ def test_in_memory_glb_export(anny_engine: AnnyAdapter):
     assert loaded_mesh.vertices.shape[0] == 13718
     assert loaded_mesh.faces.shape[0] == 27420
 
+    # Verify Y-up orientation in exported GLB: stature extent must be along Y
+    extents = loaded_mesh.extents
+    assert extents[1] > extents[0], f"Y extent ({extents[1]:.3f}) should exceed X extent ({extents[0]:.3f})"
+    assert extents[1] > extents[2], f"Y extent ({extents[1]:.3f}) should exceed Z extent ({extents[2]:.3f})"
+
 
 def test_landmark_provider(anny_engine: AnnyAdapter):
     """Verify LandmarkProvider queries landmark coordinates in meters and region vertex masks."""

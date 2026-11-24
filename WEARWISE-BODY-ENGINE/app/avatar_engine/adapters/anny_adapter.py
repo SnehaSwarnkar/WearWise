@@ -595,15 +595,31 @@ class AnnyAdapter:
     def export_glb(self, mesh_data: MeshData) -> bytes:
         """
         Serializes MeshData to web-optimized glTF 2.0 binary container in memory.
-        Returns raw bytes directly; does not manage storage paths.
+        Applies canonical Z-up to Y-up axis conversion (R_x(-90°)) so the exported
+        GLB model conforms strictly to glTF 2.0 / Three.js Y-up, +Z-forward conventions.
+        Returns raw bytes directly; does not mutate source mesh_data.
         """
         try:
+            # Canonical glTF 2.0 conversion matrix: R_x(-90°)
+            # x_gltf = x_anny
+            # y_gltf = z_anny (Head is +Y)
+            # z_gltf = -y_anny (Front is +Z, facing viewer)
+            # Determinant = +1.0 (pure rotation, preserves winding order and normals)
+            t_rot_x_neg90 = np.array([
+                [1.0,  0.0,  0.0, 0.0],
+                [0.0,  0.0,  1.0, 0.0],
+                [0.0, -1.0,  0.0, 0.0],
+                [0.0,  0.0,  0.0, 1.0],
+            ], dtype=np.float64)
+
             tm = trimesh.Trimesh(
-                vertices=mesh_data.vertices,
-                faces=mesh_data.faces,
-                vertex_normals=mesh_data.normals,
+                vertices=mesh_data.vertices.copy(),
+                faces=mesh_data.faces.copy(),
+                vertex_normals=mesh_data.normals.copy() if mesh_data.normals is not None else None,
                 process=False,
             )
+            tm.apply_transform(t_rot_x_neg90)
+
             glb_bytes = tm.export(file_type="glb")
             if not isinstance(glb_bytes, bytes):
                 raise GLBExportError("Trimesh glb export did not return bytes.")

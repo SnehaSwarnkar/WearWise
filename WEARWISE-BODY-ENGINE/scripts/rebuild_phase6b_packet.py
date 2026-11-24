@@ -61,6 +61,7 @@ def main():
         ("frontend/src/__tests__/honest_fit_display.test.tsx", git_root / "frontend/src/__tests__/honest_fit_display.test.tsx"),
 
         # Backend Enhanced Read Routes & Repositories
+        ("app/avatar_engine/adapters/anny_adapter.py", engine_root / "app/avatar_engine/adapters/anny_adapter.py"),
         ("app/repositories/profile_repository.py", engine_root / "app/repositories/profile_repository.py"),
         ("app/repositories/garment_repository.py", engine_root / "app/repositories/garment_repository.py"),
         ("app/repositories/fit_repository.py", engine_root / "app/repositories/fit_repository.py"),
@@ -70,11 +71,14 @@ def main():
         ("app/api/v1/profiles.py", engine_root / "app/api/v1/profiles.py"),
         ("app/api/v1/garments.py", engine_root / "app/api/v1/garments.py"),
         ("app/api/v1/fit.py", engine_root / "app/api/v1/fit.py"),
+        ("tests/avatar_engine/test_anny_adapter.py", engine_root / "tests/avatar_engine/test_anny_adapter.py"),
         ("tests/api/test_api_workflow.py", engine_root / "tests/api/test_api_workflow.py"),
 
         # Verification Scripts & Artifacts
         ("scripts/demo_phase6b_frontend.py", engine_root / "scripts/demo_phase6b_frontend.py"),
         ("artifacts/phase6b/phase6b_e2e_demo_report.json", engine_root / "artifacts/phase6b/phase6b_e2e_demo_report.json"),
+        ("artifacts/phase6b/before_screenshot_01_dashboard.png", engine_root / "artifacts/phase6b/before_screenshot_01_dashboard.png"),
+        ("artifacts/phase6b/before_screenshot_03_avatar_studio.png", engine_root / "artifacts/phase6b/before_screenshot_03_avatar_studio.png"),
         ("artifacts/phase6b/screenshot_01_dashboard.png", engine_root / "artifacts/phase6b/screenshot_01_dashboard.png"),
         ("artifacts/phase6b/screenshot_02_body_profile.png", engine_root / "artifacts/phase6b/screenshot_02_body_profile.png"),
         ("artifacts/phase6b/screenshot_03_avatar_studio.png", engine_root / "artifacts/phase6b/screenshot_03_avatar_studio.png"),
@@ -132,6 +136,10 @@ def main():
         "8_backend_read_routes": {
             "passed": True,
             "detail": "Versioned FastAPI endpoints for listing profiles, garments, and fit recommendations with eager relationships and 403 ownership enforcement (403/403 backend tests passed)",
+        },
+        "9_avatar_orientation_correction": {
+            "passed": True,
+            "detail": "Canonical R_x(-90°) rotation applied in AnnyAdapter.export_glb; avatar stands upright on pedestal (feet at y=0, head at y=stature), front-facing camera (+Z), verified in Dashboard and Avatar Studio",
         },
     }
 

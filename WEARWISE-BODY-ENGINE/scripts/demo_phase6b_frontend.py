@@ -114,7 +114,7 @@ def run_frontend_browser_demonstration():
         # Click Generate Avatar again to test parametric regeneration
         print("  -> Regenerating 3D Avatar with morph parameters...")
         page.click("button:has-text('Generate Avatar')")
-        time.sleep(6.0)
+        time.sleep(8.0)
 
         shot_03 = artifacts_dir / "screenshot_03_avatar_studio.png"
         page.screenshot(path=str(shot_03))
@@ -193,7 +193,7 @@ def run_frontend_browser_demonstration():
         print("\n[Step 5/5] Navigating to Executive Dashboard (/)...")
         t0 = time.perf_counter()
         page.goto(f"{FRONTEND_URL}/", wait_until="networkidle")
-        time.sleep(2.0)  # Allow 3D canvas and tables to populate
+        time.sleep(4.0)  # Allow 3D canvas and tables to populate
 
         shot_01 = artifacts_dir / "screenshot_01_dashboard.png"
         page.screenshot(path=str(shot_01), full_page=True)
