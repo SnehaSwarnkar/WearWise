@@ -196,7 +196,7 @@ function TryOn() {
           <span>
             {activeMode === "mode_a"
               ? "MODE A · 3D AVATAR ENGINE"
-              : "MODE B · AI MULTI-VIEW PHOTO VTON"}
+              : "MODE B · DETERMINISTIC MULTI-VIEW PROTOTYPE (PRE-INFERENCE BASELINE)"}
           </span>
         </div>
 
