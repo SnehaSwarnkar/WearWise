@@ -27,6 +27,7 @@ from sqlalchemy.orm import sessionmaker
 from app.db.base import Base
 from app.db.session import get_db, init_db, set_sqlite_pragma
 from app.api.app import app
+from app.api.auth import create_token
 
 
 def run_e2e_demonstration():
@@ -73,11 +74,13 @@ def run_e2e_demonstration():
         (artifacts_dir / "openapi.json").write_text(json.dumps(openapi_res.json(), indent=2), encoding="utf-8")
         print("[OK] Exported OpenAPI specification to artifacts/phase6a/openapi.json")
 
-    # Principals
-    demo_user_id = str(uuid.uuid4())
-    demo_brand_id = str(uuid.uuid4())
-    user_headers = {"X-User-Id": demo_user_id}
-    brand_headers = {"X-Brand-Id": demo_brand_id}
+    # Principals with signed cryptographic JWT Bearer credentials
+    demo_user_id = uuid.uuid4()
+    demo_brand_id = uuid.uuid4()
+    user_token = create_token(demo_user_id, principal_type="user")
+    brand_token = create_token(demo_brand_id, principal_type="brand")
+    user_headers = {"Authorization": f"Bearer {user_token}"}
+    brand_headers = {"Authorization": f"Bearer {brand_token}"}
 
     timeline = {}
 

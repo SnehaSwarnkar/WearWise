@@ -4,13 +4,19 @@ Initializes FastAPI, registers OpenAPI metadata, standard error handlers, CORS, 
 """
 
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
+from fastapi.openapi.utils import get_openapi
 
+from app.config import CORS_ALLOWED_ORIGINS, IS_PRODUCTION
 from app.api.v1 import v1_router
 from app.services.errors import ServiceError
-from app.api.errors import service_error_handler, validation_error_handler
+from app.api.errors import (
+    service_error_handler,
+    validation_error_handler,
+    http_exception_handler,
+)
 from app.db.session import init_db
 
 
@@ -33,10 +39,11 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # 1. CORS Middleware
+    # 1. Environment-Configured CORS Middleware (No wildcard in production)
+    origins = CORS_ALLOWED_ORIGINS if CORS_ALLOWED_ORIGINS else (["*"] if not IS_PRODUCTION else [])
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -45,8 +52,35 @@ def create_app() -> FastAPI:
     # 2. Register Canonical Error Envelope Handlers
     app.add_exception_handler(ServiceError, service_error_handler)
     app.add_exception_handler(RequestValidationError, validation_error_handler)
+    app.add_exception_handler(HTTPException, http_exception_handler)
 
-    # 3. Healthcheck Endpoint
+    # 3. Custom OpenAPI schema to include Bearer security scheme definition
+    def custom_openapi():
+        if app.openapi_schema:
+            return app.openapi_schema
+        openapi_schema = get_openapi(
+            title=app.title,
+            version=app.version,
+            description=app.description,
+            routes=app.routes,
+        )
+        openapi_schema["components"] = openapi_schema.get("components", {})
+        openapi_schema["components"]["securitySchemes"] = {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Enter your signed JWT Bearer token (sub=UUID, principal_type='user'|'brand').",
+            }
+        }
+        # Apply BearerAuth security globally to secure routes
+        openapi_schema["security"] = [{"BearerAuth": []}]
+        app.openapi_schema = openapi_schema
+        return app.openapi_schema
+
+    app.openapi = custom_openapi
+
+    # 4. Healthcheck Endpoint
     @app.get("/health", tags=["System"])
     @app.get("/api/v1/health", tags=["System"])
     def health_check():
@@ -57,7 +91,7 @@ def create_app() -> FastAPI:
             "storage_mode": "content_addressable_local",
         }
 
-    # 4. Include Versioned v1 Router
+    # 5. Include Versioned v1 Router
     app.include_router(v1_router)
 
     return app

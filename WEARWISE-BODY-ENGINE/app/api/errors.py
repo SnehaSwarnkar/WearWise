@@ -6,7 +6,7 @@ Formats all errors conforming strictly to API_CONTRACTS.md Section 2 Standard Er
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 
-from fastapi import Request, status
+from fastapi import Request, status, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel
@@ -36,6 +36,34 @@ def make_error_envelope(
             "details": details or [],
         }
     }
+
+
+async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    """Handles standard HTTPExceptions, preserving canonical error envelope."""
+    if isinstance(exc.detail, dict):
+        code = exc.detail.get("code", "HTTP_ERROR")
+        message = exc.detail.get("message", "An HTTP error occurred.")
+        details = exc.detail.get("details", [])
+    else:
+        status_to_code = {
+            status.HTTP_401_UNAUTHORIZED: "UNAUTHORIZED",
+            status.HTTP_403_FORBIDDEN: "FORBIDDEN",
+            status.HTTP_404_NOT_FOUND: "NOT_FOUND",
+            status.HTTP_409_CONFLICT: "CONFLICT",
+            status.HTTP_422_UNPROCESSABLE_ENTITY: "UNPROCESSABLE_ENTITY",
+        }
+        code = status_to_code.get(exc.status_code, f"HTTP_{exc.status_code}")
+        message = str(exc.detail) if exc.detail else "An HTTP error occurred."
+        details = []
+
+    content = make_error_envelope(
+        code=code,
+        message=message,
+        status_code=exc.status_code,
+        details=details,
+    )
+    headers = exc.headers or {}
+    return JSONResponse(status_code=exc.status_code, content=content, headers=headers)
 
 
 async def service_error_handler(request: Request, exc: ServiceError) -> JSONResponse:

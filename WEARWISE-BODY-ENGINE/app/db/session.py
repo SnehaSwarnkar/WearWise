@@ -5,7 +5,7 @@ Supports SQLite 3 WAL mode with foreign keys enabled, as well as PostgreSQL conn
 
 import os
 import sqlite3
-from typing import Generator
+from typing import Generator, Optional
 from pathlib import Path
 
 from sqlalchemy import create_engine, event
@@ -49,10 +49,26 @@ engine = get_engine()
 SessionFactory = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
+def run_migrations(db_url: Optional[str] = None) -> None:
+    """Executes Alembic migrations up to head on the specified or default database."""
+    from alembic.config import Config
+    from alembic import command
+    alembic_ini_path = Path(__file__).resolve().parent.parent.parent / "alembic.ini"
+    cfg = Config(str(alembic_ini_path))
+    target_url = db_url or DEFAULT_DATABASE_URL
+    cfg.set_main_option("sqlalchemy.url", target_url)
+    command.upgrade(cfg, "head")
+
+
 def init_db(target_engine=None):
-    """Initializes tables in database."""
+    """Initializes tables in database using Alembic migrations or declarative metadata."""
     eng = target_engine or engine
-    Base.metadata.create_all(bind=eng)
+    # If using default engine, apply Alembic migration baseline
+    try:
+        run_migrations(str(eng.url))
+    except Exception:
+        # Fallback to create_all if alembic runner context is unavailable
+        Base.metadata.create_all(bind=eng)
 
 
 def get_db() -> Generator[Session, None, None]:

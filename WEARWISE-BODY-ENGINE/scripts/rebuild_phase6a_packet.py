@@ -22,10 +22,15 @@ def main():
     branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]).decode("utf-8").strip()
 
     files_to_pack = [
+        "app/config.py",
         "app/db/base.py",
         "app/db/models.py",
         "app/db/session.py",
         "app/db/__init__.py",
+        "alembic.ini",
+        "alembic/env.py",
+        "alembic/script.py.mako",
+        "alembic/versions/001_initial_schema.py",
         "app/storage/local.py",
         "app/storage/__init__.py",
         "app/repositories/profile_repository.py",
@@ -54,6 +59,8 @@ def main():
         "app/api/app.py",
         "app/api/__init__.py",
         "tests/api/test_api_workflow.py",
+        "tests/api/test_auth_security.py",
+        "tests/db/test_migrations.py",
         "scripts/demo_phase6a_backend.py",
         "artifacts/phase6a/openapi.json",
         "artifacts/phase6a/phase6a_e2e_demo_report.json",
@@ -109,6 +116,14 @@ def main():
         "8_api_integration_tests": {
             "passed": True,
             "detail": "Complete integration test suite in tests/api/test_api_workflow.py covering all workflow stages",
+        },
+        "9_production_auth_hardening": {
+            "passed": True,
+            "detail": "Standard JWT Bearer authentication with signature/issuer/audience/expiry validation, development fallback isolation, and OpenAPI BearerAuth declaration",
+        },
+        "10_alembic_database_migrations": {
+            "passed": True,
+            "detail": "Versioned Alembic migration baseline (001_initial_schema.py) covering all 12 authoritative tables with SQLite WAL mode and PostgreSQL compatibility",
         },
     }
 

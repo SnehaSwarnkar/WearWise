@@ -1,6 +1,6 @@
 {
   "milestone": "Phase 6A Working Backend Vertical Slice",
-  "timestamp": "2026-11-23T18:25:39Z",
+  "timestamp": "2026-11-24T04:38:13Z",
   "architecture": {
     "pattern": "Modular Monolith",
     "framework": "FastAPI",
@@ -11,8 +11,8 @@
   },
   "workflow_execution": {
     "profile": {
-      "profile_id": "0de0ef8c-96d4-4f8d-a3c1-41914255d03f",
-      "user_id": "d195945a-ffed-4015-9be4-691e002b274c",
+      "profile_id": "e9d03650-4e9a-4560-b3b5-64839e306058",
+      "user_id": "76f6fa15-37e8-4640-848b-db385c08cb47",
       "current_revision": 1,
       "presentation_gender": "masculine",
       "stature_cm": 178.5,
@@ -38,18 +38,18 @@
         "calf_fullness": 0.5
       },
       "latest_asset_url": null,
-      "created_at": "2026-11-23T18:25:37.781681",
-      "updated_at": "2026-11-23T18:25:37.781681"
+      "created_at": "2026-11-24T04:38:11.004752",
+      "updated_at": "2026-11-24T04:38:11.004752"
     },
     "avatar": {
-      "avatar_id": "48550b4c-8ed5-4222-b5c3-12ab338a8632",
-      "profile_id": "0de0ef8c-96d4-4f8d-a3c1-41914255d03f",
+      "avatar_id": "1ef2c616-9b37-437e-b478-da1d5714930b",
+      "profile_id": "e9d03650-4e9a-4560-b3b5-64839e306058",
       "profile_revision": 1,
-      "asset_url": "/api/v1/avatar/assets/48550b4c-8ed5-4222-b5c3-12ab338a8632.glb",
+      "asset_url": "/api/v1/avatar/assets/1ef2c616-9b37-437e-b478-da1d5714930b.glb",
       "format": "glb",
       "size_bytes": 659316,
       "sha256_checksum": "a89efec33982447c8de7da35b3831a969a1ecd7005318bdfa710d04966264e86",
-      "generation_duration_ms": 52.19,
+      "generation_duration_ms": 65.86,
       "vertex_count": 13718,
       "is_valid_manifold": true,
       "status": "completed",
@@ -154,13 +154,13 @@
       }
     },
     "garment": {
-      "garment_id": "925dbbf7-c390-4c25-bcb0-dbc814e74c06",
+      "garment_id": "d33bbf1c-9a88-4669-a059-6803f0361bd4",
       "sku": "TSH-WW-CREW-001",
       "sizes_count": 4
     },
     "fit_recommendation": {
-      "recommendation_id": "d6a4f40e-e3c5-4a5c-9498-44980255802a",
-      "garment_id": "925dbbf7-c390-4c25-bcb0-dbc814e74c06",
+      "recommendation_id": "0159d408-4616-4eaa-9c94-8a86a0b6c400",
+      "garment_id": "d33bbf1c-9a88-4669-a059-6803f0361bd4",
       "recommended_size": "M",
       "composite_fit_score": 95.3,
       "status": "recommended",
@@ -190,11 +190,11 @@
     }
   },
   "benchmarks": {
-    "step_1_create_profile_ms": 37.01,
-    "step_2_generate_avatar_ms": 1782.13,
-    "step_3_verify_measurements_ms": 9.12,
-    "step_4_stream_glb_ms": 36.84,
-    "step_5_register_garment_ms": 68.46,
-    "step_6_evaluate_fit_ms": 15.29
+    "step_1_create_profile_ms": 44.74,
+    "step_2_generate_avatar_ms": 1998.53,
+    "step_3_verify_measurements_ms": 10.22,
+    "step_4_stream_glb_ms": 53.94,
+    "step_5_register_garment_ms": 73.59,
+    "step_6_evaluate_fit_ms": 16.99
   }
 }

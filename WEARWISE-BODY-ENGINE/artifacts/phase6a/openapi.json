@@ -52,23 +52,12 @@
         "summary": "Create Profile",
         "description": "Creates a new body profile anchor for the authenticated user,\ninitializing revision 1, canonical stature, and shape controls.",
         "operationId": "create_profile_api_v1_profiles_post",
-        "parameters": [
+        "security": [
           {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
           {
             "name": "x-user-id",
             "in": "header",
@@ -128,6 +117,11 @@
         "summary": "Get Profile",
         "description": "Retrieves profile summary and active measurements for authenticated owner.",
         "operationId": "get_profile_api_v1_profiles__profile_id__get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "profile_id",
@@ -137,22 +131,6 @@
               "type": "string",
               "format": "uuid",
               "title": "Profile Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
             }
           },
           {
@@ -202,6 +180,11 @@
         "summary": "Update Profile",
         "description": "Updates non-anthropometric profile metadata.",
         "operationId": "update_profile_api_v1_profiles__profile_id__patch",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "profile_id",
@@ -211,22 +194,6 @@
               "type": "string",
               "format": "uuid",
               "title": "Profile Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
             }
           },
           {
@@ -288,6 +255,11 @@
         "summary": "Get Revisions",
         "description": "Returns revision history for profile.",
         "operationId": "get_revisions_api_v1_profiles__profile_id__revisions_get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "profile_id",
@@ -297,22 +269,6 @@
               "type": "string",
               "format": "uuid",
               "title": "Profile Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
             }
           },
           {
@@ -362,6 +318,11 @@
         "summary": "Record Measurements",
         "description": "Appends a new revision with recorded measurements.\nEnforces optimistic locking on expected_revision.",
         "operationId": "record_measurements_api_v1_profiles__profile_id__measurements_post",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "profile_id",
@@ -371,22 +332,6 @@
               "type": "string",
               "format": "uuid",
               "title": "Profile Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
             }
           },
           {
@@ -444,6 +389,11 @@
         "summary": "Get Measurements",
         "description": "Retrieves active measurements for the profile.",
         "operationId": "get_measurements_api_v1_profiles__profile_id__measurements_get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "profile_id",
@@ -453,22 +403,6 @@
               "type": "string",
               "format": "uuid",
               "title": "Profile Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
             }
           },
           {
@@ -518,6 +452,11 @@
         "summary": "Get Measurement History",
         "description": "Retrieves timeline of measurements across revisions.",
         "operationId": "get_measurement_history_api_v1_profiles__profile_id__measurements_history_get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "profile_id",
@@ -527,22 +466,6 @@
               "type": "string",
               "format": "uuid",
               "title": "Profile Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
             }
           },
           {
@@ -612,6 +535,11 @@
         "summary": "Update Controls",
         "description": "Updates semantic body controls by creating a new revision.",
         "operationId": "update_controls_api_v1_profiles__profile_id__controls_put",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "profile_id",
@@ -621,22 +549,6 @@
               "type": "string",
               "format": "uuid",
               "title": "Profile Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
             }
           },
           {
@@ -696,23 +608,12 @@
         "summary": "Generate Avatar",
         "description": "Generates a 3D avatar mesh from profile revision using NAVER Anny adapter,\nsaves the GLB into content-addressable storage, extracts anthropometry,\nand updates active measurements.",
         "operationId": "generate_avatar_api_v1_avatar_generate_post",
-        "parameters": [
+        "security": [
           {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
           {
             "name": "x-user-id",
             "in": "header",
@@ -772,6 +673,11 @@
         "summary": "Get Avatar Status",
         "description": "Retrieves avatar asset generation status and mesh validation metrics.",
         "operationId": "get_avatar_status_api_v1_avatar__avatar_id__status_get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "avatar_id",
@@ -781,22 +687,6 @@
               "type": "string",
               "format": "uuid",
               "title": "Avatar Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
             }
           },
           {
@@ -848,6 +738,11 @@
         "summary": "Get Avatar Glb",
         "description": "Streams private binary glTF 2.0 payload.\nOwnership is evaluated before checking conditional caching headers.",
         "operationId": "get_avatar_glb_api_v1_avatar_assets__avatar_id__glb_get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "avatar_id",
@@ -866,22 +761,6 @@
             "schema": {
               "type": "string",
               "title": "If-None-Match"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
             }
           },
           {
@@ -931,23 +810,12 @@
         "summary": "Create Garment",
         "description": "Creates a new garment profile and initial revision for the authenticated brand.",
         "operationId": "create_garment_api_v1_garments_post",
-        "parameters": [
+        "security": [
           {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
           {
             "name": "x-brand-id",
             "in": "header",
@@ -1007,6 +875,11 @@
         "summary": "Add Garment Size",
         "description": "Adds or updates a size specification on the active garment revision.",
         "operationId": "add_garment_size_api_v1_garments__garment_id__sizes_post",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "garment_id",
@@ -1016,22 +889,6 @@
               "type": "string",
               "format": "uuid",
               "title": "Garment Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
             }
           },
           {
@@ -1177,23 +1034,12 @@
         "summary": "Evaluate Fit",
         "description": "Evaluates active profile measurements against garment size dimensions\nusing the approved Phase 5A Honest Fit Engine and persists recommendation.",
         "operationId": "evaluate_fit_api_v1_fit_recommend_post",
-        "parameters": [
+        "security": [
           {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
           {
             "name": "x-user-id",
             "in": "header",
@@ -1253,6 +1099,11 @@
         "summary": "Get Recommendation",
         "description": "Retrieves persisted fit recommendation result after verifying ownership.",
         "operationId": "get_recommendation_api_v1_fit_recommendations__recommendation_id__get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "recommendation_id",
@@ -1262,22 +1113,6 @@
               "type": "string",
               "format": "uuid",
               "title": "Recommendation Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
             }
           },
           {
@@ -2057,6 +1892,19 @@
         ],
         "title": "ValidationError"
       }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Enter your signed JWT Bearer token (sub=UUID, principal_type='user'|'brand')."
+      }
     }
-  }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ]
 }

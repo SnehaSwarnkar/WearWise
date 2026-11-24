@@ -15,6 +15,7 @@ from sqlalchemy.orm import sessionmaker
 from app.db.base import Base
 from app.db.session import get_db
 from app.api.app import app
+from app.api.auth import create_token
 from app.storage.local import LocalStorageProvider
 
 
@@ -90,10 +91,12 @@ def test_complete_vertical_workflow(client):
       6. Execute Honest Fit Evaluation
       7. Retrieve Persisted Fit Recommendation
     """
-    user_id = str(uuid.uuid4())
-    brand_id = str(uuid.uuid4())
-    auth_headers = {"X-User-Id": user_id}
-    brand_headers = {"X-Brand-Id": brand_id}
+    user_id = uuid.uuid4()
+    brand_id = uuid.uuid4()
+    user_token = create_token(user_id, principal_type="user")
+    brand_token = create_token(brand_id, principal_type="brand")
+    auth_headers = {"Authorization": f"Bearer {user_token}"}
+    brand_headers = {"Authorization": f"Bearer {brand_token}"}
 
     # 1. Create Profile
     prof_res = client.post(
@@ -284,15 +287,19 @@ def test_explicit_ownership_enforcement(client):
     """
     Verifies that unauthorized users or brands are rejected with 403 Forbidden.
     """
-    user_a = str(uuid.uuid4())
-    user_b = str(uuid.uuid4())
-    brand_a = str(uuid.uuid4())
-    brand_b = str(uuid.uuid4())
+    user_a = uuid.uuid4()
+    user_b = uuid.uuid4()
+    brand_a = uuid.uuid4()
+    brand_b = uuid.uuid4()
+    token_a = create_token(user_a, principal_type="user")
+    token_b = create_token(user_b, principal_type="user")
+    token_brand_a = create_token(brand_a, principal_type="brand")
+    token_brand_b = create_token(brand_b, principal_type="brand")
 
     # User A creates profile
     prof_res = client.post(
         "/api/v1/profiles",
-        headers={"X-User-Id": user_a},
+        headers={"Authorization": f"Bearer {token_a}"},
         json={"presentation_gender": "neutral", "stature_cm": 170.00},
     )
     assert prof_res.status_code == 201
@@ -301,7 +308,7 @@ def test_explicit_ownership_enforcement(client):
     # User B tries to read User A's profile
     forbidden_res = client.get(
         f"/api/v1/profiles/{profile_id}",
-        headers={"X-User-Id": user_b},
+        headers={"Authorization": f"Bearer {token_b}"},
     )
     assert forbidden_res.status_code == 403
     assert forbidden_res.json()["error"]["code"] == "OWNERSHIP_VIOLATION"
@@ -309,7 +316,7 @@ def test_explicit_ownership_enforcement(client):
     # User B tries to generate avatar for User A's profile
     gen_forbid = client.post(
         "/api/v1/avatar/generate",
-        headers={"X-User-Id": user_b},
+        headers={"Authorization": f"Bearer {token_b}"},
         json={"profile_id": profile_id},
     )
     assert gen_forbid.status_code == 403
@@ -317,7 +324,7 @@ def test_explicit_ownership_enforcement(client):
     # Brand A creates garment
     g_res = client.post(
         "/api/v1/garments",
-        headers={"X-Brand-Id": brand_a},
+        headers={"Authorization": f"Bearer {token_brand_a}"},
         json={
             "sku": "TSH-TEST-OWN",
             "title": "Brand A Shirt",
@@ -336,7 +343,7 @@ def test_explicit_ownership_enforcement(client):
     # Brand B tries to modify Brand A's garment sizes
     size_forbid = client.post(
         f"/api/v1/garments/{garment_id}/sizes",
-        headers={"X-Brand-Id": brand_b},
+        headers={"Authorization": f"Bearer {token_brand_b}"},
         json={
             "size_label": "M",
             "measurements": [
@@ -356,8 +363,8 @@ def test_optimistic_locking_concurrency(client):
     """
     Verifies that supplying a stale expected_revision produces 409 Conflict.
     """
-    user_id = str(uuid.uuid4())
-    headers = {"X-User-Id": user_id}
+    user_id = uuid.uuid4()
+    headers = {"Authorization": f"Bearer {create_token(user_id)}"}
 
     prof_res = client.post(
         "/api/v1/profiles",
@@ -408,8 +415,8 @@ def test_anatomical_bounds_validation(client):
     """
     Verifies that out-of-bounds anthropometry produces structured 422 error envelope.
     """
-    user_id = str(uuid.uuid4())
-    headers = {"X-User-Id": user_id}
+    user_id = uuid.uuid4()
+    headers = {"Authorization": f"Bearer {create_token(user_id)}"}
 
     # Stature too small (< 100 cm)
     err_res = client.post(
