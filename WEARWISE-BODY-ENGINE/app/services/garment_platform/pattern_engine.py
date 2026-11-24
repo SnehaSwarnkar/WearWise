@@ -334,11 +334,24 @@ class ParametricPatternBuilder:
         calculates Euler characteristic and dimensional spans, and saves to GLB.
         """
         avatar_paths = [
-            os.path.join(os.getcwd(), "artifacts", "glb", "anny_baseline_male.glb"),
             os.path.join(os.getcwd(), "..", "frontend", "public", "avatars", "anny_baseline_male.glb"),
+            os.path.join(os.getcwd(), "frontend", "public", "avatars", "anny_baseline_male.glb"),
             os.path.join(os.getcwd(), "public", "avatars", "anny_baseline_male.glb"),
+            os.path.join(os.getcwd(), "artifacts", "glb", "anny_baseline_male.glb"),
         ]
-        avatar_path = next((p for p in avatar_paths if os.path.exists(p)), None)
+        avatar_path = None
+        for p in avatar_paths:
+            if os.path.exists(p):
+                try:
+                    sc = trimesh.load(p, force="scene")
+                    geom = list(sc.geometry.values())[0]
+                    if geom.bounds[1][1] > 1.0:  # upright (Y-up)
+                        avatar_path = p
+                        break
+                except Exception:
+                    pass
+        if not avatar_path:
+            avatar_path = next((p for p in avatar_paths if os.path.exists(p)), None)
 
         if not avatar_path:
             # Fallback mock geometry if avatar is not yet accessible

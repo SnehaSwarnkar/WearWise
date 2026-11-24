@@ -81,7 +81,8 @@ def run_part1_verification():
         }
         res = requests.post(BASE_URL, json=dup_payload, timeout=10)
         passed = (res.status_code == 409)
-        log_test(2, "SKU Uniqueness & Duplicate Conflict Rejection (409)", passed, f"Status: {res.status_code} ({res.json().get('detail')[:60]}...)")
+        err_msg = res.json().get('detail') or res.json().get('error', {}).get('message', 'Conflict')
+        log_test(2, "SKU Uniqueness & Duplicate Conflict Rejection (409)", passed, f"Status: {res.status_code} ({err_msg[:60]}...)")
         if not passed: all_passed = False
     except Exception as e:
         log_test(2, "SKU Uniqueness", False, str(e))
