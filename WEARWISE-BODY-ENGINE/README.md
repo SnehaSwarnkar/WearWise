@@ -1,17 +1,31 @@
 # WEARWISE-BODY-ENGINE
 
-**WearWise AI Fashion & Honest Fit Platform**  
-*Phase 0 (Validated) & Phase 1 (Architecture & Domain Design)*
+**WearWise AI Fashion & Honest Fit Platform — Core Engine & Backend**  
+*MVP Release (Phase 6B Accepted Baseline)*
 
 ---
 
 ## Workspace Purpose & Authority
 
-This repository is an isolated research, proof-of-concept, and architectural design workspace for **WearWise**. 
+This repository is the authoritative computational engine, domain model, database migration, and backend API workspace for **WearWise**.
 - **Authority:** ChatGPT is the technical decision owner and product architect; Antigravity is the experiment and implementation executor.
-- **Scope Restriction:** Phase 0 feasibility is complete and signed off. Phase 1 is design and documentation only. No production backend (`WEARWISE-CORE`), database migrations, seller portal, or frontend modifications are implemented here.
-- **Phase 0 Status:** **FORMALLY CLOSED & SIGNED OFF** ([`docs/research/PHASE_0_FINAL_DECISION.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/research/PHASE_0_FINAL_DECISION.md)).
-- **Phase 1 Status:** **ARCHITECTURE & SPECIFICATIONS COMPLETE — SUBMITTED FOR REVIEW** ([`docs/architecture/PHASE_1_ARCHITECTURE_DECISION.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/PHASE_1_ARCHITECTURE_DECISION.md)).
+- **Master Documentation:** For full system architecture, prerequisites, quickstart, frontend integration, and operational workflows, refer to the root [`../README.md`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/README.md).
+- **Authoritative Branch:** `noTouch`
+
+---
+
+## Engine Roadmap & Milestones
+
+| Phase | Milestone | Status | Key Deliverable / Decision |
+|---|---|---|---|
+| **Phase 0** | Feasibility & Foundation | **Accepted** | NAVER Anny v0.6.2 selected over OxiHuman; CPU ($20.8\text{ ms}$) validated. |
+| **Phase 1** | Architecture & Specifications | **Accepted** | Modular Monolith, BICE design, Anthropometry spec, Honest Fit spec Rev 1.2.1. |
+| **Phase 4A** | Avatar Generation Pipeline | **Accepted** | Native Anny topology generation (27,420 triangles), binary GLB exporter. |
+| **Phase 4B** | Anthropometric Extraction | **Accepted** | Bounded slicing, mesh-topology provenance for degree-four nodes, landmark detection. |
+| **Phase 5A** | Honest Fit Engine | **Accepted** | Regional dimensional ease, six-tier fit classification, composite scoring, single recommended size. |
+| **Phase 6A** | Backend Vertical Slice | **Accepted** | FastAPI Modular Monolith, Alembic initial migration (12 tables), JWT verification, SQLite WAL. |
+| **Phase 6B** | Frontend Integration | **Accepted** | React 19 + TypeScript + Three.js SPA, $R_x(-90^\circ)$ glTF Y-up conversion, compact camera framing. |
+| **MVP** | Final Release & Operational Readiness | **Accepted** | Automated 5-module E2E browser flow, 403 Pytest / 8 Vitest passing, production readiness audit. |
 
 ---
 
@@ -19,70 +33,62 @@ This repository is an isolated research, proof-of-concept, and architectural des
 
 ```text
 WEARWISE-BODY-ENGINE/
-├── README.md                                  # This document
-├── .gitignore                                 # Git exclusion rules
-├── WEARWISE_MASTER_PROJECT_BRIEF.md           # Master product & technical brief
-├── docs/
-│   ├── architecture/                          # Phase 1: Architecture, Schemas & API Contracts
-│   │   ├── PHASE_1_ARCHITECTURE_DECISION.md   # Architectural Decision Record & Acceptance Matrix
-│   │   ├── PHASE_0_OPEN_ITEMS.md              # Reconciled Phase 0 evidence & measurement boundaries
-│   │   ├── SYSTEM_ARCHITECTURE.md             # C4 context, module boundaries, data flows, ADRs
-│   │   ├── BODY_INTELLIGENCE_DESIGN.md        # BICE, domain entities, provenance, parameter bounds
-│   │   ├── AVATAR_ENGINE_DESIGN.md            # AvatarEngine protocol, AnnyAdapter, GLB lifecycle
-│   │   ├── ANTHROPOMETRY_SPECIFICATION.md     # Measurement dictionary, landmarks, bounded slicing
-│   │   ├── HONEST_FIT_ENGINE_SPEC.md          # Ease formulation, regional fit classification
-│   │   ├── DATABASE_SCHEMA.md                 # Entity relationship diagram (ERD), ANSI SQL tables
-│   │   ├── API_CONTRACTS.md                   # Versioned /api/v1 REST contracts & Pydantic schemas
-│   │   └── IMPLEMENTATION_ROADMAP.md          # 8-phase implementation dependency plan & gates
-│   └── research/                              # Phase 0: Feasibility, Licensing & Hardware Reports
-│       ├── PHASE_0_FINAL_DECISION.md          # Formal Phase 0 sign-off & technical decision record
-│       ├── PHASE_0_RESEARCH_REPORT.md         # Master report answering all 10 technical questions
-│       ├── MODEL_COMPARISON.md                # Scored comparative scorecard & legal gate verdict
-│       ├── ANNY_PARAMETER_ANALYSIS.md         # 20-parameter behaviour & spillover analysis
-│       ├── OXIHUMAN_PARAMETER_ANALYSIS.md     # 38-morph target inventory & licensing analysis
-│       ├── ANTHROPOMETRY_ANALYSIS.md          # Coordinate scale (100x), landmarks, repeatability
-│       ├── HARDWARE_BENCHMARKS.md             # CPU (20.8 ms) vs GPU (74.5 ms) benchmarks
-│       ├── LICENSE_AUDIT.md                   # Pinned licensing audit & transitive dependencies
-│       ├── RISKS_AND_LIMITATIONS.md           # Model limitations & Phase 1-4 roadmap
-│       └── PHASE_0_REVISED_PLAN_v2.1.md       # Approved Revision 2.1 implementation plan
-├── experiments/
-│   ├── exp0_environment.py                    # Machine inventory capture script
-│   ├── exp_f_license_audit.py                 # Dependency licensing audit script
-│   ├── anny/
-│   │   ├── exp_a_real_inference.py            # Baseline & variation mesh generation
-│   │   ├── exp_b_parameter_behaviour.py       # Controlled sweeps & spillover calculation
-│   │   ├── exp_c_anthropometry.py             # Scale determination & measurement extraction
-│   │   └── exp_e_benchmarks.py                # CPU vs GPU latency, VRAM, and stability
-│   ├── oxihuman/
-│   │   └── exp_d_capability.py                # Crates.io API & morph target evaluation
-│   └── outputs/                               # Raw JSON evidence logs (exp0..exp_f)
-├── benchmarks/
-│   └── anny_benchmarks.json                   # Machine-readable benchmark outputs
-├── artifacts/
-│   ├── meshes/                                # 7 real exported OBJ meshes (~984 KB each)
-│   └── glb/                                   # 25 validated binary GLB files (~494 KB each)
-├── tests/
-│   ├── test_model_generation.py               # Initialization & forward pass tests
-│   ├── test_mesh_validity.py                  # Topology, manifold, and bounds tests
-│   ├── test_parameter_changes.py              # Phenotype and local displacement tests
-│   └── test_export.py                         # GLB export and re-import tests
-└── environments/
-    └── anny/
-        └── requirements.txt                   # Locked dependencies (PyTorch cu130, Anny 0.6.2)
+├── alembic/                         # Alembic database migrations
+│   └── versions/
+│       └── 001_initial_schema.py    # Authoritative 12-table schema baseline
+├── alembic.ini                      # Alembic environment configuration
+├── app/                             # Core Application Package
+│   ├── anthropometry/               # Bounded slicing & landmark extraction
+│   ├── api/                         # FastAPI routes, schemas, and security adapters
+│   │   ├── app.py                   # FastAPI entrypoint, CORS, exception handlers
+│   │   ├── auth.py                  # Cryptographic JWT & development auth adapter
+│   │   └── v1/                      # Versioned REST endpoints (profiles, avatar, garments, fit)
+│   ├── avatar_engine/               # AvatarEngine protocol & NAVER Anny adapter
+│   ├── config.py                    # Centralized settings & environment variables
+│   ├── db/                          # SQLAlchemy database models and session factory
+│   ├── domain/                      # Pure domain entities, value objects, and taxonomies
+│   ├── fit/                         # Honest Fit calculation, ease rules, and scoring
+│   ├── repositories/                # Persistence repository interfaces & implementations
+│   ├── services/                    # Application service orchestration layer
+│   └── storage/                     # Content-addressable asset storage
+├── artifacts/                       # Verification artifacts & release packages
+│   ├── mvp/                         # MVP release packet, manifest, and demonstration logs
+│   └── phase6b/                     # Phase 6B acceptance packet & baseline screenshots
+├── benchmarks/                      # Hardware performance and latency logs
+├── data/                            # Local database (wearwise.db) and GLB asset storage
+├── environments/                    # Pinned Python requirements and environment definitions
+├── scripts/                         # Verification, packaging, and demonstration scripts
+│   ├── demo_mvp_workflow.py         # Playwright automated 5-module E2E test script
+│   └── rebuild_mvp_packet.py        # Authoritative release archive packager
+└── tests/                           # 403 Pytest regression verification test suite
+    ├── anthropometry/
+    ├── api/
+    ├── architecture/                # Strict architectural layer boundary tests
+    ├── avatar_engine/
+    ├── db/
+    └── fit/
 ```
 
 ---
 
-## Phase 0 Technical Gate Summary (Completed)
+## Quick Commands
 
-- **Selected Foundation:** **NAVER Anny v0.6.2** (Native Topology).
-- **Non-Selected Alternative:** **OxiHuman** (Non-selected due to BUSL-1.1 relicensing on crates.io, 404 repository, and absence of regional controls for shoulders, arms, belly, thighs, and calves).
-- **Inference Speed:** **$20.82\text{ ms}$ on CPU** / $74.45\text{ ms}$ on RTX 3050.
-- **Memory Consumption:** **$113.4\text{ MB}$ peak VRAM** (only $2.7\%$ of 4 GB).
-- **Interactive Preview Feasibility:** Fully achievable on local CPU hardware with ₹0 cloud infrastructure cost.
+### Run Backend Tests (403 Tests)
+```powershell
+.\.venv-anny\Scripts\python.exe -m pytest tests/ -q
+```
 
----
+### Start API Server
+```powershell
+.\.venv-anny\Scripts\python.exe -m uvicorn app.api.app:app --host 127.0.0.1 --port 8000
+```
 
-## Phase 1 Architecture Deliverables Summary (Completed)
+### Run Database Migrations
+```powershell
+.\.venv-anny\Scripts\python.exe -m alembic upgrade head
+```
 
-All 10 architecture and domain design specifications are published under [`docs/architecture/`](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE-BODY-ENGINE/docs/architecture/). The architecture establishes a Python FastAPI Modular Monolith, strict Avatar Engine adapter isolation, a 3-tier separation of body measurements vs shape controls vs morph parameters, a 5-tier provenance taxonomy, bounded anthropometric slicing algorithms, an Honest Fit ease calculation engine, an ANSI SQL relational schema, and versioned `/api/v1` REST contracts with direct binary GLB streaming.
+### Run E2E Verification Workflow
+```powershell
+.\.venv-anny\Scripts\python.exe scripts/demo_mvp_workflow.py
+```

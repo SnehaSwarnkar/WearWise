@@ -56,7 +56,7 @@ export const Dashboard: React.FC = () => {
             <h1 style={{ fontSize: '24px', fontWeight: 800, letterSpacing: '-0.02em', color: '#ffffff' }}>
               WearWise Executive Dashboard
             </h1>
-            <span className="badge badge-cyan">Phase 6B</span>
+            <span className="badge badge-cyan">MVP Release</span>
           </div>
           <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
             Real-time anthropometry, NAVER Anny 3D avatar workspace, and deterministic Honest Fit evaluation.

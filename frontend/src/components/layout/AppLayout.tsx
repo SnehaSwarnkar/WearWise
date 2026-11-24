@@ -100,7 +100,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, banner }) => {
           WearWise &copy; 2026 &bull; Architecture: Modular Monolith &bull; NAVER Anny v0.6.2 &bull; Honest Fit Rev 1.2.1
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
-          <span>Phase 6B Frontend Integration</span>
+          <span>MVP Release Baseline</span>
           <span>FastAPI 0.115+</span>
           <span>Three.js / React 19</span>
         </div>
