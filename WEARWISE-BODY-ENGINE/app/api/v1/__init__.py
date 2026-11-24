@@ -9,6 +9,7 @@ from app.api.v1.avatar import router as avatar_router
 from app.api.v1.garments import router as garments_router
 from app.api.v1.fit import router as fit_router
 from app.api.v1.vton import router as vton_router
+from app.api.v1.merchant_garments import router as merchant_garments_router
 
 v1_router = APIRouter(prefix="/api/v1")
 v1_router.include_router(profiles_router)
@@ -16,5 +17,6 @@ v1_router.include_router(avatar_router)
 v1_router.include_router(garments_router)
 v1_router.include_router(fit_router)
 v1_router.include_router(vton_router)
+v1_router.include_router(merchant_garments_router)
 
 __all__ = ["v1_router"]
