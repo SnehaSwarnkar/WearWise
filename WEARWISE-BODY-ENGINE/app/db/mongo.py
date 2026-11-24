@@ -138,6 +138,23 @@ def upsert_document(collection_name: str, filter_query: Dict[str, Any], doc: Dic
     return False
 
 
+def update_document(collection_name: str, filter_query: Dict[str, Any], update_data: Dict[str, Any]) -> bool:
+    if not is_active():
+        return False
+    try:
+        col = get_collection(collection_name)
+        if col is not None:
+            if not any(k.startswith("$") for k in update_data.keys()):
+                update_op = {"$set": serialize_doc(update_data)}
+            else:
+                update_op = update_data
+            col.update_one(filter_query, update_op)
+            return True
+    except Exception as e:
+        logger.error(f"MongoDB update error in {collection_name}: {e}")
+    return False
+
+
 def find_document(collection_name: str, filter_query: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if not is_active():
         return None
