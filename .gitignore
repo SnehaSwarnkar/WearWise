@@ -123,6 +123,7 @@ WEARWISE-BODY-ENGINE/.env
 !*.env.example
 !frontend/.env
 !frontend/.env.example
+data_backups/
 
 # ── 9. Operating System Artifacts ─────────────────────────────────────────────
 # macOS
