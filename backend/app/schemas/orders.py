@@ -26,6 +26,8 @@ class OrderItem(BaseModel):
     quantity: int = 1
     image: Optional[str] = None
     brand: Optional[str] = None
+    size: Optional[str] = None
+    sku: Optional[str] = None
 
 
 class OrderResponse(BaseModel):

@@ -13,3 +13,4 @@ class Product(BaseModel):
     image: Optional[str] = None
     brand: Optional[str] = "WEARWISE EDIT"
     description: Optional[str] = None
+    sku: Optional[str] = None

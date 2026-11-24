@@ -20,6 +20,7 @@ PRODUCTS: list[dict] = [
         "colors": ["#ff3d9a", "#ffffff", "#1d1d1d"],
         "brand": "WEARWISE EDIT",
         "description": "A bold, playful baby tee in cherry pink. Perfect for statement-making casual days.",
+        "sku": "TSH-WW-CREW-001",
     },
     {
         "id": 2,
@@ -31,6 +32,7 @@ PRODUCTS: list[dict] = [
         "colors": ["#d8ff3f", "#ffffff", "#8d6bff"],
         "brand": "WEARWISE EDIT",
         "description": "A relaxed oversized shirt in citrusy lime. Easy to wear, hard to ignore.",
+        "sku": "TSH-WW-OVERSIZE-002",
     },
     {
         "id": 3,
@@ -42,6 +44,7 @@ PRODUCTS: list[dict] = [
         "colors": ["#6f8fe8", "#232323", "#b9d3ff"],
         "brand": "WEARWISE EDIT",
         "description": "Wide-leg silhouette in classic blue denim. The kind you wear with everything.",
+        "sku": "JNS-WW-WIDE-003",
     },
     {
         "id": 4,
@@ -53,6 +56,7 @@ PRODUCTS: list[dict] = [
         "colors": ["#ff633d", "#ff3d9a", "#ffd43b"],
         "brand": "WEARWISE EDIT",
         "description": "A vibrant mini dress blending sunset orange, pink and yellow. Made for golden hours.",
+        "sku": "DRS-WW-MINI-004",
     },
     {
         "id": 5,
@@ -64,6 +68,7 @@ PRODUCTS: list[dict] = [
         "colors": ["#8d6bff", "#1d1d1d", "#ff3d9a"],
         "brand": "WEARWISE EDIT",
         "description": "A striking electric purple jacket that makes any outfit an event.",
+        "sku": "JKT-WW-ELEC-005",
     },
     {
         "id": 6,
@@ -75,6 +80,7 @@ PRODUCTS: list[dict] = [
         "colors": ["#9ecb72", "#ffffff", "#1d1d1d"],
         "brand": "WEARWISE EDIT",
         "description": "A muted matcha green top for days when you want effortless and easy.",
+        "sku": "TSH-WW-MATCHA-006",
     },
 ]
 
