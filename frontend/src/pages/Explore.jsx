@@ -5,6 +5,7 @@ import Header from "./Header";
 import { fetchProducts } from "../api/products";
 import { addToCart } from "../api/cart";
 import { addToWishlist } from "../api/saved";
+import { apiClient } from "../api/client";
 
 const CATEGORIES = ["All", "Tops", "Jeans", "Dresses", "Jackets"];
 
@@ -15,6 +16,20 @@ function Explore() {
   const [loading, setLoading]                   = useState(true);
   const [cartFeedback, setCartFeedback]         = useState(null);
   const [wishlisted, setWishlisted]             = useState(new Set());
+  const [garmentsMap, setGarmentsMap]           = useState({});
+
+  useEffect(() => {
+    apiClient
+      .listGarments()
+      .then((list) => {
+        const map = {};
+        (list || []).forEach((g) => {
+          if (g.sku) map[g.sku] = g;
+        });
+        setGarmentsMap(map);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -159,16 +174,48 @@ function Explore() {
                 </div>
 
                 {/* ACTIONS */}
-                <div className="shop-card-actions">
-                  <button
-                    className="shop-add-btn"
-                    onClick={() => handleAddToCart(product)}
-                  >
-                    {cartFeedback === product.id ? "Added ✓" : "Add to Bag ✦"}
-                  </button>
-                  <Link to="/try-on" className="shop-try-btn">
-                    Try On
-                  </Link>
+                <div className="shop-card-actions" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      className="shop-add-btn"
+                      onClick={() => handleAddToCart(product)}
+                      style={{ flex: 1 }}
+                    >
+                      {cartFeedback === product.id ? "Added ✓" : "Add to Bag ✦"}
+                    </button>
+                    <Link to="/try-on" className="shop-try-btn">
+                      Try On
+                    </Link>
+                  </div>
+                  {garmentsMap[product.sku] ? (
+                    <Link
+                      to={`/fit?garment_id=${garmentsMap[product.sku].garment_id}&sku=${product.sku}`}
+                      className="shop-fit-btn"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        background: 'var(--lime)',
+                        color: '#151515',
+                        fontWeight: 800,
+                        fontSize: '12px',
+                        padding: '8px 12px',
+                        borderRadius: '4px',
+                        border: '2px solid var(--border)',
+                        textDecoration: 'none',
+                        boxShadow: '2px 2px 0 var(--border)',
+                        width: '100%',
+                      }}
+                    >
+                      <span>Check My Fit ✦</span>
+                      <small style={{ fontSize: '10px', opacity: 0.8 }}>({product.sku})</small>
+                    </Link>
+                  ) : (
+                    <div style={{ fontSize: '11px', color: 'var(--text-soft)', textAlign: 'center', padding: '2px 0' }}>
+                      Fit specs pending registration
+                    </div>
+                  )}
                 </div>
 
               </div>

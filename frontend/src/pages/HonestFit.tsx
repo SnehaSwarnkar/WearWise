@@ -4,6 +4,7 @@ import { AppLayout } from '../components/layout/AppLayout';
 import { useAuth } from '../context/AuthContext';
 import { apiClient } from '../api/client';
 import { GarmentProfile, FitRecommendationResponse } from '../types/api';
+import { addToCart } from '../api/cart';
 import {
   Sparkles,
   CheckCircle2,
@@ -27,21 +28,24 @@ export const HonestFitPage: React.FC = () => {
   const [userFitPreference, setUserFitPreference] = useState<'fitted' | 'regular' | 'relaxed'>('regular');
   const [evaluating, setEvaluating] = useState<boolean>(false);
   const [fitResult, setFitResult] = useState<FitRecommendationResponse | null>(null);
+  const [addedToCart, setAddedToCart] = useState<boolean>(false);
 
   const [banner, setBanner] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
 
-  // Parse query params for pre-selected garment_id
+  // Parse query params for pre-selected garment_id or sku
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const gId = params.get('garment_id');
+    const skuParam = params.get('sku');
 
     apiClient
       .listGarments()
       .then((list) => {
         setGarments(list);
         if (list.length > 0) {
-          if (gId && list.some((g) => g.garment_id === gId)) {
-            setSelectedGarmentId(gId);
+          const matched = list.find((g) => (gId && g.garment_id === gId) || (skuParam && g.sku === skuParam));
+          if (matched) {
+            setSelectedGarmentId(matched.garment_id);
           } else {
             setSelectedGarmentId(list[0].garment_id);
           }
@@ -51,6 +55,24 @@ export const HonestFitPage: React.FC = () => {
   }, [location.search]);
 
   const selectedGarment = garments.find((g) => g.garment_id === selectedGarmentId);
+
+  const handleAddRecommendedToCart = async (size: string) => {
+    try {
+      await addToCart({
+        id: 1,
+        name: selectedGarment?.title || 'Everyday Heavyweight Crewneck Tee',
+        price: 799,
+        quantity: 1,
+        brand: 'WEARWISE EDIT',
+        size: size,
+        sku: selectedGarment?.sku || 'TSH-WW-CREW-001',
+      });
+      setAddedToCart(true);
+      setTimeout(() => setAddedToCart(false), 3000);
+    } catch (err: any) {
+      console.warn('Failed to add recommended size to cart:', err);
+    }
+  };
 
   const handleEvaluateFit = async () => {
     if (!activeProfile) {
@@ -386,6 +408,50 @@ export const HonestFitPage: React.FC = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Add to Bag Action */}
+                <div style={{ marginTop: '22px', display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => handleAddRecommendedToCart(fitResult.recommended_size)}
+                    style={{
+                      background: 'var(--lime, #d8ff3f)',
+                      color: '#151515',
+                      fontWeight: 800,
+                      fontSize: '13px',
+                      padding: '12px 22px',
+                      borderRadius: '4px',
+                      border: '2px solid var(--border, #151515)',
+                      boxShadow: '3px 3px 0 var(--border, #151515)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <ShoppingBag size={17} />
+                    <span>Add Recommended Size {fitResult.recommended_size} to Bag ✦</span>
+                  </button>
+                  <button
+                    onClick={() => navigate('/cart')}
+                    style={{
+                      background: 'var(--bg-surface-raised)',
+                      color: 'var(--text-main)',
+                      fontWeight: 700,
+                      fontSize: '13px',
+                      padding: '12px 18px',
+                      borderRadius: '4px',
+                      border: '1.5px solid var(--border-medium)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    View Bag →
+                  </button>
+                  {addedToCart && (
+                    <span style={{ color: 'var(--accent-emerald)', fontWeight: 800, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <CheckCircle2 size={16} /> Added size {fitResult.recommended_size} to bag!
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Regional Ease Breakdown Table */}

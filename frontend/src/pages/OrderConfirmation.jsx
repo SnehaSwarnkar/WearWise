@@ -55,6 +55,22 @@ function OrderConfirmation() {
                   {order.customer?.city}
                 </strong>
               </div>
+
+              {order.items && order.items.length > 0 && (
+                <div style={{ marginTop: "12px", borderTop: "1px dashed var(--border-soft)", paddingTop: "10px" }}>
+                  <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", color: "var(--text-soft)", display: "block", marginBottom: "6px" }}>ORDERED ITEMS:</span>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {order.items.map((it, idx) => (
+                      <div key={idx} style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
+                        <span>
+                          {it.name} {it.size ? <strong style={{ color: "var(--pink)" }}>(Size {it.size})</strong> : null} × {it.quantity || 1}
+                        </span>
+                        <strong>₹{((it.price || 0) * (it.quantity || 1)).toLocaleString("en-IN")}</strong>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

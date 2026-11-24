@@ -399,7 +399,11 @@ function Checkout() {
 
                 <div className="checkout-item-info">
                   <strong>{item.name}</strong>
-
+                  {item.size && (
+                    <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--pink)", display: "block" }}>
+                      Size: {item.size}
+                    </span>
+                  )}
                   <small>
                     {item.brand || "WEARWISE"}
                   </small>

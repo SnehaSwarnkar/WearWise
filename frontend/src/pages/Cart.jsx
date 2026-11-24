@@ -20,21 +20,21 @@ function Cart() {
     loadCart();
   }, []);
 
-  const handleQuantityChange = async (itemId, change) => {
-    const item = cart.items.find((i) => i.id === itemId);
+  const handleQuantityChange = async (itemId, change, itemSize = null) => {
+    const item = cart.items.find((i) => i.id === itemId && (itemSize ? i.size === itemSize : true));
     if (!item) return;
     const newQty = Math.max(1, (item.quantity || 1) + change);
     try {
-      const updated = await updateCartQuantity(itemId, newQty);
+      const updated = await updateCartQuantity(itemId, newQty, itemSize);
       setCart(updated);
     } catch {
       // ignore
     }
   };
 
-  const handleRemove = async (itemId) => {
+  const handleRemove = async (itemId, itemSize = null) => {
     try {
-      const updated = await removeFromCart(itemId);
+      const updated = await removeFromCart(itemId, itemSize);
       setCart(updated);
     } catch {
       // ignore
@@ -104,8 +104,8 @@ function Cart() {
                 </span>
               </div>
 
-              {items.map((item) => (
-                <article className="cart-item" key={item.id}>
+              {items.map((item, idx) => (
+                <article className="cart-item" key={`${item.id}-${item.size || idx}`}>
                   <div className="cart-item-image">
                     {item.image ? (
                       <img src={item.image} alt={item.name} />
@@ -118,19 +118,19 @@ function Cart() {
                     <span className="cart-brand">{item.brand || "WEARWISE EDIT"}</span>
                     <h2>{item.name}</h2>
                     {item.color && <p>Color: {item.color}</p>}
-                    {item.size && <p>Size: {item.size}</p>}
+                    {item.size && <p style={{ fontWeight: 700, color: "var(--pink)" }}>Size: {item.size}</p>}
 
                     <div className="cart-item-bottom">
                       <div className="quantity-control">
                         <button
-                          onClick={() => handleQuantityChange(item.id, -1)}
+                          onClick={() => handleQuantityChange(item.id, -1, item.size)}
                           aria-label="Decrease quantity"
                         >
                           −
                         </button>
                         <span>{item.quantity || 1}</span>
                         <button
-                          onClick={() => handleQuantityChange(item.id, 1)}
+                          onClick={() => handleQuantityChange(item.id, 1, item.size)}
                           aria-label="Increase quantity"
                         >
                           +
@@ -145,7 +145,7 @@ function Cart() {
 
                   <button
                     className="cart-remove"
-                    onClick={() => handleRemove(item.id)}
+                    onClick={() => handleRemove(item.id, item.size)}
                     aria-label="Remove item"
                   >
                     ×
