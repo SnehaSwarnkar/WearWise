@@ -67,6 +67,21 @@ async function main() {
   await new Promise((r) => setTimeout(r, 1000));
   await page.screenshot({ path: path.join(screenshotsDir, '06_checkout.png') });
 
+  // 7. Dual-Mode Try-On (Mode A: 3D Avatar)
+  console.log('Capturing Try-On Mode A (3D Avatar)...');
+  await page.goto('http://127.0.0.1:3000/try-on', { waitUntil: 'networkidle0' });
+  await new Promise((r) => setTimeout(r, 2000));
+  await page.screenshot({ path: path.join(screenshotsDir, '07_tryon_mode_a.png') });
+
+  // 8. Dual-Mode Try-On (Mode B: AI Photo)
+  console.log('Capturing Try-On Mode B (AI Photo VTON)...');
+  const btns = await page.$$('.mode-toggle-btn');
+  if (btns.length > 1) {
+    await btns[1].click();
+    await new Promise((r) => setTimeout(r, 1200));
+  }
+  await page.screenshot({ path: path.join(screenshotsDir, '08_tryon_mode_b.png') });
+
   await browser.close();
   console.log('All screenshots captured successfully.');
 }
