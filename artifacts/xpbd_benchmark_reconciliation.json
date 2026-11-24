@@ -1,0 +1,119 @@
+{
+  "4_substeps": {
+    "substeps": 4,
+    "warmup_frames": 60,
+    "measured_frames": 300,
+    "test_duration_seconds": 3,
+    "cloth_solver_ms": {
+      "median": 0.3,
+      "p95": 0.4,
+      "p99": 0.5,
+      "mean": 0.27
+    },
+    "body_collision_ms": {
+      "median": 0,
+      "p95": 0.1,
+      "p99": 0.1,
+      "mean": 0.01
+    },
+    "vertex_buffer_update_ms": {
+      "median": 0,
+      "p95": 0.1,
+      "p99": 0.2,
+      "mean": 0.04
+    },
+    "render_time_ms": {
+      "median": 2.1,
+      "p95": 2.1,
+      "p99": 2.1,
+      "mean": 2.1
+    },
+    "total_browser_frame_ms": {
+      "median": 2.4,
+      "p95": 2.6,
+      "p99": 2.6,
+      "mean": 2.42
+    },
+    "sim_updates_per_second": 3333.3,
+    "actual_raf_fps": 60,
+    "interactive_verdict": "Acceptably Smooth (Interactive Standard Sustained)"
+  },
+  "6_substeps": {
+    "substeps": 6,
+    "warmup_frames": 60,
+    "measured_frames": 300,
+    "test_duration_seconds": 3,
+    "cloth_solver_ms": {
+      "median": 0.4,
+      "p95": 0.6,
+      "p99": 0.7,
+      "mean": 0.43
+    },
+    "body_collision_ms": {
+      "median": 0,
+      "p95": 0.1,
+      "p99": 0.1,
+      "mean": 0.02
+    },
+    "vertex_buffer_update_ms": {
+      "median": 0,
+      "p95": 0.1,
+      "p99": 0.1,
+      "mean": 0.04
+    },
+    "render_time_ms": {
+      "median": 2.1,
+      "p95": 2.1,
+      "p99": 2.1,
+      "mean": 2.1
+    },
+    "total_browser_frame_ms": {
+      "median": 2.6,
+      "p95": 2.8,
+      "p99": 2.8,
+      "mean": 2.59
+    },
+    "sim_updates_per_second": 2500,
+    "actual_raf_fps": 60,
+    "interactive_verdict": "Acceptably Smooth (Interactive Standard Sustained)"
+  },
+  "10_substeps": {
+    "substeps": 10,
+    "warmup_frames": 60,
+    "measured_frames": 300,
+    "test_duration_seconds": 3,
+    "cloth_solver_ms": {
+      "median": 0.7,
+      "p95": 1,
+      "p99": 1,
+      "mean": 0.71
+    },
+    "body_collision_ms": {
+      "median": 0,
+      "p95": 0.1,
+      "p99": 0.1,
+      "mean": 0.02
+    },
+    "vertex_buffer_update_ms": {
+      "median": 0,
+      "p95": 0.1,
+      "p99": 0.2,
+      "mean": 0.04
+    },
+    "render_time_ms": {
+      "median": 2.1,
+      "p95": 2.1,
+      "p99": 2.1,
+      "mean": 2.1
+    },
+    "total_browser_frame_ms": {
+      "median": 2.9,
+      "p95": 3.1,
+      "p99": 3.2,
+      "mean": 2.86
+    },
+    "sim_updates_per_second": 1428.6,
+    "actual_raf_fps": 60,
+    "interactive_verdict": "Acceptably Smooth (Interactive Standard Sustained)"
+  }
+}
