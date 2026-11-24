@@ -285,17 +285,67 @@ def generate_3d_digital_garment(garment_id: str):
     }
 
 
-@router.post("/{garment_id}/publish")
-def publish_digital_garment(garment_id: str):
-    """Publishes approved digital garment into the active shopper catalog."""
+@router.post("/{garment_id}/approve")
+def approve_digital_garment(
+    garment_id: str,
+    principal_id: str = "brand_director_demo",
+    approval_notes: str = "Physically verified boxy fit and ISO 8559-2 grading.",
+):
+    """Explicit Step 6.1: Merchant authority reviews and formally approves the generated asset."""
     garment = mongo.find_document(COLL_GARMENTS, {"id": garment_id, "is_deleted": False})
     if not garment:
         raise HTTPException(status_code=404, detail="Garment not found")
 
+    if garment.get("status") not in ["needs_review", "generating"]:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot approve garment in status '{garment.get('status')}'. Must be 'needs_review'."
+        )
+
     now = datetime.now(timezone.utc).isoformat()
+    rev = garment.get("revision", 1)
+    update_data = {
+        "status": "approved",
+        "approved_by": principal_id,
+        "approved_at": now,
+        "approval_notes": approval_notes,
+        "revision": rev,
+        "updated_at": now,
+    }
+    mongo.update_document(COLL_GARMENTS, {"id": garment_id}, {"$set": update_data})
+    garment.update(update_data)
+    return {
+        "garment_id": garment_id,
+        "status": "approved",
+        "approved_by": principal_id,
+        "approved_at": now,
+        "revision": rev,
+        "message": "Garment successfully approved. Ready for storefront publication.",
+    }
+
+
+@router.post("/{garment_id}/publish")
+def publish_digital_garment(garment_id: str, publisher_id: str = "catalog_admin_demo"):
+    """Explicit Step 6.2: Publishes approved digital garment into the active shopper catalog."""
+    garment = mongo.find_document(COLL_GARMENTS, {"id": garment_id, "is_deleted": False})
+    if not garment:
+        raise HTTPException(status_code=404, detail="Garment not found")
+
+    # Publication requires prior approval
+    if garment.get("status") != "approved":
+        raise HTTPException(
+            status_code=400,
+            detail=f"Garment status is '{garment.get('status')}'. Explicit merchant approval ('approved') is required before publishing."
+        )
+
+    now = datetime.now(timezone.utc).isoformat()
+    rev = garment.get("revision", 1)
+    published_ver = f"v{rev}.0"
     update_data = {
         "status": "published",
         "published_at": now,
+        "published_by": publisher_id,
+        "published_version": published_ver,
         "updated_at": now,
     }
     mongo.update_document(COLL_GARMENTS, {"id": garment_id}, {"$set": update_data})
@@ -303,7 +353,43 @@ def publish_digital_garment(garment_id: str):
     return {
         "garment_id": garment_id,
         "status": "published",
-        "message": f"Digital Garment {garment.get('sku')} is published and active in Mode A Shopper Try-On.",
+        "published_at": now,
+        "published_by": publisher_id,
+        "published_version": published_ver,
+        "message": f"Digital Garment {garment.get('sku')} is published (Version {published_ver}) and active in Mode A Shopper Try-On.",
+    }
+
+
+@router.get("/{garment_id}/shopper-asset")
+def get_shopper_asset(garment_id: str, size: str = "M"):
+    """
+    Shopper-facing gateway: strictly verifies that asset is approved & published
+    before serving GLB asset URLs to shoppers.
+    """
+    garment = mongo.find_document(COLL_GARMENTS, {"id": garment_id, "is_deleted": False})
+    if not garment:
+        garment = mongo.find_document(COLL_GARMENTS, {"sku": garment_id, "is_deleted": False})
+    if not garment:
+        raise HTTPException(status_code=404, detail=f"Garment {garment_id} not found")
+
+    if garment.get("status") != "published":
+        raise HTTPException(
+            status_code=403,
+            detail=f"Access denied: Garment {garment_id} is in status '{garment.get('status')}' and has not been approved and published for shoppers."
+        )
+
+    mesh_assets = garment.get("mesh_assets", {})
+    size_asset = mesh_assets.get(size) or mesh_assets.get("canonical")
+    if not size_asset:
+        raise HTTPException(status_code=404, detail=f"Size variant {size} not found in published garment")
+
+    return {
+        "sku": garment.get("sku"),
+        "status": "published",
+        "version": garment.get("published_version", "v1.0"),
+        "size": size,
+        "asset_url": size_asset,
+        "texture_url": mesh_assets.get("texture_atlas"),
     }
 
 

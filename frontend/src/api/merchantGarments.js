@@ -78,10 +78,24 @@ export async function trigger3DGeneration(garmentId) {
   return res.json();
 }
 
-export async function publishGarment(garmentId) {
-  const res = await fetch(`${BASE_URL}/${garmentId}/publish`, {
+export async function approveGarment(garmentId, principalId = 'brand_director_demo', notes = 'Physically verified boxy fit and ISO 8559-2 grading.') {
+  const res = await fetch(`${BASE_URL}/${garmentId}/approve?principal_id=${encodeURIComponent(principalId)}&approval_notes=${encodeURIComponent(notes)}`, {
+    method: 'POST',
+  });
+  if (!res.ok) throw new Error('Failed to approve digital garment');
+  return res.json();
+}
+
+export async function publishGarment(garmentId, publisherId = 'catalog_admin_demo') {
+  const res = await fetch(`${BASE_URL}/${garmentId}/publish?publisher_id=${encodeURIComponent(publisherId)}`, {
     method: 'POST',
   });
   if (!res.ok) throw new Error('Failed to publish digital garment');
+  return res.json();
+}
+
+export async function fetchShopperGarmentAsset(garmentId, size = 'M') {
+  const res = await fetch(`${BASE_URL}/${garmentId}/shopper-asset?size=${encodeURIComponent(size)}`);
+  if (!res.ok) throw new Error('Garment asset not published or unavailable');
   return res.json();
 }

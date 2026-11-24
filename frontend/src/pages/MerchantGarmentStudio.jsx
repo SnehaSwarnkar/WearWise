@@ -11,6 +11,7 @@ import {
   saveMeasurements,
   saveFabricProps,
   trigger3DGeneration,
+  approveGarment,
   publishGarment,
 } from '../api/merchantGarments';
 import './MerchantGarmentStudio.css';
@@ -223,13 +224,30 @@ export default function MerchantGarmentStudio() {
     }
   };
 
-  // Step 6: Publish
+  // Step 6.1: Formal Merchant Approval
+  const [approvalDetails, setApprovalDetails] = useState(null);
+
+  const handleApprove = async () => {
+    setLoading(true);
+    try {
+      const resp = await approveGarment(garmentId, 'brand_director_demo', 'Physically verified boxy fit and ISO 8559-2 grading.');
+      setGarmentStatus(resp.status);
+      setApprovalDetails(resp);
+      showFeedback('✦ Garment revision approved by Brand Director! Ready for storefront publication.');
+    } catch (err) {
+      showFeedback(err.message, true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 6.2: Storefront Publication
   const handlePublish = async () => {
     setLoading(true);
     try {
-      const resp = await publishGarment(garmentId);
+      const resp = await publishGarment(garmentId, 'catalog_admin_demo');
       setGarmentStatus(resp.status);
-      showFeedback('✦ Garment published to active shopper catalog!');
+      showFeedback('✦ Garment published to active shopper catalog (Version v1.0)!');
     } catch (err) {
       showFeedback(err.message, true);
     } finally {
@@ -778,32 +796,54 @@ export default function MerchantGarmentStudio() {
                 </div>
 
                 {/* Status & Publication Actions */}
-                <div style={{ background: garmentStatus === 'published' ? '#ecfdf5' : '#fef3c7', border: '2px solid var(--black)', borderRadius: '10px', padding: '16px', marginBottom: '20px' }}>
+                <div style={{ background: garmentStatus === 'published' ? '#ecfdf5' : (garmentStatus === 'approved' ? '#eff6ff' : '#fef3c7'), border: '2px solid var(--black)', borderRadius: '10px', padding: '16px', marginBottom: '20px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase' }}>PUBLICATION STATE</span>
-                    <span style={{ fontFamily: 'Archivo Black', fontSize: '12px', color: garmentStatus === 'published' ? '#166534' : '#92400e' }}>
+                    <span style={{ fontFamily: 'Archivo Black', fontSize: '12px', color: garmentStatus === 'published' ? '#166534' : (garmentStatus === 'approved' ? '#1d4ed8' : '#92400e') }}>
                       ● {garmentStatus.toUpperCase()}
                     </span>
                   </div>
                   <p style={{ fontSize: '12px', margin: 0, color: '#444' }}>
-                    {garmentStatus === 'published'
-                      ? 'This digital garment is live and available for shoppers in Mode A 3D Try-On.'
-                      : 'Assets generated. Review motion deformation above before publishing to catalog.'}
+                    {garmentStatus === 'published' && '✦ Live in catalog (v1.0). Available for shoppers in Mode A 3D Try-On.'}
+                    {garmentStatus === 'approved' && '✦ Approved by Brand Director (Rev 1). Assets validated for publication.'}
+                    {garmentStatus !== 'published' && garmentStatus !== 'approved' && 'Assets generated. Review motion deformation above, then formally approve the revision.'}
                   </p>
+                  {(approvalDetails || garmentStatus === 'approved' || garmentStatus === 'published') && (
+                    <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px solid #cbd5e1', fontSize: '11px', color: '#475569' }}>
+                      <div>Approved By: <strong>{approvalDetails?.approved_by || 'brand_director_demo'}</strong></div>
+                      <div>Approved At: <strong>{approvalDetails?.approved_at || '2026-11-24T18:05:00Z'}</strong></div>
+                      <div>Asset Version: <strong>v1.0 (Rev 1)</strong></div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Action Buttons */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <button
-                    type="button"
-                    className="btn-primary-merchant"
-                    onClick={handlePublish}
-                    disabled={loading}
-                    style={{ justifyContent: 'center', padding: '14px' }}
-                  >
-                    <Sparkles size={18} />
-                    {garmentStatus === 'published' ? 'RE-PUBLISH DIGITAL GARMENT' : '✦ PUBLISH TO SHOPPER CATALOG'}
-                  </button>
+                  {garmentStatus !== 'approved' && garmentStatus !== 'published' && (
+                    <button
+                      type="button"
+                      className="btn-primary-merchant"
+                      onClick={handleApprove}
+                      disabled={loading}
+                      style={{ justifyContent: 'center', padding: '14px', background: 'var(--lime, #d8ff3f)', color: 'var(--black)' }}
+                    >
+                      <Check size={18} />
+                      ✦ FORMALLY APPROVE ASSET REVISION
+                    </button>
+                  )}
+
+                  {(garmentStatus === 'approved' || garmentStatus === 'published') && (
+                    <button
+                      type="button"
+                      className="btn-primary-merchant"
+                      onClick={handlePublish}
+                      disabled={loading}
+                      style={{ justifyContent: 'center', padding: '14px' }}
+                    >
+                      <Sparkles size={18} />
+                      {garmentStatus === 'published' ? 'RE-PUBLISH DIGITAL GARMENT' : '✦ PUBLISH TO SHOPPER CATALOG (v1.0)'}
+                    </button>
+                  )}
 
                   <button
                     type="button"
