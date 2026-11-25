@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 class GenerateAvatarRequest(BaseModel):
     profile_id: uuid.UUID
+    rigged: bool = False
 
 
 class AvatarGenerationResponse(BaseModel):

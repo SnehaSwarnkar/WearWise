@@ -32,7 +32,18 @@ interface MeshBinding {
   vertCount: number;
 }
 
+export type SimulationLifecycleState =
+  | 'IDLE'
+  | 'INITIALIZING'
+  | 'RUNNING'
+  | 'RESETTING'
+  | 'SETTLING'
+  | 'STABLE'
+  | 'ERROR';
+
 export interface SimulationMetrics {
+  simState: SimulationLifecycleState;
+  resetEpoch: number;
   // Rig & mesh counts
   avatarVertices: number;
   garmentVertices: number;
@@ -76,6 +87,7 @@ export interface SimulationMetrics {
   meanPenetrationMm: number;
   capsuleCorrections: number;
   meshCorrections: number;
+  tunnelingIncidents: number;
 }
 
 export class WeldedClothSolver {
@@ -109,6 +121,8 @@ export class WeldedClothSolver {
   private pos!: Float32Array;
   private prevPos!: Float32Array;
   private restPos!: Float32Array;
+  private restMinY = 0.88;
+  private restSpanY = 0.34;
   private invMass!: Float32Array;
   private isCollar!: Uint8Array;
   private sleeveSide!: Int8Array; // +1 = left (+X), -1 = right (-X), 0 = torso/collar/hem
@@ -129,12 +143,15 @@ export class WeldedClothSolver {
   private currentPose: ArticulationState = { ...NEUTRAL_POSE };
   private poseDirty = true;
   private stepCount = 0;
+  private simState: SimulationLifecycleState = 'IDLE';
+  private resetEpoch = 0;
 
   // Telemetry state
   private lastSolveMs = 0;
   private lastCollisionMs = 0;
   private lastCapsuleCorr = 0;
   private lastMeshCorr = 0;
+  private lastTunneling = 0;
   private fps = 60;
   private avgFps = 60;
   private minFps = 60;
@@ -320,6 +337,14 @@ export class WeldedClothSolver {
     this.pos = new Float32Array(tempCoords);
     this.prevPos = new Float32Array(tempCoords);
     this.restPos = new Float32Array(tempCoords);
+    let minY = Infinity, maxY = -Infinity;
+    for (let i = 0; i < this.particleCount; i++) {
+      const y = this.restPos[i * 3 + 1];
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    }
+    this.restMinY = Number.isFinite(minY) ? minY + 0.04 : 0.88;
+    this.restSpanY = Number.isFinite(maxY - minY) && maxY - minY > 0.1 ? (maxY - minY) * 0.72 : 0.34;
     this.invMass = new Float32Array(tempInvMass);
     this.isCollar = new Uint8Array(tempCollar);
     this.sleeveSide = new Int8Array(tempSides);
@@ -432,14 +457,24 @@ export class WeldedClothSolver {
 
   public reset(): void {
     if (!this.pos) return;
+    this.simState = 'RESETTING';
+    this.resetEpoch++;
     this.pos.set(this.restPos);
     this.prevPos.set(this.restPos);
+    if (this.conLambda) this.conLambda.fill(0);
     this.targetPose = { ...NEUTRAL_POSE };
     this.currentPose = { ...NEUTRAL_POSE };
+    this.poseDirty = false;
     this.applyPoseToSkeleton(this.currentPose);
     this.collider.updatePoseGeometry();
+    this.updateDeltaTransforms();
+    this.lastCapsuleCorr = 0;
+    this.lastMeshCorr = 0;
+    this.lastTunneling = 0;
+    this.lastPenReport = this.collider.measurePenetration(this.pos, this.particleCount);
     this.updateDeformationAndStabilityMetrics(1 / 60);
     this.syncMeshes();
+    this.simState = 'STABLE';
   }
 
   /** Instantaneously snap skeleton to target pose (useful for deterministic headless regression) */
@@ -644,6 +679,7 @@ export class WeldedClothSolver {
     let stepColMs = 0;
     let stepCapCorr = 0;
     let stepMeshCorr = 0;
+    let stepTunnel = 0;
 
     for (let s = 0; s < substeps; s++) {
       this.conLambda.fill(0);
@@ -670,7 +706,7 @@ export class WeldedClothSolver {
         const rz = this.restPos[ix + 2];
 
         // Height-blended torso target between spine03 (waist/hem) and spine01 (chest/collar)
-        const hBlend = Math.min(1.0, Math.max(0.0, (ry - 0.88) / 0.34));
+        const hBlend = Math.min(1.0, Math.max(0.0, (ry - this.restMinY) / this.restSpanY));
         const txLo = dloE[0] * rx + dloE[4] * ry + dloE[8] * rz + dloE[12];
         const tyLo = dloE[1] * rx + dloE[5] * ry + dloE[9] * rz + dloE[13];
         const tzLo = dloE[2] * rx + dloE[6] * ry + dloE[10] * rz + dloE[14];
@@ -720,17 +756,19 @@ export class WeldedClothSolver {
       // 2. Solve XPBD constraints with Lagrange multipliers
       solveConstraintsPass();
 
-      // 3. Hybrid anatomical collision (capsules every substep; spatial-hash mesh on substeps 0 & 3)
+      // 3. Hybrid anatomical collision (capsules + swept CCD every substep; spatial-hash mesh on substeps 0 & 3)
       const colStats = this.collider.resolveCollisions(
         this.pos,
         this.invMass,
         this.particleCount,
         thicknessM,
-        s === 0 || s === substeps - 1
+        s === 0 || s === substeps - 1,
+        this.prevPos
       );
       stepColMs += colStats.collisionTimeMs;
       stepCapCorr += colStats.capsuleCorrections;
       stepMeshCorr += colStats.meshCorrections;
+      stepTunnel += colStats.tunnelingIncidents;
 
       // 4. Post-collision structural smoothing pass on final substep to eliminate spike artifacts
       if (s === substeps - 1) {
@@ -741,8 +779,10 @@ export class WeldedClothSolver {
     this.lastCollisionMs = stepColMs;
     this.lastCapsuleCorr = stepCapCorr;
     this.lastMeshCorr = stepMeshCorr;
+    this.lastTunneling = stepTunnel;
 
     this.updateDeformationAndStabilityMetrics(subDt);
+    this.simState = moved ? 'RUNNING' : this.avgVelocityMs > 0.03 ? 'SETTLING' : 'STABLE';
     this.syncMeshes();
 
     this.lastSolveMs = performance.now() - t0;
@@ -862,9 +902,23 @@ export class WeldedClothSolver {
     }
   }
 
+  public getParticleBufferCopy(reuse?: Float32Array): Float32Array {
+    const out = reuse && reuse.length === this.pos.length ? reuse : new Float32Array(this.pos.length);
+    out.set(this.pos);
+    return out;
+  }
+
+  public applyParticleBuffer(buf: Float32Array): void {
+    if (!this.pos || buf.length !== this.pos.length) return;
+    this.pos.set(buf);
+    this.syncMeshes();
+  }
+
   public getMetrics(): SimulationMetrics {
     const perfMem = (performance as any).memory;
     return {
+      simState: this.simState,
+      resetEpoch: this.resetEpoch,
       avatarVertices: this.avatarVertCount,
       garmentVertices: this.garmentVertCount,
       particleCount: this.particleCount,
@@ -901,6 +955,7 @@ export class WeldedClothSolver {
       meanPenetrationMm: this.lastPenReport.meanPenetrationMm,
       capsuleCorrections: this.lastCapsuleCorr,
       meshCorrections: this.lastMeshCorr,
+      tunnelingIncidents: this.lastTunneling,
     };
   }
 }

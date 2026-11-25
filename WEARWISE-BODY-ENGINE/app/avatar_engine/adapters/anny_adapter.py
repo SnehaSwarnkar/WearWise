@@ -508,9 +508,19 @@ class AnnyAdapter:
         # isotropic scaling guarantees exact millimeter matching to target_stature_cm.
         z_span = float(verts_np[:, 2].max() - verts_np[:, 2].min())
         target_m = stature_cm / 100.0
+        scale_factor = 1.0
         if z_span > 0.01:
             scale_factor = target_m / z_span
             verts_np = (verts_np * scale_factor).astype(np.float32)
+
+        bone_poses_tensor = out.get("bone_poses")
+        if bone_poses_tensor is not None:
+            bp_np = bone_poses_tensor[0].detach().cpu().numpy().astype(np.float64) if bone_poses_tensor.dim() == 4 else bone_poses_tensor.detach().cpu().numpy().astype(np.float64)
+            self._last_bone_poses_zup = bp_np
+            self._last_scale_factor = float(scale_factor)
+        else:
+            self._last_bone_poses_zup = None
+            self._last_scale_factor = float(scale_factor)
 
         # 7. Structural integrity validation
         if not np.isfinite(verts_np).all() or np.isnan(verts_np).any():
@@ -592,13 +602,16 @@ class AnnyAdapter:
             error_message=error_msg,
         )
 
-    def export_glb(self, mesh_data: MeshData) -> bytes:
+    def export_glb(self, mesh_data: MeshData, rigged: bool = False) -> bytes:
         """
         Serializes MeshData to web-optimized glTF 2.0 binary container in memory.
         Applies canonical Z-up to Y-up axis conversion (R_x(-90°)) so the exported
         GLB model conforms strictly to glTF 2.0 / Three.js Y-up, +Z-forward conventions.
-        Returns raw bytes directly; does not mutate source mesh_data.
+        When rigged=True, embeds the 104-bone Anny skeleton, JOINTS_0, WEIGHTS_0, and
+        inverseBindMatrices via pygltflib.
         """
+        if rigged:
+            return self.export_rigged_glb(mesh_data)
         try:
             # Canonical glTF 2.0 conversion matrix: R_x(-90°)
             # x_gltf = x_anny
@@ -626,6 +639,166 @@ class AnnyAdapter:
             return glb_bytes
         except Exception as e:
             raise GLBExportError(f"Failed to serialize mesh to GLB: {str(e)}") from e
+
+    def export_rigged_glb(self, mesh_data: MeshData) -> bytes:
+        """
+        Exports MeshData as a glTF 2.0 SkinnedMesh preserving NAVER Anny's 104-bone
+        skeleton, top-4 normalized JOINTS_0/WEIGHTS_0, and column-major inverseBindMatrices.
+        """
+        try:
+            import os
+            import tempfile
+            import pygltflib
+
+            model = self.get_model()
+            bone_poses_zup = getattr(self, "_last_bone_poses_zup", None)
+            scale_f = float(getattr(self, "_last_scale_factor", 1.0))
+            if bone_poses_zup is None:
+                with torch.no_grad():
+                    out = model(pose_parameters=self._pose_params)
+                    bp = out["bone_poses"]
+                    bone_poses_zup = (bp[0] if bp.dim() == 4 else bp).detach().cpu().numpy().astype(np.float64)
+
+            t_rot = np.array([
+                [1.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 0.0],
+                [0.0, -1.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0],
+            ], dtype=np.float64)
+
+            verts_yup = (mesh_data.vertices.astype(np.float64) @ t_rot[:3, :3].T).astype(np.float32)
+            # Align feet to y = 0.0 floor plane consistently
+            y_shift = float(-verts_yup[:, 1].min())
+            verts_yup[:, 1] += y_shift
+
+            faces = mesh_data.faces.astype(np.uint32)
+            tm_tmp = trimesh.Trimesh(vertices=verts_yup, faces=faces, process=False)
+            normals = np.asarray(tm_tmp.vertex_normals, dtype=np.float32)
+
+            bones = list(model.bone_labels)
+            parents = [int(p) for p in model.bone_parents]
+            weights_full = model.dense_vertex_bone_weights.detach().cpu().numpy()
+
+            bone_world_mats = np.zeros((len(bones), 4, 4), dtype=np.float64)
+            for i in range(len(bones)):
+                m = t_rot @ bone_poses_zup[i]
+                m[:3, 3] = m[:3, 3] * scale_f + np.array([0.0, y_shift, 0.0])
+                bone_world_mats[i] = m
+
+            bone_local_mats = np.zeros_like(bone_world_mats)
+            for i in range(len(bones)):
+                p = parents[i]
+                bone_local_mats[i] = bone_world_mats[i] if p < 0 else (np.linalg.inv(bone_world_mats[p]) @ bone_world_mats[i])
+
+            inv_bind_mats = np.array([np.linalg.inv(m) for m in bone_world_mats], dtype=np.float32)
+
+            top4_idx = np.argsort(-weights_full, axis=1)[:, :4].astype(np.uint16)
+            top4_w = np.take_along_axis(weights_full, top4_idx, axis=1).astype(np.float32)
+            w_sum = top4_w.sum(axis=1, keepdims=True)
+            w_sum[w_sum == 0] = 1.0
+            top4_w /= w_sum
+
+            def pad4(b: bytes) -> bytes:
+                rem = len(b) % 4
+                return b + (b"\x00" * (4 - rem) if rem else b"")
+
+            chunks = [
+                verts_yup.astype(np.float32).tobytes(),
+                normals.astype(np.float32).tobytes(),
+                top4_idx.tobytes(),
+                top4_w.tobytes(),
+                faces.astype(np.uint32).tobytes(),
+                np.transpose(inv_bind_mats, (0, 2, 1)).astype(np.float32).tobytes(),
+            ]
+            offsets = []
+            cur = 0
+            blob_parts = []
+            for ch in chunks:
+                p_ch = pad4(ch)
+                offsets.append((cur, len(ch)))
+                blob_parts.append(p_ch)
+                cur += len(p_ch)
+            blob = b"".join(blob_parts)
+
+            children_map = {i: [] for i in range(len(bones))}
+            root_bones = []
+            for i, p in enumerate(parents):
+                if p < 0:
+                    root_bones.append(i)
+                else:
+                    children_map[p].append(i)
+
+            nodes = [
+                pygltflib.Node(
+                    name=bname,
+                    children=children_map[i],
+                    matrix=[float(x) for x in bone_local_mats[i].T.reshape(-1)],
+                )
+                for i, bname in enumerate(bones)
+            ]
+            mesh_node_idx = len(bones)
+            nodes.append(pygltflib.Node(name="Anny_Skinned_Body", mesh=0, skin=0))
+            root_node_idx = len(bones) + 1
+            nodes.append(pygltflib.Node(name="Anny_Rig_Root", children=root_bones + [mesh_node_idx]))
+
+            n_verts = len(verts_yup)
+            gltf = pygltflib.GLTF2(
+                scene=0,
+                scenes=[pygltflib.Scene(nodes=[root_node_idx])],
+                nodes=nodes,
+                skins=[pygltflib.Skin(name="Anny_104_Skeleton", joints=list(range(len(bones))), inverseBindMatrices=5, skeleton=root_bones[0])],
+                meshes=[
+                    pygltflib.Mesh(
+                        name="Anny_Personalised_Rigged",
+                        primitives=[
+                            pygltflib.Primitive(
+                                attributes=pygltflib.Attributes(POSITION=0, NORMAL=1, JOINTS_0=2, WEIGHTS_0=3),
+                                indices=4,
+                                material=0,
+                            )
+                        ],
+                    )
+                ],
+                materials=[
+                    pygltflib.Material(
+                        name="Anny_Matte_Mannequin",
+                        pbrMetallicRoughness=pygltflib.PbrMetallicRoughness(
+                            baseColorFactor=[0.92, 0.92, 0.94, 1.0],
+                            metallicFactor=0.0,
+                            roughnessFactor=0.75,
+                        ),
+                    )
+                ],
+                buffers=[pygltflib.Buffer(byteLength=len(blob))],
+                bufferViews=[
+                    pygltflib.BufferView(buffer=0, byteOffset=offsets[0][0], byteLength=offsets[0][1], target=pygltflib.ARRAY_BUFFER),
+                    pygltflib.BufferView(buffer=0, byteOffset=offsets[1][0], byteLength=offsets[1][1], target=pygltflib.ARRAY_BUFFER),
+                    pygltflib.BufferView(buffer=0, byteOffset=offsets[2][0], byteLength=offsets[2][1], target=pygltflib.ARRAY_BUFFER),
+                    pygltflib.BufferView(buffer=0, byteOffset=offsets[3][0], byteLength=offsets[3][1], target=pygltflib.ARRAY_BUFFER),
+                    pygltflib.BufferView(buffer=0, byteOffset=offsets[4][0], byteLength=offsets[4][1], target=pygltflib.ELEMENT_ARRAY_BUFFER),
+                    pygltflib.BufferView(buffer=0, byteOffset=offsets[5][0], byteLength=offsets[5][1]),
+                ],
+                accessors=[
+                    pygltflib.Accessor(bufferView=0, componentType=pygltflib.FLOAT, count=n_verts, type="VEC3", min=verts_yup.min(axis=0).astype(float).tolist(), max=verts_yup.max(axis=0).astype(float).tolist()),
+                    pygltflib.Accessor(bufferView=1, componentType=pygltflib.FLOAT, count=n_verts, type="VEC3"),
+                    pygltflib.Accessor(bufferView=2, componentType=pygltflib.UNSIGNED_SHORT, count=n_verts, type="VEC4"),
+                    pygltflib.Accessor(bufferView=3, componentType=pygltflib.FLOAT, count=n_verts, type="VEC4"),
+                    pygltflib.Accessor(bufferView=4, componentType=pygltflib.UNSIGNED_INT, count=int(faces.size), type="SCALAR"),
+                    pygltflib.Accessor(bufferView=5, componentType=pygltflib.FLOAT, count=len(bones), type="MAT4"),
+                ],
+            )
+            gltf.set_binary_blob(blob)
+            with tempfile.NamedTemporaryFile(suffix=".glb", delete=False) as tf:
+                tmp_path = tf.name
+            try:
+                gltf.save(tmp_path)
+                with open(tmp_path, "rb") as f:
+                    return f.read()
+            finally:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+        except Exception as e:
+            raise GLBExportError(f"Failed to serialize rigged mesh to GLB: {str(e)}") from e
 
     def get_landmark_provider(self, mesh: Optional[MeshData] = None) -> LandmarkProvider:
         """Returns landmark query interface for Anthropometry Engine, optionally bound to a specific mesh."""

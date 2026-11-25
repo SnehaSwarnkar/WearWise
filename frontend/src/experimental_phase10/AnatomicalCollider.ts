@@ -28,6 +28,7 @@ export interface PenetrationReport {
 export interface CollisionStepStats {
   capsuleCorrections: number;
   meshCorrections: number;
+  tunnelingIncidents: number;
   collisionTimeMs: number;
 }
 
@@ -133,14 +134,21 @@ export class AnatomicalCollider {
     if (!pos || !jnt || !wgt || !idx) return;
 
     const totalV = pos.count;
+    let maxY = 1.56;
+    for (let i = 0; i < totalV; i++) {
+      const y = pos.getY(i);
+      if (y > maxY) maxY = y;
+    }
+    const minKeepY = maxY * 0.44;
+    const maxKeepY = maxY * 0.92;
     const oldToNew = new Int32Array(totalV).fill(-1);
     const keepVerts: number[] = [];
 
-    // Filter to garment-relevant upper-body vertices (0.76 <= y <= 1.43, |x| <= 0.44)
+    // Filter to garment-relevant upper-body vertices scaled to avatar stature
     for (let i = 0; i < totalV; i++) {
       const vx = pos.getX(i);
       const vy = pos.getY(i);
-      if (vy >= 0.76 && vy <= 1.43 && Math.abs(vx) <= 0.44) {
+      if (vy >= minKeepY && vy <= maxKeepY && Math.abs(vx) <= 0.55) {
         oldToNew[i] = keepVerts.length;
         keepVerts.push(i);
       }
@@ -228,7 +236,7 @@ export class AnatomicalCollider {
       this.tmpB.x -= 0.025;
       this.tmpB.y -= 0.06;
       this.tmpB.z += 0.025;
-      cols.push({ name: 'chest_L', a: this.tmpA.clone(), b: this.tmpB.clone(), radius: 0.068 });
+      cols.push({ name: 'chest_L', a: this.tmpA.clone(), b: this.tmpB.clone(), radius: 0.074 });
     }
     if (this.bSpine02 && this.bClavR && this.bShoulderR) {
       this.bSpine02.getWorldPosition(this.tmpA);
@@ -238,16 +246,16 @@ export class AnatomicalCollider {
       this.tmpB.x += 0.025;
       this.tmpB.y -= 0.06;
       this.tmpB.z += 0.025;
-      cols.push({ name: 'chest_R', a: this.tmpA.clone(), b: this.tmpB.clone(), radius: 0.068 });
+      cols.push({ name: 'chest_R', a: this.tmpA.clone(), b: this.tmpB.clone(), radius: 0.074 });
     }
 
     // Deltoid / shoulder & arms inner cores
-    pushCap('deltoid_L', this.bShoulderL, this.bUpperL, 0.048);
-    pushCap('deltoid_R', this.bShoulderR, this.bUpperR, 0.048);
-    pushCap('upperarm_L', this.bUpperL, this.bLowerL, 0.042);
-    pushCap('upperarm_R', this.bUpperR, this.bLowerR, 0.042);
-    pushCap('forearm_L', this.bLowerL, this.bWristL, 0.032);
-    pushCap('forearm_R', this.bLowerR, this.bWristR, 0.032);
+    pushCap('deltoid_L', this.bShoulderL, this.bUpperL, 0.054);
+    pushCap('deltoid_R', this.bShoulderR, this.bUpperR, 0.054);
+    pushCap('upperarm_L', this.bUpperL, this.bLowerL, 0.046);
+    pushCap('upperarm_R', this.bUpperR, this.bLowerR, 0.046);
+    pushCap('forearm_L', this.bLowerL, this.bWristL, 0.036);
+    pushCap('forearm_R', this.bLowerR, this.bWristR, 0.036);
 
     this.capsules = cols;
   }
@@ -399,16 +407,31 @@ export class AnatomicalCollider {
     invMass: Float32Array,
     particleCount: number,
     thicknessM = 0.004,
-    includeMeshNarrowPhase = true
+    includeMeshNarrowPhase = true,
+    prevPos?: Float32Array
   ): CollisionStepStats {
     const t0 = performance.now();
     let capsuleCorrections = 0;
     let meshCorrections = 0;
+    let tunnelingIncidents = 0;
 
-    // 1. Broad-phase anatomical capsule projection (prevents deep tunneling)
+    // 1. Broad-phase anatomical capsule projection + swept midpoint CCD
     for (let i = 0; i < particleCount; i++) {
       if (invMass[i] === 0) continue;
       const ix = i * 3;
+      let checkMid = false;
+      let mx = 0, my = 0, mz = 0;
+      if (prevPos) {
+        const dx = pos[ix] - prevPos[ix];
+        const dy = pos[ix + 1] - prevPos[ix + 1];
+        const dz = pos[ix + 2] - prevPos[ix + 2];
+        if (dx * dx + dy * dy + dz * dz > 0.0025 * 0.0025) {
+          checkMid = true;
+          mx = 0.5 * (pos[ix] + prevPos[ix]);
+          my = 0.5 * (pos[ix + 1] + prevPos[ix + 1]);
+          mz = 0.5 * (pos[ix + 2] + prevPos[ix + 2]);
+        }
+      }
 
       for (let k = 0; k < this.capsules.length; k++) {
         const col = this.capsules[k];
@@ -417,6 +440,24 @@ export class AnatomicalCollider {
         const abz = col.b.z - col.a.z;
         const ab2 = abx * abx + aby * aby + abz * abz;
         if (ab2 < 1e-8) continue;
+
+        // Swept midpoint check to prevent fast-motion tunneling
+        if (checkMid) {
+          const tm = Math.max(0, Math.min(1, ((mx - col.a.x) * abx + (my - col.a.y) * aby + (mz - col.a.z) * abz) / ab2));
+          const rmx = mx - (col.a.x + abx * tm);
+          const rmy = my - (col.a.y + aby * tm);
+          const rmz = mz - (col.a.z + abz * tm);
+          const dm2 = rmx * rmx + rmy * rmy + rmz * rmz;
+          if (dm2 < col.radius * col.radius && dm2 > 1e-10) {
+            const dm = Math.sqrt(dm2);
+            const pushM = (col.radius - dm) / dm;
+            pos[ix] = mx + rmx * pushM;
+            pos[ix + 1] = my + rmy * pushM;
+            pos[ix + 2] = mz + rmz * pushM;
+            tunnelingIncidents++;
+          }
+        }
+
         const t = Math.max(0, Math.min(1, ((pos[ix] - col.a.x) * abx + (pos[ix + 1] - col.a.y) * aby + (pos[ix + 2] - col.a.z) * abz) / ab2));
         const cx = col.a.x + abx * t;
         const cy = col.a.y + aby * t;
@@ -527,6 +568,7 @@ export class AnatomicalCollider {
     return {
       capsuleCorrections,
       meshCorrections,
+      tunnelingIncidents,
       collisionTimeMs: performance.now() - t0,
     };
   }

@@ -1,0 +1,132 @@
+{
+  "active_body_engine_db": "wearwise_body_engine_staging",
+  "ownership_isolation_enforced": true,
+  "avatars_generated": 5,
+  "calibration_records": [
+    {
+      "test_profile": "PROFILE_A_SLIM_MALE",
+      "profile_id": "a807a4ba-90ab-410d-93de-c8f1845d90c9",
+      "avatar_id": "09f8a155-e901-4363-b4fb-fc7280c54e44",
+      "sha256": "a4917afe59104cbe9579a234619d8def71b8ed1502004fdde0562b22f370af44",
+      "rig": {
+        "bytes": 1027928,
+        "skins": 1,
+        "bones": 104,
+        "has_joints_0": true,
+        "has_weights_0": true,
+        "verts": 13718
+      },
+      "target_stature_cm": 172.0,
+      "extracted_stature_cm": 172.0,
+      "stature_error_cm": 0.0,
+      "target_chest_cm": 92.0,
+      "extracted_chest_cm": 81.74,
+      "chest_diff_cm": -10.26,
+      "target_waist_cm": 76.0,
+      "extracted_waist_cm": 64.09,
+      "waist_diff_cm": -11.91,
+      "extracted_hip_cm": 94.37,
+      "extracted_shoulder_cm": 39.19
+    },
+    {
+      "test_profile": "PROFILE_B_ATHLETIC_MALE",
+      "profile_id": "e61bcbe3-d5ac-4b9c-bd3a-6a542e68b957",
+      "avatar_id": "3e7b4429-5a82-4342-a783-3d18c9e38e01",
+      "sha256": "a460b7ccddab9676e7e1a94523b97bd20af01f4e78a021ef814914cadf3b295f",
+      "rig": {
+        "bytes": 1027912,
+        "skins": 1,
+        "bones": 104,
+        "has_joints_0": true,
+        "has_weights_0": true,
+        "verts": 13718
+      },
+      "target_stature_cm": 178.5,
+      "extracted_stature_cm": 178.5,
+      "stature_error_cm": 0.0,
+      "target_chest_cm": 100.0,
+      "extracted_chest_cm": 85.44,
+      "chest_diff_cm": -14.56,
+      "target_waist_cm": 82.0,
+      "extracted_waist_cm": 67.3,
+      "waist_diff_cm": -14.7,
+      "extracted_hip_cm": 99.0,
+      "extracted_shoulder_cm": 41.54
+    },
+    {
+      "test_profile": "PROFILE_C_BROAD_MALE",
+      "profile_id": "74da8f2e-71f0-4e7f-a8a8-d7445e957224",
+      "avatar_id": "66d82efd-01ff-498f-a765-eb6c31cda4ba",
+      "sha256": "3b6870a74517ca6f6cd4f757f494c9e1bd071d880fbbd142f1f4d942aa1c5a67",
+      "rig": {
+        "bytes": 1027888,
+        "skins": 1,
+        "bones": 104,
+        "has_joints_0": true,
+        "has_weights_0": true,
+        "verts": 13718
+      },
+      "target_stature_cm": 184.0,
+      "extracted_stature_cm": 184.0,
+      "stature_error_cm": 0.0,
+      "target_chest_cm": 110.0,
+      "extracted_chest_cm": 88.71,
+      "chest_diff_cm": -21.29,
+      "target_waist_cm": 94.0,
+      "extracted_waist_cm": 80.12,
+      "waist_diff_cm": -13.88,
+      "extracted_hip_cm": 111.6,
+      "extracted_shoulder_cm": 43.68
+    },
+    {
+      "test_profile": "PROFILE_D_PETITE_FEMININE",
+      "profile_id": "4fd20b07-446a-4970-a83b-2df69eb3d13e",
+      "avatar_id": "497e8af4-8a61-412e-95e8-cd53e56f1e89",
+      "sha256": "b6e5dd96c0a62cc042f08da0a4714ee559af36645835588ced9a3a66f56741e5",
+      "rig": {
+        "bytes": 1027948,
+        "skins": 1,
+        "bones": 104,
+        "has_joints_0": true,
+        "has_weights_0": true,
+        "verts": 13718
+      },
+      "target_stature_cm": 161.0,
+      "extracted_stature_cm": 161.0,
+      "stature_error_cm": 0.0,
+      "target_chest_cm": 86.0,
+      "extracted_chest_cm": 83.91,
+      "chest_diff_cm": -2.09,
+      "target_waist_cm": 68.0,
+      "extracted_waist_cm": 64.98,
+      "waist_diff_cm": -3.02,
+      "extracted_hip_cm": 88.79,
+      "extracted_shoulder_cm": 37.13
+    },
+    {
+      "test_profile": "PROFILE_E_TALL_NEUTRAL",
+      "profile_id": "a27f77e5-cc4f-4d32-b901-9c682ecc7b3f",
+      "avatar_id": "6bba0e83-cd36-41b1-9d8b-864923f9ca6c",
+      "sha256": "b1ff58f0a41dc5662c518ea6beb7ffbf89deef6eb94dc986c346ed5bb5ad9877",
+      "rig": {
+        "bytes": 1027928,
+        "skins": 1,
+        "bones": 104,
+        "has_joints_0": true,
+        "has_weights_0": true,
+        "verts": 13718
+      },
+      "target_stature_cm": 180.0,
+      "extracted_stature_cm": 180.0,
+      "stature_error_cm": 0.0,
+      "target_chest_cm": 96.0,
+      "extracted_chest_cm": 88.03,
+      "chest_diff_cm": -7.97,
+      "target_waist_cm": 80.0,
+      "extracted_waist_cm": 71.97,
+      "waist_diff_cm": -8.03,
+      "extracted_hip_cm": 96.39,
+      "extracted_shoulder_cm": 40.78
+    }
+  ]
+}

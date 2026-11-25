@@ -1,0 +1,31 @@
+{
+  "desktop_chrome": {
+    "load_sec": 3.84,
+    "fit_M_athletic": "Relaxed fit",
+    "fit_M_petite": "Too loose",
+    "fit_S_petite": "Relaxed fit",
+    "worker_mode": "web_worker",
+    "fps": 30,
+    "avg_fps": 54,
+    "cart_banner": "Added TSH-WW-PHASE11-ACCEPTANCE-001 (Size S, Rev 1) to cart.",
+    "cart_has_sku": false,
+    "page_errors": []
+  },
+  "mobile_chrome": {
+    "rendered": true,
+    "page_errors": []
+  },
+  "desktop_edge": {
+    "available": true,
+    "rendered": true,
+    "page_errors": []
+  },
+  "failure_recovery": {
+    "stale_rev_999_error": "Simulation Stopped (Fail-Closed): Failed to resolve garment TSH-WW-PHASE11-ACCEPTANCE-001 size M (HTTP 409)Retry"
+  },
+  "protected_rev3_intact": {
+    "S": true,
+    "M": true,
+    "L": true
+  }
+}

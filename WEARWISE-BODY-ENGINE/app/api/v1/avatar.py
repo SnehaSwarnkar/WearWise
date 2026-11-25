@@ -35,6 +35,7 @@ def generate_avatar(
     result = srv.generate_avatar_for_profile(
         profile_id=payload.profile_id,
         requesting_user_id=user_id,
+        rigged=payload.rigged,
     )
     db.commit()
     return result

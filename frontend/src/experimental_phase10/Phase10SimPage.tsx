@@ -4,7 +4,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import Header from '../pages/Header';
 import { ARTICULATED_POSES, ArticulationState, NEUTRAL_POSE } from './ArticulatedPoseLibrary';
-import { SIM_FABRICS, SimulationMetrics, WeldedClothSolver } from './WeldedClothSolver';
+import { SIM_FABRICS } from './FabricProfiles';
+import { ClientMetrics, WorkerClothClient } from './WorkerClothClient';
 
 interface SliderDef {
   key: keyof ArticulationState;
@@ -30,7 +31,7 @@ const JOINT_SLIDERS: SliderDef[] = [
 
 export default function Phase10SimPage() {
   const mountRef = useRef<HTMLDivElement | null>(null);
-  const solverRef = useRef<WeldedClothSolver>(new WeldedClothSolver());
+  const clientRef = useRef<WorkerClothClient>(new WorkerClothClient());
   const garmentGroupRef = useRef<THREE.Group | null>(null);
 
   const [activePoseId, setActivePoseId] = useState<string>('P0');
@@ -38,7 +39,7 @@ export default function Phase10SimPage() {
   const [fabricId, setFabricId] = useState('waffle_knit_240');
   const [wireframe, setWireframe] = useState(false);
   const [rigInfo, setRigInfo] = useState<{ boneCount: number; hasSkinnedMesh: boolean } | null>(null);
-  const [metrics, setMetrics] = useState<SimulationMetrics | null>(null);
+  const [metrics, setMetrics] = useState<ClientMetrics | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -73,24 +74,33 @@ export default function Phase10SimPage() {
     scene.add(fillLight);
 
     const loader = new GLTFLoader();
-    const solver = solverRef.current;
-    (window as any).__phase10Solver = solver;
+    const client = clientRef.current;
+    (window as any).__phase10Client = client;
+
+    client.setCallbacks(
+      (m) => {
+        if (frameCounter % 4 === 0 || m.simState === 'STABLE') {
+          setMetrics(m);
+        }
+      },
+      (msg) => setLoadError(msg)
+    );
 
     Promise.all([
       new Promise<any>((res, rej) => loader.load('/experimental_phase10/anny_rigged_male_exp.glb', res, undefined, rej)),
       new Promise<any>((res, rej) => loader.load('/experimental_phase10/TSH-EXP-PHASE10_M.glb', res, undefined, rej)),
     ])
-      .then(([avatarGltf, garmentGltf]) => {
+      .then(async ([avatarGltf, garmentGltf]) => {
         const avatarScene = avatarGltf.scene as THREE.Group;
         const garmentScene = garmentGltf.scene as THREE.Group;
         scene.add(avatarScene);
         scene.add(garmentScene);
         garmentGroupRef.current = garmentScene;
 
-        const rInfo = solver.bindAvatar(avatarScene);
-        solver.bindGarment(garmentScene);
+        const rInfo = await client.init(avatarScene, garmentScene);
         setRigInfo(rInfo);
-        setMetrics(solver.getMetrics());
+        const m0 = client.getMetrics();
+        if (m0) setMetrics(m0);
       })
       .catch((err) => {
         setLoadError(err?.message || 'Failed to load Phase 10 experimental assets');
@@ -104,13 +114,14 @@ export default function Phase10SimPage() {
       const dt = Math.min(0.033, Math.max(0.001, (now - lastTime) / 1000));
       lastTime = now;
 
-      solver.step(dt);
+      client.step(dt);
       controls.update();
       renderer.render(scene, camera);
 
       frameCounter++;
       if (frameCounter % 6 === 0) {
-        setMetrics(solver.getMetrics());
+        const m = client.getMetrics();
+        if (m) setMetrics(m);
       }
       rafId = requestAnimationFrame(animate);
     };
@@ -118,17 +129,18 @@ export default function Phase10SimPage() {
 
     return () => {
       cancelAnimationFrame(rafId);
+      client.dispose();
       controls.dispose();
       renderer.dispose();
     };
   }, []);
 
   useEffect(() => {
-    solverRef.current.setTargetPose(poseState);
+    clientRef.current.setTargetPose(poseState);
   }, [poseState]);
 
   useEffect(() => {
-    solverRef.current.setFabric(fabricId);
+    clientRef.current.setFabric(fabricId);
   }, [fabricId]);
 
   useEffect(() => {
@@ -150,8 +162,9 @@ export default function Phase10SimPage() {
   const handleReset = () => {
     setActivePoseId('P0');
     setPoseState({ ...NEUTRAL_POSE });
-    solverRef.current.reset();
-    setMetrics(solverRef.current.getMetrics());
+    clientRef.current.reset();
+    const m = clientRef.current.getMetrics();
+    if (m) setMetrics(m);
   };
 
   return (
@@ -210,12 +223,12 @@ export default function Phase10SimPage() {
                   <div>Colliders: {metrics.colliderCapsules} Capsules + {metrics.colliderUpperTris.toLocaleString()} Tris</div>
                   <div>Garment: {metrics.garmentVertices.toLocaleString()} Verts → {metrics.particleCount.toLocaleString()} Welded</div>
                   <div>Constraints: {metrics.constraintCount.toLocaleString()} ({metrics.structuralConstraints} Struct, {metrics.bendingConstraints} Bend)</div>
-                  <div>Solve: {metrics.lastSolveMs} ms (Col: {metrics.collisionTimeMs} ms)</div>
-                  <div>FPS: {metrics.fps} (Avg {metrics.avgFps}, Min {metrics.minFps}) | P95: {metrics.p95FrameMs} ms</div>
+                  <div>Solve: {metrics.lastSolveMs} ms (Col: {metrics.collisionTimeMs} ms | Mode: {metrics.workerMode} {metrics.workerCommMs} ms)</div>
+                  <div>FPS: {metrics.fps} (Avg {metrics.avgFps}, Min {metrics.minFps}) | P95: {metrics.p95FrameMs} ms | State: {metrics.simState}</div>
                   <div>Displacement: Max {metrics.maxDisplacementCm} cm | Avg {metrics.avgDisplacementCm} cm</div>
                   <div>Stretch Ratio: Max {metrics.maxStretchRatio} | Mean {metrics.meanStretchRatio} | Comp {metrics.maxCompressionRatio}</div>
                   <div>Bend Dev: Max {metrics.maxBendDeviation} | Mean {metrics.meanBendDeviation} | Res {metrics.constraintResidual} mm</div>
-                  <div>Velocity: Max {metrics.maxVelocityMs} m/s | Seam Sep: {metrics.seamSeparationMm} mm</div>
+                  <div>Velocity: Max {metrics.maxVelocityMs} m/s | Seam Sep: {metrics.seamSeparationMm} mm | Tunneling: {metrics.tunnelingIncidents}</div>
                   <div>Penetration: {metrics.penetratingParticles}/{metrics.particleCount} | Max {metrics.maxPenetrationMm} mm | Mean {metrics.meanPenetrationMm} mm</div>
                   <div>Corrections/Step: {metrics.capsuleCorrections} Cap + {metrics.meshCorrections} Mesh{metrics.heapMB !== null ? ` | Heap: ${metrics.heapMB} MB` : ''}</div>
                 </>

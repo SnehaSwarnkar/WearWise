@@ -52,6 +52,7 @@ class AvatarOrchestrationService:
         self,
         profile_id: uuid.UUID,
         requesting_user_id: uuid.UUID,
+        rigged: bool = False,
     ) -> Dict[str, Any]:
         """
         Executes end-to-end avatar generation for the active profile revision:
@@ -120,7 +121,7 @@ class AvatarOrchestrationService:
         start_time = time.perf_counter()
         mesh = self.adapter.generate_avatar(shape_spec)
         validation_report = self.adapter.validate_mesh(mesh)
-        glb_bytes = self.adapter.export_glb(mesh)
+        glb_bytes = self.adapter.export_glb(mesh, rigged=rigged)
         duration_ms = Decimal(f"{(time.perf_counter() - start_time) * 1000.0:.2f}")
 
         # 5. Store GLB in content-addressable storage
@@ -158,6 +159,8 @@ class AvatarOrchestrationService:
                 "supported_capabilities": [c.value if hasattr(c, "value") else str(c) for c in engine_meta.supported_capabilities],
                 "mesh_is_valid": validation_report.is_valid,
                 "is_watertight": validation_report.is_watertight,
+                "rigged": rigged,
+                "bone_count": 104 if rigged else 0,
             },
         )
 

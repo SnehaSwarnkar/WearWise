@@ -1075,10 +1075,10 @@ def get_package_manifest(
 
 
 @router.get("/{garment_id}/shopper-asset")
-def get_shopper_asset(garment_id: str, size: str = "M"):
+def get_shopper_asset(garment_id: str, size: str = "M", revision: Optional[int] = Query(None)):
     """
-    Shopper-facing gateway: strictly verifies that asset is published in Commerce catalog
-    before serving GLB asset URLs to shoppers.
+    Shopper-facing gateway: strictly verifies that asset is published in Commerce catalog,
+    rejects unapproved/stale revisions (fail-closed), and returns full digital twin metadata.
     """
     garment = mongo.find_document(COLL_GARMENTS, {"id": garment_id, "is_deleted": False})
     if not garment:
@@ -1092,31 +1092,58 @@ def get_shopper_asset(garment_id: str, size: str = "M"):
             detail=f"Access denied: Garment {garment_id} is in status '{garment.get('status')}' and has not been approved and published for shoppers."
         )
 
+    pub_rev = garment.get("published_revision") or garment.get("revision")
+    if revision is not None and pub_rev is not None and int(revision) != int(pub_rev):
+        raise HTTPException(
+            status_code=409,
+            detail=f"Revision mismatch: requested revision {revision}, but published revision is {pub_rev}."
+        )
+
     size_variants = garment.get("size_variants", {})
     sv = size_variants.get(size)
+    raw_fab = garment.get("fabric_properties") or {}
+    fabric_props = {**raw_fab, "id": raw_fab.get("id") or raw_fab.get("preset_id") or "cotton_waffle_knit_240gsm"}
+    measurements = garment.get("measurements") or {}
+    qa_report = garment.get("qa_report") or {}
+
     if sv and sv.get("asset_url"):
         return {
+            "garment_id": garment.get("id"),
             "sku": garment.get("sku"),
+            "name": garment.get("name"),
             "status": "published",
-            "revision": garment.get("published_revision") or garment.get("revision"),
+            "revision": pub_rev,
             "version": garment.get("published_version", "v1.0"),
             "size": size,
+            "available_sizes": garment.get("available_sizes", list(size_variants.keys())),
             "asset_url": sv["asset_url"],
             "sha256": sv.get("sha256"),
+            "fabric_profile": fabric_props,
+            "measurements": measurements.get(size, measurements),
+            "all_size_measurements": measurements,
+            "qa_status": qa_report.get("overall_status", "UNKNOWN"),
         }
 
     mesh_assets = garment.get("mesh_assets", {})
-    size_asset = mesh_assets.get(size) or mesh_assets.get("canonical")
+    size_asset = mesh_assets.get(size)
     if not size_asset:
         raise HTTPException(status_code=404, detail=f"Size variant {size} not found in published garment")
 
     return {
+        "garment_id": garment.get("id"),
         "sku": garment.get("sku"),
+        "name": garment.get("name"),
         "status": "published",
+        "revision": pub_rev,
         "version": garment.get("published_version", "v1.0"),
         "size": size,
+        "available_sizes": garment.get("available_sizes", ["S", "M", "L"]),
         "asset_url": size_asset,
         "texture_url": mesh_assets.get("texture_atlas"),
+        "fabric_profile": fabric_props,
+        "measurements": measurements.get(size, measurements),
+        "all_size_measurements": measurements,
+        "qa_status": qa_report.get("overall_status", "UNKNOWN"),
     }
 
 

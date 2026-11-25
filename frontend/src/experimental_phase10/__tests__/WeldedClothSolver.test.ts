@@ -146,6 +146,9 @@ describe('WeldedClothSolver (Phase 10.4-10.7)', () => {
     solver.reset();
     const afterReset = solver.getMetrics();
     expect(afterReset.maxDisplacementCm).toBe(0);
+    expect(afterReset.simState).toBe('STABLE');
+    expect(afterReset.resetEpoch).toBeGreaterThanOrEqual(1);
+    expect(afterReset.tunnelingIncidents).toBe(0);
   });
 
   it('produces distinct mechanical metrics between Waffle Knit (240 GSM) and Structured Poplin (140 GSM)', () => {

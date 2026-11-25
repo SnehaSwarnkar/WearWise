@@ -1,0 +1,130 @@
+{
+  "profiles_tested": 5,
+  "sizes_tested": [
+    "S",
+    "M",
+    "L"
+  ],
+  "fit_matrix": [
+    {
+      "test_profile": "PROFILE_A_SLIM_MALE",
+      "gender": "masculine",
+      "sizes": {
+        "S": {
+          "chest_ease_cm": 14.26,
+          "waist_ease_cm": 27.91,
+          "shoulder_ease_cm": 3.81,
+          "classification": "Relaxed fit"
+        },
+        "M": {
+          "chest_ease_cm": 22.26,
+          "waist_ease_cm": 35.91,
+          "shoulder_ease_cm": 6.81,
+          "classification": "Too loose"
+        },
+        "L": {
+          "chest_ease_cm": 30.26,
+          "waist_ease_cm": 43.91,
+          "shoulder_ease_cm": 9.81,
+          "classification": "Too loose"
+        }
+      }
+    },
+    {
+      "test_profile": "PROFILE_B_ATHLETIC_MALE",
+      "gender": "masculine",
+      "sizes": {
+        "S": {
+          "chest_ease_cm": 10.56,
+          "waist_ease_cm": 24.7,
+          "shoulder_ease_cm": 1.46,
+          "classification": "Regular fit"
+        },
+        "M": {
+          "chest_ease_cm": 18.56,
+          "waist_ease_cm": 32.7,
+          "shoulder_ease_cm": 4.46,
+          "classification": "Relaxed fit"
+        },
+        "L": {
+          "chest_ease_cm": 26.56,
+          "waist_ease_cm": 40.7,
+          "shoulder_ease_cm": 7.46,
+          "classification": "Too loose"
+        }
+      }
+    },
+    {
+      "test_profile": "PROFILE_C_BROAD_MALE",
+      "gender": "masculine",
+      "sizes": {
+        "S": {
+          "chest_ease_cm": 7.29,
+          "waist_ease_cm": 11.88,
+          "shoulder_ease_cm": -0.68,
+          "classification": "Regular fit"
+        },
+        "M": {
+          "chest_ease_cm": 15.29,
+          "waist_ease_cm": 19.88,
+          "shoulder_ease_cm": 2.32,
+          "classification": "Relaxed fit"
+        },
+        "L": {
+          "chest_ease_cm": 23.29,
+          "waist_ease_cm": 27.88,
+          "shoulder_ease_cm": 5.32,
+          "classification": "Too loose"
+        }
+      }
+    },
+    {
+      "test_profile": "PROFILE_D_PETITE_FEMININE",
+      "gender": "feminine",
+      "sizes": {
+        "S": {
+          "chest_ease_cm": 12.09,
+          "waist_ease_cm": 27.02,
+          "shoulder_ease_cm": 5.87,
+          "classification": "Relaxed fit"
+        },
+        "M": {
+          "chest_ease_cm": 20.09,
+          "waist_ease_cm": 35.02,
+          "shoulder_ease_cm": 8.87,
+          "classification": "Too loose"
+        },
+        "L": {
+          "chest_ease_cm": 28.09,
+          "waist_ease_cm": 43.02,
+          "shoulder_ease_cm": 11.87,
+          "classification": "Too loose"
+        }
+      }
+    },
+    {
+      "test_profile": "PROFILE_E_TALL_NEUTRAL",
+      "gender": "neutral",
+      "sizes": {
+        "S": {
+          "chest_ease_cm": 7.97,
+          "waist_ease_cm": 20.03,
+          "shoulder_ease_cm": 2.22,
+          "classification": "Regular fit"
+        },
+        "M": {
+          "chest_ease_cm": 15.97,
+          "waist_ease_cm": 28.03,
+          "shoulder_ease_cm": 5.22,
+          "classification": "Relaxed fit"
+        },
+        "L": {
+          "chest_ease_cm": 23.97,
+          "waist_ease_cm": 36.03,
+          "shoulder_ease_cm": 8.22,
+          "classification": "Too loose"
+        }
+      }
+    }
+  ]
+}
