@@ -19,6 +19,9 @@ import {
   approveGarment,
   publishGarment,
   fetchGarmentManifest,
+  fetchPrototypePreviewMeta,
+  fetchGarmentRevisions,
+  rollbackGarment,
 } from '../api/merchantGarments';
 import './MerchantGarmentStudio.css';
 import {
@@ -52,6 +55,10 @@ export default function MerchantGarmentStudio() {
   // Active Garment State
   const [garmentId, setGarmentId] = useState('ww-seed-tsh-ww-crew-001');
   const [garmentData, setGarmentData] = useState(null);
+  const [garmentsList, setGarmentsList] = useState([]);
+  const [revisionsList, setRevisionsList] = useState([]);
+  const [downstreamStale, setDownstreamStale] = useState(false);
+  const [staleReason, setStaleReason] = useState(null);
 
   // Step 1: Product Identity
   const [identity, setIdentity] = useState({
@@ -166,6 +173,8 @@ export default function MerchantGarmentStudio() {
 
   // Step 6: 3D Preview, Motion, QA & Publication
   const [previewSize, setPreviewSize] = useState('M');
+  const [prototypeMeta, setPrototypeMeta] = useState(null);
+  const [prototypeError, setPrototypeError] = useState(null);
   const [armAngle, setArmAngle] = useState(0);
   const [garmentStatus, setGarmentStatus] = useState('published');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -173,6 +182,39 @@ export default function MerchantGarmentStudio() {
   const [qaReport, setQaReport] = useState(null);
   const [manifestData, setManifestData] = useState(null);
   const [showManifestModal, setShowManifestModal] = useState(false);
+
+  const applyGarmentDoc = (g) => {
+    if (!g) return;
+    setGarmentId(g.id);
+    setGarmentData(g);
+    setIdentity({
+      name: g.name,
+      sku: g.sku,
+      category: g.category || 'T-Shirt',
+      subcategory: g.subcategory || 'Oversized Drop-Shoulder Tee',
+      description: g.description || '',
+      color_variant: g.color_variant || '',
+      price: g.price || 2999,
+      available_sizes: g.available_sizes || ['S', 'M', 'L'],
+    });
+    if (g.images) setUploadedImages(g.images);
+    if (g.images_meta) setImagesMeta(g.images_meta);
+    if (g.pattern) setPatternSpec(g.pattern);
+    if (g.measurements) setMeasurementsTable(g.measurements);
+    if (g.fabric_properties) setFabricProps(g.fabric_properties);
+    if (g.status) setGarmentStatus(g.status);
+    setQaReport(g.qa_report || null);
+    setManifestData(g.manifest || null);
+    setDownstreamStale(Boolean(g.downstream_stale));
+    setStaleReason(g.stale_reason || null);
+  };
+
+  const refreshRevisions = (id) => {
+    if (!id) return;
+    fetchGarmentRevisions(id)
+      .then((res) => setRevisionsList(res?.revisions || []))
+      .catch(() => setRevisionsList([]));
+  };
 
   // Load initial garment data & fabric presets
   useEffect(() => {
@@ -185,31 +227,68 @@ export default function MerchantGarmentStudio() {
     fetchMerchantGarments()
       .then((garments) => {
         if (garments && garments.length > 0) {
-          const g = garments[0];
-          setGarmentId(g.id);
-          setGarmentData(g);
-          setIdentity({
-            name: g.name,
-            sku: g.sku,
-            category: g.category || 'T-Shirt',
-            subcategory: g.subcategory || 'Oversized Drop-Shoulder Tee',
-            description: g.description,
-            color_variant: g.color_variant,
-            price: g.price || 2999,
-            available_sizes: g.available_sizes || ['S', 'M', 'L'],
-          });
-          if (g.images) setUploadedImages(g.images);
-          if (g.images_meta) setImagesMeta(g.images_meta);
-          if (g.pattern) setPatternSpec(g.pattern);
-          if (g.measurements) setMeasurementsTable(g.measurements);
-          if (g.fabric_properties) setFabricProps(g.fabric_properties);
-          if (g.status) setGarmentStatus(g.status);
-          if (g.qa_report) setQaReport(g.qa_report);
-          if (g.manifest) setManifestData(g.manifest);
+          setGarmentsList(garments);
+          applyGarmentDoc(garments[0]);
+          refreshRevisions(garments[0].id);
         }
       })
       .catch((err) => console.warn('Could not load merchant garments:', err));
   }, []);
+
+  // Resolve explicit unpublished prototype candidate assets for TSH-WW-CREW-001 or ungenerated SKUs
+  useEffect(() => {
+    const activeSku = identity?.sku || 'TSH-WW-CREW-001';
+    if (activeSku !== 'TSH-WW-CREW-001' && garmentData?.size_variants) {
+      setPrototypeMeta(null);
+      setPrototypeError(null);
+      return;
+    }
+    setPrototypeError(null);
+    fetchPrototypePreviewMeta(activeSku, 'rev3')
+      .then((meta) => {
+        setPrototypeMeta(meta);
+        setPrototypeError(null);
+      })
+      .catch((err) => {
+        setPrototypeMeta(null);
+        setPrototypeError(err?.message || `Prototype candidate assets unavailable for ${activeSku}`);
+      });
+  }, [identity?.sku, garmentData?.size_variants]);
+
+  const handleStartNewDraft = () => {
+    setGarmentId('');
+    setGarmentData(null);
+    setRevisionsList([]);
+    setQaReport(null);
+    setManifestData(null);
+    setPipelineProgress([]);
+    setDownstreamStale(false);
+    setStaleReason(null);
+    setGarmentStatus('draft');
+    setIdentity({
+      name: '',
+      sku: '',
+      category: 'T-Shirt',
+      subcategory: 'Oversized Drop-Shoulder Tee',
+      description: '',
+      color_variant: 'Coral Pink / White Trim',
+      price: 2999,
+      available_sizes: ['S', 'M', 'L'],
+    });
+    setUploadedImages({
+      front: null,
+      back: null,
+      left_side: null,
+      right_side: null,
+      close_up: null,
+      collar: null,
+      cuff: null,
+      construction: null,
+    });
+    setImagesMeta([]);
+    setActiveStep(1);
+    showFeedback('Ready to configure a new unique product SKU.');
+  };
 
   const showFeedback = (msg, isError = false) => {
     if (isError) {
@@ -226,8 +305,9 @@ export default function MerchantGarmentStudio() {
     setLoading(true);
     try {
       const resp = await createGarmentIdentity(identity);
-      setGarmentId(resp.id);
-      setGarmentData(resp);
+      applyGarmentDoc(resp);
+      setGarmentsList((prev) => [resp, ...prev.filter((x) => x.id !== resp.id)]);
+      refreshRevisions(resp.id);
       showFeedback('Step 1: Product identity and SKU created successfully.');
       setActiveStep(2);
     } catch (err) {
@@ -243,8 +323,7 @@ export default function MerchantGarmentStudio() {
     setLoading(true);
     try {
       const resp = await uploadViewpointImage(garmentId, viewpoint, file, imageRole);
-      setUploadedImages(resp.garment.images);
-      if (resp.garment.images_meta) setImagesMeta(resp.garment.images_meta);
+      applyGarmentDoc(resp.garment);
       showFeedback(`Uploaded ${viewpoint} image (${imageRole}) successfully.`);
     } catch (err) {
       showFeedback(err.message, true);
@@ -273,7 +352,7 @@ export default function MerchantGarmentStudio() {
     setLoading(true);
     try {
       const resp = await uploadCADPattern(garmentId, file, cadUnits);
-      setPatternSpec(resp.garment.pattern);
+      applyGarmentDoc(resp.garment);
       showFeedback(`Method A: CAD pattern parsed (${resp.cad_validation.panel_count} panels).`);
     } catch (err) {
       showFeedback(err.message, true);
@@ -292,10 +371,12 @@ export default function MerchantGarmentStudio() {
         hem_finish: patternSpec.hem_finish || 'clean_28mm',
         has_pocket: patternSpec.has_pocket !== false,
         pocket_type: patternSpec.pocket_type || 'left_chest_patch',
+        pocket_width_cm: patternSpec.pocket_width_cm || null,
+        pocket_height_cm: patternSpec.pocket_height_cm || null,
         measurements: measurementsTable[activeSizeTab],
       });
-      setPatternSpec(resp.garment.pattern);
-      showFeedback('Method B: Guided pattern synthesized with 11 explicit seams.');
+      applyGarmentDoc(resp.garment);
+      showFeedback('Method B: Guided pattern synthesized with explicit 2D panels and seams.');
       setActiveStep(4);
     } catch (err) {
       showFeedback(err.message, true);
@@ -309,8 +390,8 @@ export default function MerchantGarmentStudio() {
     setLoading(true);
     try {
       const resp = await requestAIRepairPattern(garmentId, { adapter: 'SwiftTailorAdapter' });
-      setPatternSpec(resp.garment.pattern);
-      showFeedback('Method C: AI image-based pattern reconstruction completed.');
+      applyGarmentDoc(resp.garment);
+      showFeedback('Method C: Provisional AI adapter pattern generated (requires merchant verification).');
       setActiveStep(4);
     } catch (err) {
       showFeedback(err.message, true);
@@ -324,7 +405,8 @@ export default function MerchantGarmentStudio() {
     setLoading(true);
     try {
       const current = measurementsTable[activeSizeTab];
-      await saveMeasurements(garmentId, { size_label: activeSizeTab, ...current });
+      const updated = await saveMeasurements(garmentId, { size_label: activeSizeTab, ...current });
+      applyGarmentDoc(updated);
       showFeedback(`Step 4: Size ${activeSizeTab} flat & circumference measurements saved.`);
       setActiveStep(5);
     } catch (err) {
@@ -348,7 +430,7 @@ export default function MerchantGarmentStudio() {
     setLoading(true);
     try {
       const resp = await saveFabricProps(garmentId, fabricProps);
-      setFabricProps(resp.fabric_properties);
+      applyGarmentDoc(resp);
       showFeedback('Step 5: Fabric mechanical properties registered.');
       setActiveStep(6);
     } catch (err) {
@@ -367,7 +449,21 @@ export default function MerchantGarmentStudio() {
       setGarmentStatus(resp.status);
       setPipelineProgress(resp.pipeline_stages || []);
       setQaReport(resp.qa_report);
-      showFeedback(`✦ 3D Garments synthesized across S, M, L. QA Status: ${resp.qa_report.overall_status}.`);
+      setDownstreamStale(false);
+      setStaleReason(null);
+      setGarmentData((prev) => ({
+        ...(prev || {}),
+        id: garmentId,
+        revision: resp.revision,
+        active_revision: resp.revision,
+        status: resp.status,
+        downstream_stale: false,
+        mesh_assets: resp.assets,
+        size_variants: resp.size_variants,
+        qa_report: resp.qa_report,
+      }));
+      refreshRevisions(garmentId);
+      showFeedback(`✦ 3D Garments synthesized across S, M, L (rev${resp.revision}). QA Status: ${resp.qa_report.overall_status}.`);
     } catch (err) {
       showFeedback(err.message, true);
     } finally {
@@ -441,6 +537,38 @@ export default function MerchantGarmentStudio() {
             Transform physical fashion products into structured, size-specific, physically responsive 3D garment packages
             with automated QA and versioned package manifests.
           </p>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '10px', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              data-testid="new-draft-btn"
+              className="btn-secondary-merchant"
+              onClick={handleStartNewDraft}
+              style={{ padding: '7px 14px', fontSize: '12px' }}
+            >
+              + NEW DRAFT PRODUCT
+            </button>
+            {garmentsList.length > 0 && (
+              <select
+                data-testid="garment-switcher"
+                className="form-select"
+                style={{ width: 'auto', minWidth: '260px', padding: '6px 10px', fontSize: '12px' }}
+                value={garmentId || ''}
+                onChange={(e) => {
+                  const found = garmentsList.find((x) => x.id === e.target.value);
+                  if (found) {
+                    applyGarmentDoc(found);
+                    refreshRevisions(found.id);
+                  }
+                }}
+              >
+                {garmentsList.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.sku} — {g.name} ({g.status})
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
         </div>
 
         {/* Feedback alerts */}
@@ -748,7 +876,7 @@ export default function MerchantGarmentStudio() {
                 onClick={() => setPatternMethodTab('cad')}
               >
                 <div className="method-tab-title">METHOD A: CAD / DXF / SVG</div>
-                <div className="method-tab-sub">Production 2D Pattern Upload (Graded)</div>
+                <div className="method-tab-sub">2D Upload &amp; Structural Validation (Reference Only)</div>
               </button>
 
               <button
@@ -862,8 +990,8 @@ export default function MerchantGarmentStudio() {
                   </div>
                 </div>
 
-                <p className="info-subtext">
-                  ✦ Validates closed boundary loops, panel names, and notch matching under ISO 8559-2 standards.
+                <p className="info-subtext" data-testid="cad-capability-disclosure">
+                  ℹ Validates DXF closed polyline loops/layers or SVG path/polygon/group counts and stores the file as a pattern reference. Arbitrary uploaded CAD geometry is NOT yet extruded into 3D; 3D synthesis currently uses the Method B 7-panel parametric builder.
                 </p>
               </div>
             )}
@@ -1277,15 +1405,64 @@ export default function MerchantGarmentStudio() {
             <div className="preview-stage-layout">
               {/* Left Column: 3D Studio Canvas with Static Mannequin */}
               <div>
-                <AvatarViewer
-                  assetUrl="/avatars/anny_baseline_male.glb"
-                  garmentUrl={`/garments/TSH-WW-CREW-001_${previewSize}.glb`}
-                  showGarment={true}
-                  armAngle={armAngle}
-                  studioBackground="#720e2c"
-                  fabricProfile="knit"
-                  height="520px"
-                />
+                {downstreamStale && (
+                  <div
+                    data-testid="downstream-stale-banner"
+                    style={{
+                      marginBottom: '10px',
+                      padding: '10px 14px',
+                      borderRadius: '8px',
+                      background: '#fffbeb',
+                      border: '1px solid #f59e0b',
+                      color: '#92400e',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Stale Downstream Output: {staleReason || 'Inputs modified since last generation'}. Regenerate to produce a new candidate revision before approval.
+                  </div>
+                )}
+                {prototypeError && !garmentData?.size_variants?.[previewSize]?.asset_url && (
+                  <div
+                    data-testid="prototype-preview-error"
+                    style={{
+                      marginBottom: '10px',
+                      padding: '10px 14px',
+                      borderRadius: '8px',
+                      background: '#fef2f2',
+                      border: '1px solid #ef4444',
+                      color: '#991b1b',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Prototype Candidate Unavailable: {prototypeError} (Legacy public catalog fallback disabled)
+                  </div>
+                )}
+                {(() => {
+                  const activeVariant = garmentData?.size_variants?.[previewSize] || prototypeMeta?.size_variants?.[previewSize] || null;
+                  const activeUrl = activeVariant?.asset_url || null;
+                  const activeQa = garmentData?.size_variants?.[previewSize] ? (qaReport || garmentData?.qa_report) : (prototypeMeta || qaReport);
+                  const unavailErr = activeUrl
+                    ? null
+                    : prototypeError ||
+                      (!prototypeMeta && !garmentData?.size_variants
+                        ? 'Resolving prototype candidate asset...'
+                        : `Missing candidate GLB for SKU ${identity.sku} Size ${previewSize}`);
+                  return (
+                    <AvatarViewer
+                      assetUrl="/avatars/anny_baseline_male.glb"
+                      garmentUrl={activeUrl}
+                      garmentQaReport={activeQa}
+                      garmentUnavailableError={unavailErr}
+                      showGarment={Boolean(activeUrl)}
+                      armAngle={armAngle}
+                      studioBackground="#720e2c"
+                      fabricProfile="knit"
+                      height="520px"
+                    />
+                  );
+                })()}
 
                 {/* Motion Control Slider */}
                 <div className="motion-control-card">
@@ -1336,7 +1513,25 @@ export default function MerchantGarmentStudio() {
                     ))}
                   </div>
                   <div style={{ fontSize: '11px', color: '#666', marginTop: '10px' }}>
-                    Active 3D mesh: <code>TSH-WW-CREW-001_{previewSize}.glb</code>
+                    {(() => {
+                      const v = garmentData?.size_variants?.[previewSize] || prototypeMeta?.size_variants?.[previewSize];
+                      const revLbl = garmentData?.active_revision ? `rev${garmentData.active_revision}` : prototypeMeta?.revision;
+                      return (
+                        <>
+                          Active 3D mesh:{' '}
+                          <code>
+                            {v?.glb_file ||
+                              (prototypeError ? 'UNAVAILABLE (NO LEGACY FALLBACK)' : `${identity.sku}_${previewSize}.glb`)}
+                          </code>
+                          {v?.sha256 && (
+                            <div style={{ marginTop: '4px', color: '#475569' }}>
+                              SHA-256: <code>{v.sha256.slice(0, 16)}...</code> · Revision:{' '}
+                              <code>{revLbl}</code>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
 
@@ -1450,7 +1645,7 @@ export default function MerchantGarmentStudio() {
                   <button
                     type="button"
                     className="btn-secondary-merchant"
-                    onClick={() => navigate('/try-on')}
+                    onClick={() => navigate(identity.sku && identity.sku !== 'TSH-WW-CREW-001' ? `/try-on?sku=${encodeURIComponent(identity.sku)}&size=${previewSize}` : '/try-on')}
                     style={{ justifyContent: 'center', padding: '12px' }}
                   >
                     OPEN IN SHOPPER TRY-ON STUDIO →

@@ -5,11 +5,13 @@ Manages dual-role image storage, technical assets, SHA-256 verification,
 and compiles the immutable Digital Garment Package Manifest for published revisions.
 """
 
+import io
 import os
 import hashlib
 import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timezone
+from PIL import Image
 
 logger = logging.getLogger("wearwise.garment_platform.assets")
 
@@ -35,17 +37,27 @@ class GarmentAssetManager:
 
     @classmethod
     def validate_image_upload(cls, filename: str, content: bytes) -> Dict[str, Any]:
-        """Validates image file extension and size constraints."""
+        """Validates image file extension, size constraints, and actual image payload."""
         ext = os.path.splitext(filename)[1].lower()
         if ext not in cls.VALID_IMAGE_EXTS:
             return {
                 "valid": False,
                 "error": f"Invalid image format '{ext}'. Allowed formats: JPEG, PNG, WebP.",
             }
+        if not content or len(content) == 0:
+            return {"valid": False, "error": "Empty image file uploaded."}
         if len(content) > cls.MAX_IMAGE_SIZE_BYTES:
             return {
                 "valid": False,
                 "error": f"File size exceeds maximum limit of 15 MB (received {round(len(content)/(1024*1024), 2)} MB).",
+            }
+        try:
+            with Image.open(io.BytesIO(content)) as img:
+                img.verify()
+        except Exception:
+            return {
+                "valid": False,
+                "error": f"Corrupt or invalid image payload for '{filename}'.",
             }
         return {"valid": True, "size_bytes": len(content), "ext": ext}
 
@@ -57,6 +69,7 @@ class GarmentAssetManager:
         garment_dir: str,
         principal_id: str,
         revision: int,
+        glb_paths_by_size: Optional[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
         """
         Compiles the authoritative, immutable Digital Garment Package Manifest.
@@ -69,7 +82,7 @@ class GarmentAssetManager:
         # Compute SHA-256 hashes of all assets
         asset_hashes = {}
         for sz in available_sizes:
-            glb_path = os.path.join(garment_dir, f"TSH-WW-CREW-001_{sz}.glb")
+            glb_path = (glb_paths_by_size or {}).get(sz) or os.path.join(garment_dir, f"{sku}_{sz}.glb")
             if os.path.exists(glb_path):
                 asset_hashes[f"glb_size_{sz}"] = cls.compute_sha256(glb_path)
 

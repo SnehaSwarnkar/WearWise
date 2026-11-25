@@ -1,0 +1,43 @@
+{
+  "avatar_file": "anny_baseline_male.glb",
+  "avatar_vertex_count": 13718,
+  "avatar_face_count": 27420,
+  "avatar_bounds_cm": [
+    98.56,
+    155.97,
+    42.17
+  ],
+  "front_torso_clearance": {
+    "protruding_vertices": 0,
+    "max_protrusion_cm": 0.0,
+    "min_clearance_cm": 0.24
+  },
+  "rear_scapula_clearance": {
+    "protruding_vertices": 0,
+    "max_protrusion_cm": 0.0,
+    "min_clearance_cm": 0.43
+  },
+  "shoulder_and_armhole_clearance": {
+    "shoulder_crest_clearance_cm": 4.39,
+    "armhole_z_span_cm": 10.23
+  },
+  "underarm_clearance": {
+    "axilla_drop_clearance_cm": 4.44
+  },
+  "sleeve_to_arm_alignment": {
+    "yz_centroid_offset_cm": {
+      "left": 2.87,
+      "right": 2.87
+    }
+  },
+  "hem_and_body_clearance": {
+    "lateral_ease_per_side_cm": 1.67,
+    "lower_front_protruding_vertices": 0,
+    "lower_rear_protruding_vertices": 0
+  },
+  "rear_scapula_protruding_vertices": 0,
+  "max_rear_protrusion_cm": 0.0,
+  "front_chest_protruding_vertices": 0,
+  "max_front_protrusion_cm": 0.0,
+  "note": "Avatar fit metrics are isolated from garment QA metrics."
+}

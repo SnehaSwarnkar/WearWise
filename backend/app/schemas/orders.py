@@ -17,6 +17,7 @@ class PlaceOrderRequest(BaseModel):
     session_id: str
     customer: CustomerInfo
     paymentMethod: str  # upi | card | cod
+    idempotency_key: Optional[str] = None
 
 
 class OrderItem(BaseModel):
@@ -28,6 +29,7 @@ class OrderItem(BaseModel):
     brand: Optional[str] = None
     size: Optional[str] = None
     sku: Optional[str] = None
+    published_revision: Optional[int] = None
 
 
 class OrderResponse(BaseModel):
@@ -40,3 +42,5 @@ class OrderResponse(BaseModel):
     total: int
     createdAt: str
     status: str
+    is_demo_checkout: bool = True
+    payment_status: str = "DEMO_NO_PAYMENT_CAPTURED"

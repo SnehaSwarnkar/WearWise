@@ -1,0 +1,91 @@
+{
+  "route_interception_used": false,
+  "merchant_prototype_preview": {
+    "S": {
+      "browser_requested_url": "http://127.0.0.1:4173/api/v1/merchant/garments/prototype-preview/TSH-WW-CREW-001/assets/S?revision=rev3",
+      "http_status": 200,
+      "resolved_asset_path": "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/graded_m2rc/S/TSH-WW-CREW-001_S_candidate_rev3.glb",
+      "response_bytes": 249156,
+      "downloaded_sha256": "8f9bd0c79c54d4f40e3354f729c5f236634acec3a06d33a1f0ec771b51e41690",
+      "expected_sha256": "8f9bd0c79c54d4f40e3354f729c5f236634acec3a06d33a1f0ec771b51e41690",
+      "sha256_exact_match": true,
+      "header_revision": "rev3",
+      "header_filename": "TSH-WW-CREW-001_S_candidate_rev3.glb",
+      "garment_hud_text": "Garment (TSH-WW-CREW-001_S_candidate_rev3.glb):\nMeshes: 7\nVertices: 3,384\nTriangles: 6,096\nTopology: Open-Shell Manifold (196 boundary edges)\nQA: PASSED (WearWise M2R-C Prototype QA Engine (rev3))",
+      "avatar_hud_text": "Avatar:\nMeshes: 1\nVertices: 13,718\nTriangles: 27,420\nSource: Runtime glTF Geometry Check"
+    },
+    "M": {
+      "browser_requested_url": "http://127.0.0.1:4173/api/v1/merchant/garments/prototype-preview/TSH-WW-CREW-001/assets/M?revision=rev3",
+      "http_status": 200,
+      "resolved_asset_path": "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/graded_m2rc/M/TSH-WW-CREW-001_M_candidate_rev3.glb",
+      "response_bytes": 249100,
+      "downloaded_sha256": "9b6212ff218ba6231000cdca1716f808fd501df4e843353655ec7ce4d7389769",
+      "expected_sha256": "9b6212ff218ba6231000cdca1716f808fd501df4e843353655ec7ce4d7389769",
+      "sha256_exact_match": true,
+      "header_revision": "rev3",
+      "header_filename": "TSH-WW-CREW-001_M_candidate_rev3.glb",
+      "garment_hud_text": "Garment (TSH-WW-CREW-001_M_candidate_rev3.glb):\nMeshes: 7\nVertices: 3,384\nTriangles: 6,096\nTopology: Open-Shell Manifold (196 boundary edges)\nQA: PASSED (WearWise M2R-C Prototype QA Engine (rev3))",
+      "avatar_hud_text": "Avatar:\nMeshes: 1\nVertices: 13,718\nTriangles: 27,420\nSource: Runtime glTF Geometry Check"
+    },
+    "L": {
+      "browser_requested_url": "http://127.0.0.1:4173/api/v1/merchant/garments/prototype-preview/TSH-WW-CREW-001/assets/L?revision=rev3",
+      "http_status": 200,
+      "resolved_asset_path": "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/graded_m2rc/L/TSH-WW-CREW-001_L_candidate_rev3.glb",
+      "response_bytes": 249160,
+      "downloaded_sha256": "4bc1a0cbcb0cccbe3b4bd5646b614bc881a06d5db06ec44b0034a577e8101387",
+      "expected_sha256": "4bc1a0cbcb0cccbe3b4bd5646b614bc881a06d5db06ec44b0034a577e8101387",
+      "sha256_exact_match": true,
+      "header_revision": "rev3",
+      "header_filename": "TSH-WW-CREW-001_L_candidate_rev3.glb",
+      "garment_hud_text": "Garment (TSH-WW-CREW-001_L_candidate_rev3.glb):\nMeshes: 7\nVertices: 3,384\nTriangles: 6,096\nTopology: Open-Shell Manifold (196 boundary edges)\nQA: PASSED (WearWise M2R-C Prototype QA Engine (rev3))",
+      "avatar_hud_text": "Avatar:\nMeshes: 1\nVertices: 13,718\nTriangles: 27,420\nSource: Runtime glTF Geometry Check"
+    }
+  },
+  "shopper_legacy_preview": {
+    "S": {
+      "browser_requested_url": "http://127.0.0.1:4173/garments/TSH-WW-CREW-001_S.glb",
+      "http_status": 200,
+      "resolved_asset_path": "frontend/public/garments/TSH-WW-CREW-001_S.glb",
+      "response_bytes": 83180,
+      "downloaded_sha256": "2bb0b4046a735520542a577ed3aad5271359457871c6c57d9cb386f096bc1b28",
+      "expected_sha256": "2bb0b4046a735520542a577ed3aad5271359457871c6c57d9cb386f096bc1b28",
+      "sha256_exact_match": true,
+      "garment_hud_text": "Garment (TSH-WW-CREW-001_S.glb):\nMeshes: 1\nVertices: 1,899\nTriangles: 3,650\nTopology: Open-Shell Manifold (152 boundary edges)\nQA: UNVERIFIED (Runtime Only) (Runtime glTF Check (No Verified QA Report))"
+    },
+    "M": {
+      "browser_requested_url": "http://127.0.0.1:4173/garments/TSH-WW-CREW-001_M.glb",
+      "http_status": 200,
+      "resolved_asset_path": "frontend/public/garments/TSH-WW-CREW-001_M.glb",
+      "response_bytes": 88576,
+      "downloaded_sha256": "200435ff34940224f51b1af6dfb13d3b19e5c68cfe0c62035ef1f1a93622225c",
+      "expected_sha256": "200435ff34940224f51b1af6dfb13d3b19e5c68cfe0c62035ef1f1a93622225c",
+      "sha256_exact_match": true,
+      "garment_hud_text": "Garment (TSH-WW-CREW-001_M.glb):\nMeshes: 1\nVertices: 2,022\nTriangles: 3,896\nTopology: Open-Shell Manifold (152 boundary edges)\nQA: UNVERIFIED (Runtime Only) (Runtime glTF Check (No Verified QA Report))"
+    },
+    "L": {
+      "browser_requested_url": "http://127.0.0.1:4173/garments/TSH-WW-CREW-001_L.glb",
+      "http_status": 200,
+      "resolved_asset_path": "frontend/public/garments/TSH-WW-CREW-001_L.glb",
+      "response_bytes": 94328,
+      "downloaded_sha256": "b712b64ca07063dab2d30d8860c24ecc80201e94dbd65799c2593bfc110776b7",
+      "expected_sha256": "b712b64ca07063dab2d30d8860c24ecc80201e94dbd65799c2593bfc110776b7",
+      "sha256_exact_match": true,
+      "garment_hud_text": "Garment (TSH-WW-CREW-001_L.glb):\nMeshes: 1\nVertices: 2,152\nTriangles: 4,160\nTopology: Open-Shell Manifold (148 boundary edges)\nQA: UNVERIFIED (Runtime Only) (Runtime glTF Check (No Verified QA Report))"
+    }
+  },
+  "missing_candidate_failure_check": {
+    "api_status": 404,
+    "api_detail": "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"Prototype revision 'nonexistent' not found for SKU 'TSH-WW-CREW-001'.\",\"status_code\":404,\"timestamp\":\"2026-11-24T22:00:32.801552+00:00\",\"details\":[]}}"
+  },
+  "screenshots_rendered": [
+    "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/graded_m2rc/S/preview_S_front_rev3.png",
+    "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/graded_m2rc/S/preview_S_side_rev3.png",
+    "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/graded_m2rc/S/preview_S_rear_rev3.png",
+    "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/graded_m2rc/M/preview_M_front_rev3.png",
+    "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/graded_m2rc/M/preview_M_side_rev3.png",
+    "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/graded_m2rc/M/preview_M_rear_rev3.png",
+    "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/graded_m2rc/L/preview_L_front_rev3.png",
+    "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/graded_m2rc/L/preview_L_side_rev3.png",
+    "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/graded_m2rc/L/preview_L_rear_rev3.png"
+  ]
+}

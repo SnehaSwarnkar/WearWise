@@ -18,6 +18,7 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 from app.config import (
     MONGODB_URI,
     MONGODB_BODY_ENGINE_DB,
+    MONGODB_COMMERCE_DB,
     MONGODB_SERVER_SELECTION_TIMEOUT_MS,
 )
 
@@ -119,6 +120,20 @@ def get_collection(name: str):
     db = get_db()
     if db is not None:
         return db[name]
+    return None
+
+
+def get_commerce_db():
+    client = get_client()
+    if client is not None and is_active():
+        return client[MONGODB_COMMERCE_DB]
+    return None
+
+
+def get_commerce_collection(name: str):
+    cdb = get_commerce_db()
+    if cdb is not None:
+        return cdb[name]
     return None
 
 

@@ -9,6 +9,7 @@ DELETE /api/cart/{session_id}          — clear cart
 """
 
 from fastapi import APIRouter, HTTPException
+from app.routers.products import resolve_catalog_item
 from app.schemas.cart import (
     CartAddRequest,
     CartUpdateRequest,
@@ -47,28 +48,48 @@ def get_cart(session_id: str):
 
 @router.post("/add", response_model=CartResponse)
 def add_to_cart(payload: CartAddRequest):
-    """Add a product to the cart (differentiating by id AND size)."""
+    """Add a product to the cart (differentiating by id AND size) with authoritative catalog pricing."""
+    if payload.item.quantity < 1:
+        raise HTTPException(status_code=400, detail="Quantity must be at least 1")
+
+    resolved = resolve_catalog_item(
+        sku=payload.item.sku,
+        item_id=payload.item.id,
+        size=payload.item.size,
+    )
+    if payload.item.sku and not resolved:
+        raise HTTPException(status_code=404, detail=f"Published product not found for SKU '{payload.item.sku}'")
+
+    item_data = payload.item.model_dump()
+    if resolved:
+        item_data["id"] = resolved["id"]
+        item_data["name"] = resolved["name"]
+        item_data["price"] = int(resolved["price"])
+        item_data["sku"] = resolved.get("sku") or item_data.get("sku")
+        item_data["published_revision"] = resolved.get("published_revision")
+
     carts = db.find_all("carts")
     cart_index = next(
         (i for i, c in enumerate(carts) if c["session_id"] == payload.session_id), None
     )
 
     if cart_index is None:
-        # Create new cart
         carts.append({"session_id": payload.session_id, "items": []})
         cart_index = len(carts) - 1
 
     items: list[dict] = carts[cart_index]["items"]
-    # Match both product ID and size so different sizes are not merged together
     existing = next(
-        (it for it in items if it["id"] == payload.item.id and it.get("size") == payload.item.size),
+        (it for it in items if it["id"] == item_data["id"] and it.get("size") == item_data.get("size")),
         None
     )
 
     if existing:
-        existing["quantity"] = existing.get("quantity", 1) + payload.item.quantity
+        existing["quantity"] = existing.get("quantity", 1) + item_data["quantity"]
+        existing["price"] = item_data["price"]
+        if item_data.get("published_revision") is not None:
+            existing["published_revision"] = item_data["published_revision"]
     else:
-        items.append(payload.item.model_dump())
+        items.append(item_data)
 
     db.save("carts", carts)
 

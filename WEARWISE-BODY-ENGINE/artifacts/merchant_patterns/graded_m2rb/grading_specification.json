@@ -1,0 +1,131 @@
+{
+  "sku": "TSH-WW-CREW-001",
+  "grading_specification": {
+    "canonical_base_size": "M",
+    "canonical_base_asset": "TSH-WW-CREW-001_M_prototype_rev2.glb",
+    "grading_method": "2d_component_pattern_grading_then_3d_assembly",
+    "arbitrary_uniform_glb_scaling_prohibited": true,
+    "rules_relative_to_M": {
+      "half_chest_width_cm": {
+        "S": -4.0,
+        "M": 0.0,
+        "L": 4.0,
+        "rule": "Distribute symmetrically across front/back superellipse torso panels (3D chest circ +/-8.0 cm)."
+      },
+      "back_length_cm": {
+        "S": -3.0,
+        "M": 0.0,
+        "L": 3.0,
+        "rule": "Anchor HPS at y=1.355 m and grade lower torso hem downward (hem band height fixed at 2.80 cm)."
+      },
+      "shoulder_breadth_cm": {
+        "S": -3.0,
+        "M": 0.0,
+        "L": 3.0,
+        "rule": "Grade dropped-shoulder tip +/-1.5 cm per side following shoulder slope dy/dx=0.45."
+      },
+      "armhole_depth_cm": {
+        "S": -1.5,
+        "M": 0.0,
+        "L": 1.5,
+        "rule": "Shift underarm seam level y_underarm +1.5 cm (S) / -1.5 cm (L) relative to M=1.085 m."
+      },
+      "sleeve_length_cm": {
+        "S": -2.0,
+        "M": 0.0,
+        "L": 2.0,
+        "rule": "Grade sleeve centerline length along A-pose arm axis from armhole cap midpoint to cuff opening centroid."
+      },
+      "sleeve_opening_cm": {
+        "S": -1.0,
+        "M": 0.0,
+        "L": 1.0,
+        "rule": "Grade cuff flat half-width +/-1.0 cm (+/-2.0 cm cuff circumference)."
+      },
+      "collar_circumference_cm": {
+        "S": -2.0,
+        "M": 0.0,
+        "L": 2.0,
+        "rule": "Grade finished collar top opening circumference +/-2.0 cm and scale neckline aperture x_neck, dips proportionally (C_open / 44.0)."
+      },
+      "hem_width_cm": {
+        "S": -4.0,
+        "M": 0.0,
+        "L": 4.0,
+        "rule": "Grade hem flat half-width +/-4.0 cm (hem perimeter +/-8.0 cm)."
+      },
+      "chest_pocket_cm": {
+        "S": {
+          "width": 11.0,
+          "height": 13.0
+        },
+        "M": {
+          "width": 11.5,
+          "height": 13.5
+        },
+        "L": {
+          "width": 12.0,
+          "height": 14.0
+        },
+        "rule": "Grade pocket width +/-0.5 cm, height +/-0.5 cm, and placement proportional to chest half-width and back length while maintaining 3.5 mm normal relief."
+      }
+    },
+    "seam_allowances_cm": {
+      "torso_and_sleeves": 1.0,
+      "collar_and_hem_bands": 0.7,
+      "pocket_patch": 1.0
+    },
+    "collar_closure_convention": {
+      "cause": "conical_ring_curvature_development",
+      "explanation": "2D pattern unrolls the tapered neckband onto a straight strip (end slant = sqrt(((C_seam - C_open)/2)^2 + h^2), e.g., 4.54 cm on M), whereas closing the ring in 3D distributes radial taper uniformly around the oval aperture (3D join meridian = sqrt(h^2 + delta_r_join^2), e.g., 3.10 cm on M). Cutting edge adds 0.70 cm SA at top and bottom."
+    },
+    "pocket_attachment_convention": {
+      "mapping": "planar_chest_box_to_curved_3d_torso_surface_with_normal_relief",
+      "explanation": "Planar 2D U-stitch path (e.g., 37.33 cm on M) projects onto the curved convex front torso superellipse + right shoulder slope, adding surface Z-curvature arc length (~+2.66 cm on M -> 39.99 cm 3D) plus 3.5 mm normal applique relief."
+    }
+  },
+  "size_specifications_cm": {
+    "S": {
+      "size_label": "S",
+      "half_chest_width_cm": 50.0,
+      "back_length_cm": 64.0,
+      "shoulder_breadth_cm": 47.0,
+      "sleeve_length_cm": 15.0,
+      "sleeve_opening_cm": 19.5,
+      "bicep_width_cm": 21.0,
+      "armhole_depth_cm": 25.0,
+      "collar_circumference_cm": 42.0,
+      "hem_width_cm": 49.0,
+      "dimensional_ease_chest_cm": "+2.0 cm",
+      "measurement_type": "flat_tabletop"
+    },
+    "M": {
+      "size_label": "M",
+      "half_chest_width_cm": 54.0,
+      "back_length_cm": 67.0,
+      "shoulder_breadth_cm": 50.0,
+      "sleeve_length_cm": 17.0,
+      "sleeve_opening_cm": 20.5,
+      "bicep_width_cm": 22.0,
+      "armhole_depth_cm": 26.5,
+      "collar_circumference_cm": 44.0,
+      "hem_width_cm": 53.0,
+      "dimensional_ease_chest_cm": "+4.5 cm (Recommended)",
+      "measurement_type": "flat_tabletop"
+    },
+    "L": {
+      "size_label": "L",
+      "half_chest_width_cm": 58.0,
+      "back_length_cm": 70.0,
+      "shoulder_breadth_cm": 53.0,
+      "sleeve_length_cm": 19.0,
+      "sleeve_opening_cm": 21.5,
+      "bicep_width_cm": 23.0,
+      "armhole_depth_cm": 28.0,
+      "collar_circumference_cm": 46.0,
+      "hem_width_cm": 57.0,
+      "dimensional_ease_chest_cm": "+8.0 cm",
+      "measurement_type": "flat_tabletop"
+    }
+  }
+}

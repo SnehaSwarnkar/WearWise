@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="775.3" height="950.8" viewBox="0 0 775.3 950.8">
+  <rect width="100%" height="100%" fill="#fdfbf7"/>
+  <text x="16" y="22" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0f172a">SIZE M · PANEL-BACK-TORSO — Back Torso Panel</text>
+  <text x="16" y="38" font-family="sans-serif" font-size="10" fill="#475569">Units: cm | Seam Allowance: 1.0 cm | Algorithmic 2D CAD Spec With Cutline (Verify Before Plotter Cutting)</text>
+  <polygon points="109.29,809.84 102.16,770.57 96.85,739.41 92.24,708.15 88.58,676.81 86.11,645.41 85.00,613.97 85.27,582.54 86.88,551.14 89.70,519.79 93.49,488.53 97.95,457.37 103.44,421.91 127.85,405.96 147.39,392.58 164.85,379.39 179.39,366.48 190.32,354.07 197.28,342.39 200.42,331.55 200.14,321.02 196.46,309.96 189.11,298.06 178.25,285.47 164.45,272.46 148.54,259.17 118.56,235.53 177.50,208.74 199.50,198.74 265.50,168.74 287.50,158.74 335.33,137.00 338.13,140.38 316.01,171.86 315.39,176.43 317.45,180.91 323.99,186.60 335.41,192.19 350.68,196.62 368.51,199.44 387.64,200.40 406.77,199.44 424.60,196.62 439.87,192.19 451.29,186.60 457.83,180.91 459.89,176.43 459.27,171.86 437.15,140.38 439.95,137.00 487.78,158.74 509.78,168.74 575.78,198.74 597.78,208.74 656.72,235.53 626.74,259.17 610.83,272.46 597.03,285.47 586.17,298.06 578.82,309.96 575.14,321.02 574.86,331.55 578.00,342.39 584.96,354.07 595.89,366.48 610.43,379.39 627.89,392.58 647.43,405.96 671.84,421.91 677.33,457.37 681.79,488.53 685.58,519.79 688.40,551.14 690.01,582.54 690.28,613.97 689.17,645.41 686.70,676.81 683.04,708.15 678.43,739.41 673.12,770.57 665.99,809.84" fill="none" stroke="#1e293b" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <polygon points="117.64,799.84 151.39,799.84 185.14,799.84 218.89,799.84 252.64,799.84 286.39,799.84 320.14,799.84 353.89,799.84 387.64,799.84 421.39,799.84 455.14,799.84 488.89,799.84 522.64,799.84 556.39,799.84 590.14,799.84 623.89,799.84 657.64,799.84 663.27,768.84 668.55,737.84 673.13,706.84 676.75,675.84 679.18,644.84 680.28,613.84 680.01,582.84 678.42,551.84 675.63,520.84 671.88,489.84 667.44,458.84 662.64,427.84 641.87,414.27 622.05,400.70 604.09,387.13 588.79,373.55 576.84,359.98 568.75,346.41 564.82,332.84 565.18,319.27 569.70,305.70 578.08,292.13 589.80,278.55 604.19,264.98 620.44,251.41 637.64,237.84 615.64,227.84 593.64,217.84 571.64,207.84 549.64,197.84 527.64,187.84 505.64,177.84 483.64,167.84 461.64,157.84 468.85,168.10 470.19,177.96 466.02,187.04 456.86,195.01 443.49,201.55 426.78,206.40 407.80,209.40 387.64,210.41 367.48,209.40 348.50,206.40 331.79,201.55 318.42,195.01 309.26,187.04 305.09,177.96 306.43,168.10 313.64,157.84 291.64,167.84 269.64,177.84 247.64,187.84 225.64,197.84 203.64,207.84 181.64,217.84 159.64,227.84 137.64,237.84 154.84,251.41 171.09,264.98 185.48,278.55 197.20,292.13 205.58,305.70 210.10,319.27 210.46,332.84 206.53,346.41 198.44,359.98 186.49,373.55 171.19,387.13 153.23,400.70 133.41,414.27 112.64,427.84 107.84,458.84 103.40,489.84 99.65,520.84 96.86,551.84 95.27,582.84 95.00,613.84 96.10,644.84 98.53,675.84 102.15,706.84 106.73,737.84 112.01,768.84" fill="#fce7f3" fill-opacity="0.65" stroke="#be185d" stroke-width="2.0"/>
+  <line x1="387.64" y1="719.84" x2="387.64" y2="319.84" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="387.6" y="513.8" font-family="sans-serif" font-size="9" fill="#475569" text-anchor="middle">GRAIN (vertical_warp)</text>
+  <text x="387.6" y="831.8" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">BACK_BOTTOM_SEAM (54.00cm)</text>
+  <text x="703.3" y="630.8" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">BACK_SIDE_L (37.47cm)</text>
+  <text x="592.8" y="317.4" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">BACK_ARMHOLE_L (26.44cm)</text>
+  <text x="567.9" y="171.6" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">BACK_SHOULDER_L (19.33cm)</text>
+  <text x="387.6" y="178.4" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">BACK_NECKLINE (23.26cm)</text>
+  <text x="207.4" y="171.6" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">BACK_SHOULDER_R (19.33cm)</text>
+  <text x="182.5" y="317.4" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">BACK_ARMHOLE_R (26.44cm)</text>
+  <text x="72.0" y="630.8" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">BACK_SIDE_R (37.47cm)</text>
+  <circle cx="387.64" cy="799.84" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <circle cx="387.64" cy="210.44" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <circle cx="662.64" cy="427.84" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <circle cx="112.64" cy="427.84" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <line x1="16" y1="918.8" x2="38" y2="918.8" stroke="#be185d" stroke-width="2.0"/>
+  <text x="44" y="921.8" font-family="sans-serif" font-size="9.5" fill="#0f172a">Stitch Line</text>
+  <line x1="115" y1="918.8" x2="137" y2="918.8" stroke="#1e293b" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <text x="143" y="921.8" font-family="sans-serif" font-size="9.5" fill="#0f172a">Cut Line (+1.0 cm SA)</text>
+  <line x1="262" y1="918.8" x2="284" y2="918.8" stroke="#0284c7" stroke-width="2.6"/>
+  <text x="290" y="921.8" font-family="sans-serif" font-size="9.5" fill="#0f172a">Open Boundary</text>
+  <circle cx="22" cy="933.8" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <text x="32" y="936.8" font-family="sans-serif" font-size="9.5" fill="#0f172a">Notch</text>
+  <line x1="82" y1="933.8" x2="104" y2="933.8" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="110" y="936.8" font-family="sans-serif" font-size="9.5" fill="#0f172a">Grainline</text>
+  <line x1="172" y1="933.8" x2="194" y2="933.8" stroke="#2563eb" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="200" y="936.8" font-family="sans-serif" font-size="9.5" fill="#0f172a">Topstitch Attachment</text>
+</svg>

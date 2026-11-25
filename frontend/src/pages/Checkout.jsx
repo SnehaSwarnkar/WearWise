@@ -11,6 +11,11 @@ function Checkout() {
   const [cart, setCart] = useState({ items: [], subtotal: 0, shipping: 0, total: 0 });
   const [loadingCart, setLoadingCart] = useState(true);
   const [placing, setPlacing] = useState(false);
+  const [checkoutError, setCheckoutError] = useState(null);
+  const idempotencyKey = useMemo(
+    () => `chk_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
+    []
+  );
 
   const [paymentMethod, setPaymentMethod] = useState("upi");
 
@@ -47,14 +52,25 @@ function Checkout() {
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
+    setCheckoutError(null);
+    const reqFields = ["firstName", "lastName", "email", "phone", "address", "city", "state", "pincode"];
+    for (const f of reqFields) {
+      if (!String(form[f] || "").trim()) {
+        setCheckoutError(`Please fill in required field: ${f}`);
+        return;
+      }
+    }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.trim())) {
+      setCheckoutError("Please enter a valid email address.");
+      return;
+    }
     setPlacing(true);
     try {
-      const order = await placeOrder(form, paymentMethod);
-      // Store the confirmed order for the confirmation page
+      const order = await placeOrder(form, paymentMethod, idempotencyKey);
       localStorage.setItem("wearwise-last-order", JSON.stringify(order));
-      navigate("/order-confirmation");
+      navigate(`/order-confirmation?orderId=${encodeURIComponent(order.id)}`);
     } catch (err) {
-      alert(err.message || "Could not place order. Please try again.");
+      setCheckoutError(err.message || "Could not place order. Please try again.");
     } finally {
       setPlacing(false);
     }
@@ -111,7 +127,7 @@ function Checkout() {
 
         <div>
           <span className="checkout-label">
-            ✦ SECURE CHECKOUT
+            ✦ DEMO / TEST CHECKOUT (NO REAL PAYMENT CAPTURED)
           </span>
 
           <h1>
@@ -448,16 +464,34 @@ function Checkout() {
           </div>
 
 
+          {checkoutError && (
+            <div
+              data-testid="checkout-error"
+              style={{
+                marginBottom: "10px",
+                padding: "10px 12px",
+                borderRadius: "6px",
+                background: "#fef2f2",
+                border: "1px solid #ef4444",
+                color: "#991b1b",
+                fontSize: "12px",
+                fontWeight: 700,
+              }}
+            >
+              {checkoutError}
+            </div>
+          )}
+
           <button
             type="submit"
             className="place-order"
             disabled={placing}
           >
-            {placing ? "Placing Order…" : "Place Order →"}
+            {placing ? "Placing Demo Order…" : "Place Demo Order →"}
           </button>
 
-          <p className="secure-note">
-            🔒 Your order information is secure.
+          <p className="secure-note" data-testid="demo-payment-notice">
+            ℹ Demo / Test Checkout: No real payment gateway is connected and no payment is captured.
           </p>
 
         </aside>

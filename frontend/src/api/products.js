@@ -16,3 +16,7 @@ export function fetchProducts(category = null, sortPrice = false) {
 export function fetchProduct(id) {
   return api.get(`/api/products/${id}`);
 }
+
+export function fetchProductBySku(sku) {
+  return api.get(`/api/products/sku/${encodeURIComponent(sku)}`);
+}

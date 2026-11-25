@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="690.8" height="498.7" viewBox="0 0 690.8 498.7">
+  <rect width="100%" height="100%" fill="#fdfbf7"/>
+  <text x="16" y="22" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0f172a">SIZE L · PANEL-SLEEVE-R — Right Dropped Sleeve</text>
+  <text x="16" y="38" font-family="sans-serif" font-size="10" fill="#475569">Units: cm | Seam Allowance: 1.0 cm | Algorithmic 2D CAD Spec With Cutline (Verify Before Plotter Cutting)</text>
+  <polygon points="122.89,357.66 116.56,336.05 112.35,321.64 103.91,292.82 99.69,278.40 95.48,264.00 91.26,249.58 85.00,228.21 108.80,211.91 126.68,199.91 144.64,188.32 162.70,177.39 180.85,167.33 199.11,158.38 217.51,150.72 236.04,144.58 254.69,140.13 273.48,137.55 292.35,137.00 311.24,138.56 330.11,142.32 345.38,147.17 360.65,142.32 379.52,138.56 398.41,137.00 417.28,137.55 436.07,140.13 454.72,144.58 473.25,150.72 491.65,158.38 509.91,167.33 528.06,177.39 546.12,188.32 564.08,199.91 581.96,211.91 605.76,228.21 599.50,249.58 595.28,264.00 591.07,278.41 586.85,292.82 582.63,307.23 578.41,321.65 574.20,336.06 567.87,357.66" fill="none" stroke="#1e293b" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <polygon points="130.38,347.66 157.26,347.66 184.13,347.66 211.00,347.66 237.88,347.66 264.76,347.66 291.63,347.66 318.50,347.66 345.38,347.66 372.26,347.66 399.13,347.66 426.00,347.66 452.88,347.66 479.76,347.66 506.63,347.66 533.50,347.66 560.38,347.66 564.60,333.25 568.81,318.84 573.03,304.42 577.25,290.01 581.47,275.60 585.68,261.19 589.90,246.77 594.12,232.36 576.35,220.19 558.58,208.26 540.82,196.80 523.05,186.04 505.28,176.20 487.52,167.49 469.75,160.10 451.98,154.21 434.22,149.97 416.45,147.53 398.68,147.01 380.91,148.48 363.15,152.02 345.38,157.66 327.61,152.02 309.85,148.48 292.08,147.01 274.31,147.53 256.54,149.97 238.78,154.21 221.01,160.10 203.24,167.49 185.48,176.20 167.71,186.04 149.94,196.80 132.18,208.26 114.41,220.19 96.64,232.36 100.86,246.77 105.08,261.19 109.29,275.60 113.51,290.01 117.73,304.42 121.95,318.83 126.16,333.25" fill="#fce7f3" fill-opacity="0.65" stroke="#be185d" stroke-width="2.0"/>
+  <polyline points="130.38,347.66 157.26,347.66 184.13,347.66 211.00,347.66 237.88,347.66 264.76,347.66 291.63,347.66 318.50,347.66 345.38,347.66 372.26,347.66 399.13,347.66 426.00,347.66 452.88,347.66 479.76,347.66 506.63,347.66 533.50,347.66 560.38,347.66" fill="none" stroke="#0284c7" stroke-width="2.6"/>
+  <line x1="345.38" y1="327.66" x2="345.38" y2="187.66" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="345.4" y="251.7" font-family="sans-serif" font-size="9" fill="#475569" text-anchor="middle">GRAIN (vertical_warp)</text>
+  <text x="345.4" y="379.7" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">SLEEVE_CUFF_OPENING (43.00cm)</text>
+  <text x="608.8" y="295.4" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">SLEEVE_UNDERARM_B (12.01cm)</text>
+  <text x="495.6" y="141.3" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">SLEEVE_CAP_BACK (27.15cm)</text>
+  <text x="195.1" y="141.3" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">SLEEVE_CAP_FRONT (27.15cm)</text>
+  <text x="82.0" y="295.4" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">SLEEVE_UNDERARM_F (12.01cm)</text>
+  <circle cx="345.38" cy="157.66" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <circle cx="345.38" cy="347.66" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <line x1="16" y1="466.7" x2="38" y2="466.7" stroke="#be185d" stroke-width="2.0"/>
+  <text x="44" y="469.7" font-family="sans-serif" font-size="9.5" fill="#0f172a">Stitch Line</text>
+  <line x1="115" y1="466.7" x2="137" y2="466.7" stroke="#1e293b" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <text x="143" y="469.7" font-family="sans-serif" font-size="9.5" fill="#0f172a">Cut Line (+1.0 cm SA)</text>
+  <line x1="262" y1="466.7" x2="284" y2="466.7" stroke="#0284c7" stroke-width="2.6"/>
+  <text x="290" y="469.7" font-family="sans-serif" font-size="9.5" fill="#0f172a">Open Boundary</text>
+  <circle cx="22" cy="481.7" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <text x="32" y="484.7" font-family="sans-serif" font-size="9.5" fill="#0f172a">Notch</text>
+  <line x1="82" y1="481.7" x2="104" y2="481.7" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="110" y="484.7" font-family="sans-serif" font-size="9.5" fill="#0f172a">Grainline</text>
+  <line x1="172" y1="481.7" x2="194" y2="481.7" stroke="#2563eb" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="200" y="484.7" font-family="sans-serif" font-size="9.5" fill="#0f172a">Topstitch Attachment</text>
+</svg>

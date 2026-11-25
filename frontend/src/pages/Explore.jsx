@@ -187,7 +187,30 @@ function Explore() {
                       Try On
                     </Link>
                   </div>
-                  {garmentsMap[product.sku] ? (
+                  {product.published_revision ? (
+                    <Link
+                      to={`/try-on?sku=${encodeURIComponent(product.sku)}&size=M`}
+                      className="shop-fit-btn"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        background: 'var(--lime)',
+                        color: '#151515',
+                        fontWeight: 800,
+                        fontSize: '12px',
+                        padding: '8px 12px',
+                        borderRadius: '4px',
+                        border: '2px solid var(--border)',
+                        textDecoration: 'none',
+                        boxShadow: '2px 2px 0 var(--border)',
+                        width: '100%',
+                      }}
+                    >
+                      <span>3D Try-On ({product.published_version || `v${product.published_revision}.0`}) →</span>
+                    </Link>
+                  ) : garmentsMap[product.sku] ? (
                     <Link
                       to={`/fit?garment_id=${garmentsMap[product.sku].garment_id}&sku=${product.sku}`}
                       className="shop-fit-btn"

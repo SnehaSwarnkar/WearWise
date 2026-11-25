@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1264.0" height="320.0" viewBox="0 0 1264.0 320.0">
+  <rect width="100%" height="100%" fill="#fdfbf7"/>
+  <text x="16" y="22" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0f172a">SIZE M · PANEL-HEM-BAND — Clean 28mm Hem Band</text>
+  <text x="16" y="38" font-family="sans-serif" font-size="10" fill="#475569">Units: cm | Seam Allowance: 0.7 cm | Algorithmic 2D CAD Spec With Cutline (Verify Before Plotter Cutting)</text>
+  <polygon points="85.00,179.00 85.00,137.00 1179.00,137.00 1179.00,179.00" fill="none" stroke="#1e293b" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <polygon points="92.00,172.00 125.75,172.00 159.50,172.00 193.25,172.00 227.00,172.00 260.75,172.00 294.50,172.00 328.25,172.00 362.00,172.00 395.75,172.00 429.50,172.00 463.25,172.00 497.00,172.00 530.75,172.00 564.50,172.00 598.25,172.00 632.00,172.00 665.75,172.00 699.50,172.00 733.25,172.00 767.00,172.00 800.75,172.00 834.50,172.00 868.25,172.00 902.00,172.00 935.75,172.00 969.50,172.00 1003.25,172.00 1037.00,172.00 1070.75,172.00 1104.50,172.00 1138.25,172.00 1172.00,172.00 1172.00,162.67 1172.00,153.33 1172.00,144.00 1138.25,144.00 1104.50,144.00 1070.75,144.00 1037.00,144.00 1003.25,144.00 969.50,144.00 935.75,144.00 902.00,144.00 868.25,144.00 834.50,144.00 800.75,144.00 767.00,144.00 733.25,144.00 699.50,144.00 665.75,144.00 632.00,144.00 598.25,144.00 564.50,144.00 530.75,144.00 497.00,144.00 463.25,144.00 429.50,144.00 395.75,144.00 362.00,144.00 328.25,144.00 294.50,144.00 260.75,144.00 227.00,144.00 193.25,144.00 159.50,144.00 125.75,144.00 92.00,144.00 92.00,153.33 92.00,162.67" fill="#fce7f3" fill-opacity="0.65" stroke="#be185d" stroke-width="2.0"/>
+  <polyline points="92.00,172.00 125.75,172.00 159.50,172.00 193.25,172.00 227.00,172.00 260.75,172.00 294.50,172.00 328.25,172.00 362.00,172.00 395.75,172.00 429.50,172.00 463.25,172.00 497.00,172.00 530.75,172.00 564.50,172.00 598.25,172.00 632.00,172.00 665.75,172.00 699.50,172.00 733.25,172.00 767.00,172.00 800.75,172.00 834.50,172.00 868.25,172.00 902.00,172.00 935.75,172.00 969.50,172.00 1003.25,172.00 1037.00,172.00 1070.75,172.00 1104.50,172.00 1138.25,172.00 1172.00,172.00" fill="none" stroke="#0284c7" stroke-width="2.6"/>
+  <line x1="227.00" y1="158.00" x2="1037.00" y2="158.00" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="632.0" y="152.0" font-family="sans-serif" font-size="9" fill="#475569" text-anchor="middle">GRAIN (horizontal_weft)</text>
+  <text x="632.0" y="201.0" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">HEM_LOWER_OPENING (108.00cm)</text>
+  <text x="1192.0" y="153.1" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">HEM_JOIN_END (2.80cm)</text>
+  <text x="931.0" y="142.5" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">HEM_BODY_SEAM_BACK (54.00cm)</text>
+  <text x="333.0" y="142.5" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">HEM_BODY_SEAM_FRONT (54.00cm)</text>
+  <text x="72.0" y="162.9" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">HEM_JOIN_START (2.80cm)</text>
+  <circle cx="632.00" cy="144.00" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <line x1="16" y1="288.0" x2="38" y2="288.0" stroke="#be185d" stroke-width="2.0"/>
+  <text x="44" y="291.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Stitch Line</text>
+  <line x1="115" y1="288.0" x2="137" y2="288.0" stroke="#1e293b" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <text x="143" y="291.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Cut Line (+0.7 cm SA)</text>
+  <line x1="262" y1="288.0" x2="284" y2="288.0" stroke="#0284c7" stroke-width="2.6"/>
+  <text x="290" y="291.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Open Boundary</text>
+  <circle cx="22" cy="303.0" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <text x="32" y="306.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Notch</text>
+  <line x1="82" y1="303.0" x2="104" y2="303.0" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="110" y="306.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Grainline</text>
+  <line x1="172" y1="303.0" x2="194" y2="303.0" stroke="#2563eb" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="200" y="306.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Topstitch Attachment</text>
+</svg>

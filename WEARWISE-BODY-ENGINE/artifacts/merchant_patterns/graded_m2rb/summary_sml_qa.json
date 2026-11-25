@@ -1,0 +1,56 @@
+{
+  "sku": "TSH-WW-CREW-001",
+  "sizes": {
+    "S": {
+      "glb_path": "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/graded_m2rb/S/TSH-WW-CREW-001_S_candidate.glb",
+      "glb_sha256": "098d692e83d935e1395575345d036802db7976f13d28fa4aa6ad2fbc778e8770",
+      "statuses": {
+        "prototype_geometry_qa": "PASSED",
+        "pattern_seam_qa": "PASSED",
+        "material_uv_qa": "PASSED",
+        "dimensional_qa": "PASSED",
+        "overall_prototype_qa": "PASSED",
+        "publication_status": "NOT_PUBLISHED_PROTOTYPE_ONLY"
+      },
+      "blocking_issues": [],
+      "vertices": 3384,
+      "faces": 6096,
+      "fit_rear_protruding": 0,
+      "fit_front_protruding": 0
+    },
+    "M": {
+      "glb_path": "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/prototype_m2r/TSH-WW-CREW-001_M_prototype_rev2.glb",
+      "glb_sha256": "5b73beaf3b8255612b3f259a1df279ec78b36f56215118ef997155fdecfa1f51",
+      "statuses": {
+        "prototype_geometry_qa": "PASSED",
+        "pattern_seam_qa": "PASSED",
+        "material_uv_qa": "PASSED",
+        "dimensional_qa": "PASSED",
+        "overall_prototype_qa": "PASSED",
+        "publication_status": "NOT_PUBLISHED_PROTOTYPE_ONLY"
+      },
+      "blocking_issues": [],
+      "vertices": 3384,
+      "faces": 6096,
+      "fit_rear_protruding": 0,
+      "fit_front_protruding": 0
+    },
+    "L": {
+      "glb_path": "WEARWISE-BODY-ENGINE/artifacts/merchant_patterns/graded_m2rb/L/TSH-WW-CREW-001_L_candidate.glb",
+      "glb_sha256": "485023b061a1e4622c7becc2da1ce2d9dd726f4b7aba56f8721fd56b30052267",
+      "statuses": {
+        "prototype_geometry_qa": "PASSED",
+        "pattern_seam_qa": "PASSED",
+        "material_uv_qa": "PASSED",
+        "dimensional_qa": "PASSED",
+        "overall_prototype_qa": "PASSED",
+        "publication_status": "NOT_PUBLISHED_PROTOTYPE_ONLY"
+      },
+      "blocking_issues": [],
+      "vertices": 3384,
+      "faces": 6096,
+      "fit_rear_protruding": 0,
+      "fit_front_protruding": 0
+    }
+  }
+}

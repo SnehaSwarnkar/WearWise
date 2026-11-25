@@ -179,17 +179,23 @@ class ParametricPatternBuilder:
     ]
 
     SEAM_RELATIONSHIPS = [
-        {"seam_id": "SEAM-SH-L", "name": "Left Shoulder Seam", "panels": ["front_torso", "back_torso"], "type": "flat_joined"},
-        {"seam_id": "SEAM-SH-R", "name": "Right Shoulder Seam", "panels": ["front_torso", "back_torso"], "type": "flat_joined"},
-        {"seam_id": "SEAM-SIDE-L", "name": "Left Torso Side Seam", "panels": ["front_torso", "back_torso"], "type": "closed_edge"},
-        {"seam_id": "SEAM-SIDE-R", "name": "Right Torso Side Seam", "panels": ["front_torso", "back_torso"], "type": "closed_edge"},
-        {"seam_id": "SEAM-ARMHOLE-L", "name": "Left Armhole Inset Seam", "panels": ["front_torso", "back_torso", "left_sleeve"], "type": "curved_inset"},
-        {"seam_id": "SEAM-ARMHOLE-R", "name": "Right Armhole Inset Seam", "panels": ["front_torso", "back_torso", "right_sleeve"], "type": "curved_inset"},
-        {"seam_id": "SEAM-UNDERARM-L", "name": "Left Sleeve Underarm Seam", "panels": ["left_sleeve"], "type": "tubular_closed"},
-        {"seam_id": "SEAM-UNDERARM-R", "name": "Right Sleeve Underarm Seam", "panels": ["right_sleeve"], "type": "tubular_closed"},
-        {"seam_id": "SEAM-NECK-RIB", "name": "Collar Neckband Seam", "panels": ["front_torso", "back_torso", "neckband"], "type": "binding_rib"},
-        {"seam_id": "SEAM-HEM-BAND", "name": "Bottom Hem Band Binding", "panels": ["front_torso", "back_torso", "hem_band"], "type": "binding_hem"},
-        {"seam_id": "SEAM-POCKET-STITCH", "name": "Chest Patch Pocket Topstitch", "panels": ["front_torso", "patch_pocket"], "type": "topstitched_patch"},
+        {"seam_id": "SEAM-SH-L", "name": "Left Shoulder Seam", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-FRONT-TORSO", "source_edge_id": "FRONT_SHOULDER_L", "dest_panel_id": "PANEL-BACK-TORSO", "dest_edge_id": "BACK_SHOULDER_L", "type": "flat_joined", "notches": ["neck_hps_l", "drop_shoulder_l"]},
+        {"seam_id": "SEAM-SH-R", "name": "Right Shoulder Seam", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-FRONT-TORSO", "source_edge_id": "FRONT_SHOULDER_R", "dest_panel_id": "PANEL-BACK-TORSO", "dest_edge_id": "BACK_SHOULDER_R", "type": "flat_joined", "notches": ["neck_hps_r", "drop_shoulder_r"]},
+        {"seam_id": "SEAM-SIDE-L", "name": "Left Torso Side Seam", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-FRONT-TORSO", "source_edge_id": "FRONT_SIDE_L", "dest_panel_id": "PANEL-BACK-TORSO", "dest_edge_id": "BACK_SIDE_L", "type": "closed_edge", "notches": ["underarm_l", "hem_seam_l"]},
+        {"seam_id": "SEAM-SIDE-R", "name": "Right Torso Side Seam", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-FRONT-TORSO", "source_edge_id": "FRONT_SIDE_R", "dest_panel_id": "PANEL-BACK-TORSO", "dest_edge_id": "BACK_SIDE_R", "type": "closed_edge", "notches": ["underarm_r", "hem_seam_r"]},
+        {"seam_id": "SEAM-ARMHOLE-L-FRONT", "name": "Left Armhole Front Inset Seam", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-FRONT-TORSO", "source_edge_id": "FRONT_ARMHOLE_L", "dest_panel_id": "PANEL-SLEEVE-L", "dest_edge_id": "SLEEVE_CAP_FRONT", "type": "curved_inset", "notches": ["underarm_l", "shoulder_apex_l"]},
+        {"seam_id": "SEAM-ARMHOLE-L-BACK", "name": "Left Armhole Back Inset Seam", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-BACK-TORSO", "source_edge_id": "BACK_ARMHOLE_L", "dest_panel_id": "PANEL-SLEEVE-L", "dest_edge_id": "SLEEVE_CAP_BACK", "type": "curved_inset", "notches": ["underarm_l", "shoulder_apex_l"]},
+        {"seam_id": "SEAM-ARMHOLE-R-FRONT", "name": "Right Armhole Front Inset Seam", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-FRONT-TORSO", "source_edge_id": "FRONT_ARMHOLE_R", "dest_panel_id": "PANEL-SLEEVE-R", "dest_edge_id": "SLEEVE_CAP_FRONT", "type": "curved_inset", "notches": ["underarm_r", "shoulder_apex_r"]},
+        {"seam_id": "SEAM-ARMHOLE-R-BACK", "name": "Right Armhole Back Inset Seam", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-BACK-TORSO", "source_edge_id": "BACK_ARMHOLE_R", "dest_panel_id": "PANEL-SLEEVE-R", "dest_edge_id": "SLEEVE_CAP_BACK", "type": "curved_inset", "notches": ["underarm_r", "shoulder_apex_r"]},
+        {"seam_id": "SEAM-UNDERARM-L", "name": "Left Sleeve Underarm Seam", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-SLEEVE-L", "source_edge_id": "SLEEVE_UNDERARM_F", "dest_panel_id": "PANEL-SLEEVE-L", "dest_edge_id": "SLEEVE_UNDERARM_B", "type": "tubular_closed", "notches": ["underarm_l", "cuff_underarm_l"]},
+        {"seam_id": "SEAM-UNDERARM-R", "name": "Right Sleeve Underarm Seam", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-SLEEVE-R", "source_edge_id": "SLEEVE_UNDERARM_F", "dest_panel_id": "PANEL-SLEEVE-R", "dest_edge_id": "SLEEVE_UNDERARM_B", "type": "tubular_closed", "notches": ["underarm_r", "cuff_underarm_r"]},
+        {"seam_id": "SEAM-NECK-RIB-FRONT", "name": "Collar Front Neckband Seam", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-FRONT-TORSO", "source_edge_id": "FRONT_NECKLINE", "dest_panel_id": "PANEL-COLLAR-RIB", "dest_edge_id": "COLLAR_NECK_SEAM_FRONT", "type": "binding_rib", "notches": ["center_front_neck", "hps_l", "hps_r"]},
+        {"seam_id": "SEAM-NECK-RIB-BACK", "name": "Collar Back Neckband Seam", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-BACK-TORSO", "source_edge_id": "BACK_NECKLINE", "dest_panel_id": "PANEL-COLLAR-RIB", "dest_edge_id": "COLLAR_NECK_SEAM_BACK", "type": "binding_rib", "notches": ["center_back_neck", "hps_l", "hps_r"]},
+        {"seam_id": "SEAM-COLLAR-JOIN", "name": "Collar Rib Ring Closure Seam", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-COLLAR-RIB", "source_edge_id": "COLLAR_JOIN_START", "dest_panel_id": "PANEL-COLLAR-RIB", "dest_edge_id": "COLLAR_JOIN_END", "type": "closed_edge", "notches": ["collar_join_r"]},
+        {"seam_id": "SEAM-HEM-BAND-FRONT", "name": "Bottom Hem Band Front Binding", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-FRONT-TORSO", "source_edge_id": "FRONT_BOTTOM_SEAM", "dest_panel_id": "PANEL-HEM-BAND", "dest_edge_id": "HEM_BODY_SEAM_FRONT", "type": "binding_hem", "notches": ["side_l_hem", "side_r_hem", "center_front_hem"]},
+        {"seam_id": "SEAM-HEM-BAND-BACK", "name": "Bottom Hem Band Back Binding", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-BACK-TORSO", "source_edge_id": "BACK_BOTTOM_SEAM", "dest_panel_id": "PANEL-HEM-BAND", "dest_edge_id": "HEM_BODY_SEAM_BACK", "type": "binding_hem", "notches": ["side_l_hem", "side_r_hem", "center_back_hem"]},
+        {"seam_id": "SEAM-HEM-JOIN", "name": "Bottom Hem Band Ring Closure Seam", "record_kind": "ordinary_sewing_seam", "source_panel_id": "PANEL-HEM-BAND", "source_edge_id": "HEM_JOIN_START", "dest_panel_id": "PANEL-HEM-BAND", "dest_edge_id": "HEM_JOIN_END", "type": "closed_edge", "notches": ["hem_join_r"]},
+        {"attachment_id": "ATTACH-POCKET-CHEST", "name": "Chest Patch Pocket Topstitch Attachment", "record_kind": "surface_attachment_path", "source_panel_id": "PANEL-POCKET-CHEST", "source_edge_ids": ["POCKET_SIDE_R", "POCKET_BOTTOM", "POCKET_SIDE_L"], "target_panel_id": "PANEL-FRONT-TORSO", "target_attachment_type": "interior_surface_path", "type": "topstitched_applique_surface_path", "notches": ["pocket_top_left", "pocket_top_right"]},
     ]
 
     @classmethod
@@ -215,7 +221,7 @@ class ParametricPatternBuilder:
         """Returns the 11 explicit seam relationships for the boxy drop-shoulder tee."""
         if has_pocket:
             return cls.SEAM_RELATIONSHIPS
-        return [s for s in cls.SEAM_RELATIONSHIPS if s["seam_id"] != "SEAM-POCKET-STITCH"]
+        return [s for s in cls.SEAM_RELATIONSHIPS if s.get("attachment_id") != "ATTACH-POCKET-CHEST"]
 
     @classmethod
     def generate_2d_panel_spec(cls, config: Dict[str, Any], measurements: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -224,11 +230,12 @@ class ParametricPatternBuilder:
         back_len = float(measurements.get("back_length_cm", 67.0))
         shoulder_w = float(measurements.get("shoulder_breadth_cm", 50.0))
         sleeve_len = float(measurements.get("sleeve_length_cm", 17.0))
+        sleeve_open = float(measurements.get("sleeve_opening_cm", 20.5))
+        bicep_w = float(measurements.get("bicep_width_cm", 22.0))
         collar_circ = float(measurements.get("collar_circumference_cm", 44.0))
         hem_width = float(measurements.get("hem_width_cm", half_chest))
 
         is_drop_shoulder = config.get("shoulder_style", "dropped") == "dropped"
-        drop_offset = 3.5 if is_drop_shoulder else 0.0
         has_pocket = config.get("has_pocket", True)
 
         panels = [
@@ -238,13 +245,22 @@ class ParametricPatternBuilder:
                 "name": "Front Torso Panel",
                 "pattern_type": "front_body",
                 "width_cm": half_chest,
-                "length_cm": back_len - 3.0,
+                "length_cm": round(back_len - 2.8, 2),
                 "shoulder_slope_deg": 14.0,
-                "shoulder_width_cm": (shoulder_w / 2.0) + drop_offset,
+                "shoulder_width_cm": shoulder_w / 2.0,
                 "neckline_dip_cm": 7.5,
                 "hem_width_cm": hem_width,
                 "seam_count": 5,
-                "boundary_edges": ["neckline_front", "shoulder_left", "armhole_left", "side_left", "bottom_hem", "side_right", "armhole_right", "shoulder_right"],
+                "boundary_edges": [
+                    "FRONT_NECKLINE",
+                    "FRONT_SHOULDER_L",
+                    "FRONT_ARMHOLE_L",
+                    "FRONT_SIDE_L",
+                    "FRONT_BOTTOM_SEAM",
+                    "FRONT_SIDE_R",
+                    "FRONT_ARMHOLE_R",
+                    "FRONT_SHOULDER_R",
+                ],
             },
             {
                 "id": "PANEL-BACK-TORSO",
@@ -252,37 +268,48 @@ class ParametricPatternBuilder:
                 "name": "Back Torso Panel",
                 "pattern_type": "back_body",
                 "width_cm": half_chest,
-                "length_cm": back_len,
+                "length_cm": round(back_len - 2.8, 2),
                 "shoulder_slope_deg": 14.0,
-                "shoulder_width_cm": (shoulder_w / 2.0) + drop_offset,
+                "shoulder_width_cm": shoulder_w / 2.0,
                 "neckline_dip_cm": 2.5,
                 "hem_width_cm": hem_width,
                 "seam_count": 5,
-                "boundary_edges": ["neckline_back", "shoulder_left", "armhole_left", "side_left", "bottom_hem", "side_right", "armhole_right", "shoulder_right"],
+                "boundary_edges": [
+                    "BACK_NECKLINE",
+                    "BACK_SHOULDER_L",
+                    "BACK_ARMHOLE_L",
+                    "BACK_SIDE_L",
+                    "BACK_BOTTOM_SEAM",
+                    "BACK_SIDE_R",
+                    "BACK_ARMHOLE_R",
+                    "BACK_SHOULDER_R",
+                ],
             },
             {
                 "id": "PANEL-SLEEVE-L",
                 "panel_id": "PANEL-SLEEVE-L",
                 "name": "Left Dropped Sleeve",
                 "pattern_type": "sleeve_bell",
-                "bicep_width_cm": 21.0,
-                "cuff_width_cm": 18.5,
+                "bicep_width_cm": bicep_w,
+                "cuff_width_cm": sleeve_open,
+                "cuff_circumference_cm": round(sleeve_open * 2.0, 2),
                 "length_cm": sleeve_len,
                 "cap_height_cm": 6.5,
                 "seam_count": 2,
-                "boundary_edges": ["sleeve_cap", "underarm_seam_1", "cuff_opening", "underarm_seam_2"],
+                "boundary_edges": ["SLEEVE_CAP_FRONT", "SLEEVE_CAP_BACK", "SLEEVE_UNDERARM_F", "SLEEVE_CUFF_OPENING", "SLEEVE_UNDERARM_B"],
             },
             {
                 "id": "PANEL-SLEEVE-R",
                 "panel_id": "PANEL-SLEEVE-R",
                 "name": "Right Dropped Sleeve",
                 "pattern_type": "sleeve_bell",
-                "bicep_width_cm": 21.0,
-                "cuff_width_cm": 18.5,
+                "bicep_width_cm": bicep_w,
+                "cuff_width_cm": sleeve_open,
+                "cuff_circumference_cm": round(sleeve_open * 2.0, 2),
                 "length_cm": sleeve_len,
                 "cap_height_cm": 6.5,
                 "seam_count": 2,
-                "boundary_edges": ["sleeve_cap", "underarm_seam_1", "cuff_opening", "underarm_seam_2"],
+                "boundary_edges": ["SLEEVE_CAP_FRONT", "SLEEVE_CAP_BACK", "SLEEVE_UNDERARM_F", "SLEEVE_CUFF_OPENING", "SLEEVE_UNDERARM_B"],
             },
             {
                 "id": "PANEL-COLLAR-RIB",
@@ -292,7 +319,7 @@ class ParametricPatternBuilder:
                 "circumference_cm": collar_circ,
                 "width_cm": 2.8,
                 "seam_count": 1,
-                "boundary_edges": ["collar_top_opening", "collar_neck_seam"],
+                "boundary_edges": ["COLLAR_TOP_OPENING", "COLLAR_NECK_SEAM_FRONT", "COLLAR_NECK_SEAM_BACK", "COLLAR_JOIN_START", "COLLAR_JOIN_END"],
             },
             {
                 "id": "PANEL-HEM-BAND",
@@ -302,25 +329,33 @@ class ParametricPatternBuilder:
                 "circumference_cm": hem_width * 2.0,
                 "width_cm": 2.8,
                 "seam_count": 1,
-                "boundary_edges": ["hem_body_seam", "hem_lower_opening"],
+                "boundary_edges": ["HEM_BODY_SEAM_FRONT", "HEM_BODY_SEAM_BACK", "HEM_LOWER_OPENING", "HEM_JOIN_START", "HEM_JOIN_END"],
             },
         ]
 
         if has_pocket:
+            pkt_w = round(11.5 + 0.5 * ((half_chest - 54.0) / 4.0), 2)
+            pkt_h = round(13.5 + 0.5 * ((back_len - 67.0) / 3.0), 2)
             panels.append({
                 "id": "PANEL-POCKET-CHEST",
                 "panel_id": "PANEL-POCKET-CHEST",
                 "name": "Left Chest Patch Pocket",
                 "pattern_type": "patch_pocket",
-                "width_cm": 7.5,
-                "length_cm": 8.5,
+                "width_cm": pkt_w,
+                "length_cm": pkt_h,
                 "corner_style": "beveled_bottom",
                 "placement": "wearer_left_chest",
                 "seam_count": 1,
-                "boundary_edges": ["pocket_top_hem", "pocket_side_r", "pocket_bottom", "pocket_side_l"],
+                "boundary_edges": ["POCKET_TOP_HEM", "POCKET_SIDE_R", "POCKET_BOTTOM", "POCKET_SIDE_L"],
             })
 
         return panels
+
+    @classmethod
+    def get_grading_spec(cls) -> Dict[str, Any]:
+        """Returns the authoritative M-canonical S/M/L pattern grading specification."""
+        from app.services.garment_platform.pattern_garment_builder import PATTERN_GRADING_SPEC
+        return PATTERN_GRADING_SPEC
 
     @classmethod
     def build_3d_geometry(
@@ -328,176 +363,76 @@ class ParametricPatternBuilder:
         measurements: Dict[str, Any],
         size_label: str = "M",
         out_glb: Optional[str] = None,
+        panels_svg_dir: Optional[str] = None,
+        collar_type: str = "ribbed_crewneck",
+        pocket_width_cm: Optional[float] = None,
+        pocket_height_cm: Optional[float] = None,
+        fabric_profile: Optional[Dict[str, Any]] = None,
+        sku: str = "TSH-WW-CREW-001",
     ) -> Dict[str, Any]:
         """
-        Builds size-graded 3D cloth geometry (non-watertight, open boundaries),
-        calculates Euler characteristic and dimensional spans, and saves to GLB.
+        Builds pattern-authored 3D garment geometry from 7 explicit 2D panels
+        with PBR texture atlas assignment and seam-edge verification.
+        Completely independent of avatar skin cropping.
         """
-        avatar_paths = [
-            os.path.join(os.getcwd(), "..", "frontend", "public", "avatars", "anny_baseline_male.glb"),
-            os.path.join(os.getcwd(), "frontend", "public", "avatars", "anny_baseline_male.glb"),
-            os.path.join(os.getcwd(), "public", "avatars", "anny_baseline_male.glb"),
-            os.path.join(os.getcwd(), "artifacts", "glb", "anny_baseline_male.glb"),
-        ]
-        avatar_path = None
-        for p in avatar_paths:
-            if os.path.exists(p):
-                try:
-                    sc = trimesh.load(p, force="scene")
-                    geom = list(sc.geometry.values())[0]
-                    if geom.bounds[1][1] > 1.0:  # upright (Y-up)
-                        avatar_path = p
-                        break
-                except Exception:
-                    pass
-        if not avatar_path:
-            avatar_path = next((p for p in avatar_paths if os.path.exists(p)), None)
+        from app.services.garment_platform.pattern_garment_builder import PatternGarmentBuilder
 
-        if not avatar_path:
-            # Fallback mock geometry if avatar is not yet accessible
-            return {
-                "size_label": size_label,
-                "euler_characteristic": -2,
-                "num_vertices": 2022,
-                "num_faces": 3950,
-                "boundary_edges_count": 142,
-                "half_chest_width_cm": float(measurements.get("half_chest_width_cm", 54.0)),
-                "is_non_watertight": True,
-            }
-
-        mesh, uvs = cls.generate_size_specific_mesh(
-            size_label=size_label,
-            config={"shoulder_style": "dropped"},
+        build_res = PatternGarmentBuilder.build_garment(
             measurements=measurements,
-            avatar_path=avatar_path,
+            size_label=size_label,
+            out_glb=out_glb,
+            panels_svg_dir=panels_svg_dir,
+            collar_type=collar_type,
+            pocket_width_cm=pocket_width_cm,
+            pocket_height_cm=pocket_height_cm,
+            fabric_profile=fabric_profile,
+            sku=sku,
         )
 
-        # Compute topological properties
-        v = mesh.vertices
-        f = mesh.faces
+        components = build_res["components"]
+        shell_keys = [
+            "PANEL-FRONT-TORSO",
+            "PANEL-BACK-TORSO",
+            "PANEL-SLEEVE-L",
+            "PANEL-SLEEVE-R",
+            "PANEL-COLLAR-RIB",
+            "PANEL-HEM-BAND",
+        ]
+        comb_shell = trimesh.util.concatenate([components[k] for k in shell_keys])
+        welded_shell = trimesh.Trimesh(vertices=comb_shell.vertices, faces=comb_shell.faces, process=True)
+
+        v = welded_shell.vertices
+        f = welded_shell.faces
         num_v = len(v)
         num_f = len(f)
-        edges = mesh.edges_unique
-        num_e = len(edges)
+        num_e = len(welded_shell.edges_unique)
         euler_char = num_v - num_e + num_f
 
-        # Boundary loops analysis
-        edges_sorted = mesh.edges_sorted
+        edges_sorted = welded_shell.edges_sorted
         unique_edges, counts = np.unique(edges_sorted, axis=0, return_counts=True)
-        boundary_edges = unique_edges[counts == 1]
-        num_boundary = len(boundary_edges)
+        num_boundary = int(np.sum(counts == 1))
 
-        # Export GLB if requested
-        if out_glb:
-            os.makedirs(os.path.dirname(out_glb), exist_ok=True)
-            # Attach visual material UVs
-            mesh.visual = trimesh.visual.TextureVisuals(uv=uvs)
-            mesh.export(out_glb)
+        total_v = sum(len(m.vertices) for m in components.values())
+        total_f = sum(len(m.faces) for m in components.values())
 
         return {
             "size_label": size_label,
+            "generation_method": build_res["generation_method"],
+            "avatar_skin_cropped": False,
+            "component_count": len(components),
             "euler_characteristic": int(euler_char),
-            "num_vertices": int(num_v),
-            "num_faces": int(num_f),
-            "boundary_edges_count": int(num_boundary),
+            "num_vertices": int(total_v),
+            "num_faces": int(total_f),
+            "welded_shell_vertices": int(num_v),
+            "welded_shell_faces": int(num_f),
+            "boundary_edges_count": num_boundary,
             "half_chest_width_cm": float(measurements.get("half_chest_width_cm", 54.0)),
-            "is_non_watertight": not mesh.is_watertight,
-            "mesh": mesh,
+            "is_non_watertight": not welded_shell.is_watertight,
+            "panel_metadata": build_res["panel_metadata"],
+            "seam_map": build_res["seam_map"],
+            "surface_attachments": build_res["surface_attachments"],
+            "scene": build_res["scene"],
         }
-
-    @classmethod
-    def generate_size_specific_mesh(
-        cls,
-        size_label: str,
-        config: Dict[str, Any],
-        measurements: Dict[str, Any],
-        avatar_path: str,
-    ) -> Tuple[trimesh.Trimesh, np.ndarray]:
-        """
-        Generates distinct pattern-level size-specific 3D geometry (S, M, L)
-        derived from the calibrated NAVER Anny avatar surface with verified dimensional ease.
-        """
-        anny = trimesh.load(avatar_path, force="scene")
-        body = [g for g in anny.geometry.values() if len(g.vertices) > 5000][0]
-        v = body.vertices.copy()
-        f = body.faces.copy()
-
-        # Size specific ease offsets based on ISO 8559-2 grading
-        grading_rules = {
-            "S": {"ease": 0.016, "boxy_scale": 1.03, "y_hem": 0.90, "sleeve_scale": 0.95},
-            "M": {"ease": 0.022, "boxy_scale": 1.06, "y_hem": 0.89, "sleeve_scale": 1.00},
-            "L": {"ease": 0.028, "boxy_scale": 1.09, "y_hem": 0.87, "sleeve_scale": 1.05},
-        }
-        sp = grading_rules.get(size_label, grading_rules["M"])
-
-        if measurements:
-            if "back_length_cm" in measurements:
-                delta_l = (float(measurements["back_length_cm"]) - 67.0) / 100.0
-                sp["y_hem"] -= delta_l * 0.5
-            if "half_chest_width_cm" in measurements:
-                delta_w = (float(measurements["half_chest_width_cm"]) - 54.0) / 100.0
-                sp["ease"] += delta_w * 0.25
-
-        face_centers = v[f].mean(axis=1)
-        mask = (face_centers[:, 1] >= sp["y_hem"]) & (face_centers[:, 1] <= 1.34) & (abs(face_centers[:, 0]) <= 0.32 * sp["sleeve_scale"])
-        front_neck = (face_centers[:, 1] > 1.30) & (abs(face_centers[:, 0]) < 0.08) & (face_centers[:, 2] > -0.06)
-        mask = mask & (~front_neck)
-
-        sub_faces = f[mask]
-        sub_mesh = trimesh.Trimesh(vertices=v, faces=sub_faces, process=True)
-        comps = trimesh.graph.connected_components(sub_mesh.face_adjacency, min_len=10)
-        main_faces = sub_faces[list(comps[0])]
-        cloth = trimesh.Trimesh(vertices=v, faces=main_faces, process=True)
-        cloth.remove_unreferenced_vertices()
-
-        # Offset along vertex normals with boxy drape ease
-        garment_v = cloth.vertices + cloth.vertex_normals * sp["ease"]
-
-        # Drape adjustment: loosen waist/hem slightly for relaxed drop-shoulder boxy fit
-        y_vals = garment_v[:, 1]
-        boxy_factor = np.clip((1.20 - y_vals) / 0.30, 0.0, 1.0)
-        garment_v[:, 0] *= (1.0 + (sp["boxy_scale"] - 1.0) * boxy_factor)
-        garment_v[:, 2] += 0.005 * boxy_factor
-
-        # Assign UVs mapped to PBR atlas
-        verts = garment_v
-        uvs = np.zeros((len(verts), 2), dtype=np.float32)
-        y_min = verts[:, 1].min()
-        y_max = verts[:, 1].max()
-
-        for i, pt in enumerate(verts):
-            x, y, z = pt
-            # Hem
-            if y < y_min + 0.025:
-                u = np.clip(0.5 + x / 0.5, 0.0, 1.0)
-                v_coord = 0.94 + 0.05 * ((y - y_min) / 0.025)
-            # Cuffs
-            elif abs(x) > 0.28:
-                u = np.clip(0.5 + z / 0.3, 0.0, 1.0)
-                v_coord = 0.86 + 0.06 * np.clip((y - 1.05) / 0.15, 0.0, 1.0)
-            # Collar
-            elif y > y_max - 0.025 or (y > 1.28 and abs(x) < 0.09):
-                u = np.clip(0.5 + x / 0.18, 0.0, 1.0)
-                v_coord = 0.02 + 0.08 * np.clip((y_max - y) / 0.025, 0.0, 1.0)
-            # Pocket
-            elif x > 0.03 and x < 0.12 and y > 1.16 and y < 1.25 and z > -0.05:
-                u = 0.70 + 0.24 * ((x - 0.03) / 0.09)
-                v_coord = 0.16 + 0.24 * ((1.25 - y) / 0.09)
-            # Main Body
-            else:
-                if z > -0.075:
-                    u = np.clip(0.5 + x / 0.6, 0.05, 0.65)
-                else:
-                    u = np.clip(0.5 - x / 0.6, 0.05, 0.65)
-                v_coord = np.clip(0.20 + 0.60 * ((y_max - y) / (y_max - y_min)), 0.15, 0.85)
-            uvs[i] = [u, v_coord]
-
-        mesh = trimesh.Trimesh(
-            vertices=garment_v.astype(np.float32),
-            faces=cloth.faces.astype(np.int32),
-            process=True,
-        )
-        return mesh, uvs
 
 
 class AIReconstructionAdapter:

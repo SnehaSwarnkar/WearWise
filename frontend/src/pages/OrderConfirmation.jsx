@@ -1,17 +1,34 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Header from "./Header";
+import { getOrderDetail } from "../api/orders";
 import "../App.css";
 
 function OrderConfirmation() {
+  const [searchParams] = useSearchParams();
+  const orderIdParam = searchParams.get("orderId");
   const [order, setOrder] = useState(null);
+  const [loadError, setLoadError] = useState(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("wearwise-last-order");
-    if (saved) {
-      setOrder(JSON.parse(saved));
-    }
-  }, []);
+    const parsedSaved = saved ? JSON.parse(saved) : null;
+    const targetId = orderIdParam || parsedSaved?.id;
+    if (!targetId) return;
+
+    getOrderDetail(targetId)
+      .then((fetched) => {
+        setOrder(fetched);
+        localStorage.setItem("wearwise-last-order", JSON.stringify(fetched));
+      })
+      .catch((err) => {
+        if (parsedSaved && parsedSaved.id === targetId) {
+          setOrder(parsedSaved);
+        } else {
+          setLoadError(err.message || "Could not load order confirmation");
+        }
+      });
+  }, [orderIdParam]);
 
   return (
     <div className="order-confirm-page">
@@ -23,13 +40,21 @@ function OrderConfirmation() {
 
           <div className="order-confirm-icon">✦</div>
 
-          <span className="order-confirm-label">ORDER CONFIRMED</span>
+          <span className="order-confirm-label" data-testid="confirm-demo-label">
+            DEMO ORDER RECORDED · NO REAL PAYMENT CAPTURED
+          </span>
 
           <h1>
-            YOUR LOOK
+            YOUR DEMO ORDER
             <br />
-            IS ON ITS WAY.
+            IS RECORDED.
           </h1>
+
+          {loadError && (
+            <div style={{ color: "#991b1b", fontSize: "13px", fontWeight: 700, marginBottom: "12px" }}>
+              {loadError}
+            </div>
+          )}
 
           {order && (
             <div className="order-confirm-details">
@@ -45,7 +70,7 @@ function OrderConfirmation() {
 
               <div className="order-confirm-row">
                 <span>PAYMENT</span>
-                <strong>{order.paymentMethod?.toUpperCase()}</strong>
+                <strong>{order.paymentMethod?.toUpperCase()} ({order.payment_status || "DEMO_NO_PAYMENT_CAPTURED"})</strong>
               </div>
 
               <div className="order-confirm-row">
@@ -81,12 +106,12 @@ function OrderConfirmation() {
           </p>
 
           <div className="order-confirm-actions">
-            <Link to="/explore" className="order-confirm-btn primary">
-              Continue Shopping →
+            <Link to="/orders" className="order-confirm-btn primary">
+              View Order History →
             </Link>
 
-            <Link to="/" className="order-confirm-btn secondary">
-              Back to Home
+            <Link to="/explore" className="order-confirm-btn secondary">
+              Continue Shopping
             </Link>
           </div>
 

@@ -1,9 +1,18 @@
 /**
  * WearWise Merchant Digital Garment Studio API Client (Part 1 Platform)
- * Base URL: http://localhost:8000/api/v1/merchant/garments
+ * Base URL: /api/v1/merchant/garments (proxied to FastAPI in dev/preview or overridden via VITE_MERCHANT_API_BASE)
  */
 
-const BASE_URL = 'http://localhost:8000/api/v1/merchant/garments';
+const BASE_URL = import.meta.env?.VITE_MERCHANT_API_BASE || '/api/v1/merchant/garments';
+
+export async function fetchPrototypePreviewMeta(sku, revision = 'rev3') {
+  const res = await fetch(`${BASE_URL}/prototype-preview/${encodeURIComponent(sku)}?revision=${encodeURIComponent(revision)}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `Prototype candidate unavailable for ${sku} (${revision})`);
+  }
+  return res.json();
+}
 
 export async function fetchMerchantGarments(brandId = null) {
   const url = brandId ? `${BASE_URL}?brand_id=${brandId}` : BASE_URL;
@@ -133,13 +142,49 @@ export async function saveFabricProps(garmentId, payload) {
   return res.json();
 }
 
-export async function trigger3DGeneration(garmentId) {
-  const res = await fetch(`${BASE_URL}/${garmentId}/generate`, {
+export async function trigger3DGeneration(garmentId, force = false) {
+  const qs = force ? '?force=true' : '';
+  const res = await fetch(`${BASE_URL}/${garmentId}/generate${qs}`, {
     method: 'POST',
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || 'Failed to trigger 3D generation');
+  }
+  return res.json();
+}
+
+export async function fetchGarmentRevisions(garmentId) {
+  const res = await fetch(`${BASE_URL}/${garmentId}/revisions`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to fetch revisions');
+  }
+  return res.json();
+}
+
+export async function rollbackGarment(garmentId, targetRevision, publisherId = 'catalog_admin_demo', reason = 'Catalog rollback') {
+  const res = await fetch(`${BASE_URL}/${garmentId}/rollback`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      target_revision: targetRevision,
+      publisher_id: publisherId,
+      reason,
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to rollback garment revision');
+  }
+  return res.json();
+}
+
+export async function exportGarmentPattern(garmentId) {
+  const res = await fetch(`${BASE_URL}/${garmentId}/pattern/export`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to export 2D pattern');
   }
   return res.json();
 }

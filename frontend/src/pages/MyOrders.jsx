@@ -118,6 +118,7 @@ function OrderCard({ order }) {
             <div className="order-item-info">
               <strong>{item.name}</strong>
               <span>{item.brand || "WEARWISE"}</span>
+              {item.sku && <span>SKU: {item.sku}{item.published_revision ? ` (rev${item.published_revision})` : ""}</span>}
               {item.color && <span>Color: {item.color}</span>}
               {item.size  && <span>Size: {item.size}</span>}
               <span>Qty: {item.quantity || 1}</span>

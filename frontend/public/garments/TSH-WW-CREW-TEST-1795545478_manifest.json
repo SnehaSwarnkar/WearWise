@@ -1,0 +1,150 @@
+{
+  "manifest_version": "1.0.0",
+  "garment_id": "1c783621-6dd2-4508-b4f2-189923f9075e",
+  "merchant_id": "00000000-0000-0000-0000-000000000001",
+  "sku": "TSH-WW-CREW-TEST-1795545478",
+  "garment_revision": 1,
+  "published_version": "v1.0",
+  "product_name": "WearWise Signature Boxy Crew Tee (Audit)",
+  "category": "T-Shirt",
+  "subcategory": "Oversized Drop-Shoulder Tee",
+  "color_variant": "Coral Pink / White Trim",
+  "price_inr": 2999.0,
+  "available_sizes": [
+    "S",
+    "M",
+    "L"
+  ],
+  "construction_confidence": "AI_RECONSTRUCTED",
+  "pattern_provenance": {
+    "pattern_mode": "ai_reconstruct",
+    "construction_type": "ai_approximated_tee",
+    "standards": [
+      "ISO 8559-2",
+      "BS 4952",
+      "ASTM D1777"
+    ]
+  },
+  "panel_definitions": [
+    {
+      "id": "PANEL-FRONT-TORSO",
+      "name": "Front Torso Panel"
+    },
+    {
+      "id": "PANEL-BACK-TORSO",
+      "name": "Back Torso Panel"
+    },
+    {
+      "id": "PANEL-SLEEVE-L",
+      "name": "Left Dropped Sleeve"
+    },
+    {
+      "id": "PANEL-SLEEVE-R",
+      "name": "Right Dropped Sleeve"
+    },
+    {
+      "id": "PANEL-COLLAR-RIB",
+      "name": "Ribbed Crewneck Collar (1x1 Rib)"
+    },
+    {
+      "id": "PANEL-HEM-BAND",
+      "name": "Clean 28mm Hem Band"
+    },
+    {
+      "id": "PANEL-POCKET-CHEST",
+      "name": "Left Chest Patch Pocket"
+    }
+  ],
+  "seam_map": [
+    "Left Shoulder Seam",
+    "Right Shoulder Seam",
+    "Left Torso Side Seam",
+    "Right Torso Side Seam",
+    "Left Armhole Inset Seam",
+    "Right Armhole Inset Seam",
+    "Left Sleeve Underarm Seam",
+    "Right Sleeve Underarm Seam",
+    "Collar Neckband Seam",
+    "Bottom Hem Band Binding",
+    "Chest Patch Pocket Topstitch"
+  ],
+  "measurement_specifications": {
+    "S": {
+      "size_label": "S",
+      "half_chest_width_cm": 50.0,
+      "back_length_cm": 64.0,
+      "shoulder_breadth_cm": 47.0,
+      "sleeve_length_cm": 15.0,
+      "sleeve_opening_cm": 20.5,
+      "bicep_width_cm": 22.0,
+      "armhole_depth_cm": 26.5,
+      "collar_circumference_cm": 42.0,
+      "hem_width_cm": 53.0,
+      "dimensional_ease_chest_cm": "+2.0 cm",
+      "measurement_type": "flat_tabletop"
+    },
+    "M": {
+      "size_label": "M",
+      "half_chest_width_cm": 54.0,
+      "back_length_cm": 67.0,
+      "shoulder_breadth_cm": 50.0,
+      "sleeve_length_cm": 17.0,
+      "sleeve_opening_cm": 20.5,
+      "bicep_width_cm": 22.0,
+      "armhole_depth_cm": 26.5,
+      "collar_circumference_cm": 44.0,
+      "hem_width_cm": 53.0,
+      "dimensional_ease_chest_cm": "+4.5 cm (Recommended)",
+      "measurement_type": "flat_tabletop"
+    },
+    "L": {
+      "size_label": "L",
+      "half_chest_width_cm": 58.0,
+      "back_length_cm": 70.0,
+      "shoulder_breadth_cm": 53.0,
+      "sleeve_length_cm": 19.0,
+      "sleeve_opening_cm": 20.5,
+      "bicep_width_cm": 22.0,
+      "armhole_depth_cm": 26.5,
+      "collar_circumference_cm": 46.0,
+      "hem_width_cm": 53.0,
+      "dimensional_ease_chest_cm": "+8.0 cm",
+      "measurement_type": "flat_tabletop"
+    }
+  },
+  "material_profile": {
+    "name": "Heavyweight Cotton Waffle Knit (240 GSM)",
+    "composition": "100% Combed Organic Cotton",
+    "structure": "Waffle / Honeycomb Knit",
+    "gsm": 240.0,
+    "thickness_mm": 1.15,
+    "warp_stretch_percent": 14.5,
+    "weft_stretch_percent": 28.0,
+    "elastic_recovery_percent": 88.0,
+    "bending_stiffness": 18.5,
+    "shear_stiffness": 22.0,
+    "preset_id": "cotton_waffle_knit_240gsm"
+  },
+  "asset_sha256_checksums": {
+    "glb_size_S": "2bb0b4046a735520542a577ed3aad5271359457871c6c57d9cb386f096bc1b28",
+    "glb_size_M": "200435ff34940224f51b1af6dfb13d3b19e5c68cfe0c62035ef1f1a93622225c",
+    "glb_size_L": "b712b64ca07063dab2d30d8860c24ecc80201e94dbd65799c2593bfc110776b7",
+    "glb_canonical": "a0bfee42aa1c18e4e2b7c20343d22fae1faf07a85a4c7b348da107de1a91929f",
+    "texture_atlas_diffuse": "f0a96faf0d98f1a93e2b7ea22a58f1b245ebe7fd6b88117e235d2511fe8df298",
+    "provenance_metadata": "ee29c04aa15affb26dca2e1db7af68f4a70a18ad1a7ff2a01a366aa2c7447ffa"
+  },
+  "qa_verification_status": "PASSED",
+  "qa_report_summary": {
+    "geometry_qa": "PASSED",
+    "confidence_level": "AI_RECONSTRUCTED",
+    "sizes_validated": [
+      "S",
+      "M",
+      "L"
+    ]
+  },
+  "approval_principal": "catalog_admin_audit",
+  "approval_timestamp": "2026-11-24T18:37:59.175550+00:00",
+  "published_at": "2026-11-24T18:37:59.234857+00:00",
+  "publication_status": "published"
+}

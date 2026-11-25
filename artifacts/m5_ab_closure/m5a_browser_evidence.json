@@ -1,0 +1,173 @@
+{
+  "staging_dbs": {
+    "body_engine": "wearwise_body_engine_staging",
+    "commerce": "wearwise_commerce_staging"
+  },
+  "routes_visited": [
+    "http://127.0.0.1:4173/try-on?sku=TSH-WW-ACCEPTANCE-001&size=M",
+    "http://127.0.0.1:4173/cart",
+    "http://127.0.0.1:4173/checkout",
+    "http://127.0.0.1:4173/order-confirmation?orderId=WW261125044511-B28295",
+    "http://127.0.0.1:4173/orders"
+  ],
+  "api_calls": [
+    {
+      "url": "http://127.0.0.1:8001/api/cart/sess_vd13mcuyx",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/cart/sess_vd13mcuyx",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/products/sku/TSH-WW-ACCEPTANCE-001",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4173/api/products/sku/TSH-WW-ACCEPTANCE-001/revisions/1/assets/M",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:4173/api/products/sku/TSH-WW-ACCEPTANCE-001/revisions/1/assets/M",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/cart/add",
+      "status": 200,
+      "method": "POST"
+    },
+    {
+      "url": "http://127.0.0.1:4173/api/products/sku/TSH-WW-ACCEPTANCE-001/revisions/1/assets/M",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/cart/sess_vd13mcuyx",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/cart/sess_vd13mcuyx",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/cart/sess_vd13mcuyx",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/cart/sess_vd13mcuyx",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/cart/update",
+      "status": 200,
+      "method": "PUT"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/cart/update",
+      "status": 200,
+      "method": "PUT"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/cart/sess_vd13mcuyx",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/cart/sess_vd13mcuyx",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/orders/place",
+      "status": 200,
+      "method": "POST"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/cart/sess_vd13mcuyx",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/orders/detail/WW261125044511-B28295",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/cart/sess_vd13mcuyx",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/orders/detail/WW261125044511-B28295",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/cart/sess_vd13mcuyx",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "http://127.0.0.1:8001/api/orders/my",
+      "status": 200,
+      "method": "GET"
+    }
+  ],
+  "console_errors": [],
+  "network_failures": [],
+  "screenshots": {
+    "cart": "c:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\artifacts\\m5_ab_closure\\m5a_cart.png",
+    "checkout": "c:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\artifacts\\m5_ab_closure\\m5a_checkout.png",
+    "confirmation": "c:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\artifacts\\m5_ab_closure\\m5a_confirmation.png",
+    "order_history": "c:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\artifacts\\m5_ab_closure\\m5a_order_history.png"
+  },
+  "demo_payment_notice": "\u2139 Demo / Test Checkout: No real payment gateway is connected and no payment is captured.",
+  "order_id": "WW261125044511-B28295",
+  "final_order_record": {
+    "id": "WW261125044511-B28295",
+    "session_id": "sess_vd13mcuyx",
+    "user_id": "ca4a047a-cd0",
+    "idempotency_key": "chk_1795562109802_i0n0zevp",
+    "items": [
+      {
+        "id": 881792,
+        "name": "WearWise Acceptance Boxy Tee",
+        "price": 2499,
+        "quantity": 1,
+        "image": null,
+        "brand": "WEARWISE EDIT",
+        "color": null,
+        "size": "M",
+        "sku": "TSH-WW-ACCEPTANCE-001",
+        "published_revision": 1
+      }
+    ],
+    "customer": {
+      "firstName": "Riya",
+      "lastName": "Verma",
+      "email": "m5a.shopper.9a45d5@wearwise.test",
+      "phone": "9876543210",
+      "address": "12 MG Road",
+      "city": "Bengaluru",
+      "state": "Karnataka",
+      "pincode": "560001"
+    },
+    "paymentMethod": "upi",
+    "subtotal": 2499,
+    "shipping": 0,
+    "total": 2499,
+    "createdAt": "2026-11-24T23:15:11.745160+00:00",
+    "status": "Confirmed",
+    "is_demo_checkout": true,
+    "payment_status": "DEMO_NO_PAYMENT_CAPTURED"
+  }
+}

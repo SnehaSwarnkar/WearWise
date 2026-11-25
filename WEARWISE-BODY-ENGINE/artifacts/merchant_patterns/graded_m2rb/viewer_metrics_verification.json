@@ -1,0 +1,37 @@
+{
+  "production_viewer_checks": {
+    "avatar_metrics_text": "Avatar:\nMeshes: 1\nVertices: 13,718\nTriangles: 27,420\nSource: Runtime glTF Geometry Check",
+    "hardcoded_manifold_valid_absent": true,
+    "per_size_hud": {
+      "S": {
+        "garment_hud_text": "Garment (TSH-WW-CREW-001_S.glb):\nMeshes: 7\nVertices: 3,384\nTriangles: 6,096\nTopology: Open-Shell Manifold (196 boundary edges)\nQA: UNVERIFIED (Runtime Only) (Runtime glTF Check (No Verified QA Report))",
+        "avatar_hud_text": "Avatar:\nMeshes: 1\nVertices: 13,718\nTriangles: 27,420\nSource: Runtime glTF Geometry Check",
+        "distinct_from_anny_13718": true,
+        "shows_actual_asset": true,
+        "shows_runtime_unverified_when_no_qa_report": true
+      },
+      "M": {
+        "garment_hud_text": "Garment (TSH-WW-CREW-001_M.glb):\nMeshes: 7\nVertices: 3,384\nTriangles: 6,096\nTopology: Open-Shell Manifold (196 boundary edges)\nQA: UNVERIFIED (Runtime Only) (Runtime glTF Check (No Verified QA Report))",
+        "avatar_hud_text": "Avatar:\nMeshes: 1\nVertices: 13,718\nTriangles: 27,420\nSource: Runtime glTF Geometry Check",
+        "distinct_from_anny_13718": true,
+        "shows_actual_asset": true,
+        "shows_runtime_unverified_when_no_qa_report": true
+      },
+      "L": {
+        "garment_hud_text": "Garment (TSH-WW-CREW-001_L.glb):\nMeshes: 7\nVertices: 3,384\nTriangles: 6,096\nTopology: Open-Shell Manifold (196 boundary edges)\nQA: UNVERIFIED (Runtime Only) (Runtime glTF Check (No Verified QA Report))",
+        "avatar_hud_text": "Avatar:\nMeshes: 1\nVertices: 13,718\nTriangles: 27,420\nSource: Runtime glTF Geometry Check",
+        "distinct_from_anny_13718": true,
+        "shows_actual_asset": true,
+        "shows_runtime_unverified_when_no_qa_report": true
+      }
+    }
+  },
+  "negative_test_10_viewer_attribution": {
+    "production_viewer_passes_isolation": true,
+    "negative_case_detected_status": "FAILED",
+    "negative_case_blocking_issues": [
+      "Viewer erroneously attributed Anny vertex count (13,718) to garment.",
+      "Viewer displayed hardcoded 'Manifold: Valid' without verified source."
+    ]
+  }
+}

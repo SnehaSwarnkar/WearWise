@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../App.css";
 import "./TryOn.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "./Header";
 import { AvatarViewer } from "../components/avatar/AvatarViewer";
 import { addToCart } from "../api/cart";
+import { fetchProductBySku } from "../api/products";
 import {
   createVtonJob,
   getVtonJob,
@@ -29,13 +30,20 @@ const SIZE_FIT_DATA = {
 
 function TryOn() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const querySku = searchParams.get("sku");
+  const querySize = searchParams.get("size");
 
   // Mode Selection: 'mode_a' (3D Avatar) vs 'mode_b' (AI Photo VTON)
   const [activeMode, setActiveMode] = useState("mode_a");
 
   // ── Mode A State ────────────────────────────────────────────────────────────
   const [mannequinGender, setMannequinGender] = useState("male");
-  const [selectedSize, setSelectedSize] = useState("M");
+  const [selectedSize, setSelectedSize] = useState(
+    querySize && ["S", "M", "L"].includes(querySize.toUpperCase()) ? querySize.toUpperCase() : "M"
+  );
+  const [catalogProduct, setCatalogProduct] = useState(null);
+  const [catalogError, setCatalogError] = useState(null);
   const [showGarmentMesh, setShowGarmentMesh] = useState(true);
   const [armAngle, setArmAngle] = useState(0);
   const [fabricProfile, setFabricProfile] = useState("knit");
@@ -63,6 +71,24 @@ function TryOn() {
       .then((data) => setProviderTelemetry(data))
       .catch((err) => console.warn("Could not load provider telemetry:", err));
   }, []);
+
+  useEffect(() => {
+    if (!querySku) {
+      setCatalogProduct(null);
+      setCatalogError(null);
+      return;
+    }
+    setCatalogError(null);
+    fetchProductBySku(querySku)
+      .then((prod) => {
+        setCatalogProduct(prod);
+        setCatalogError(null);
+      })
+      .catch((err) => {
+        setCatalogProduct(null);
+        setCatalogError(err?.message || `Published digital garment not found for SKU ${querySku}`);
+      });
+  }, [querySku]);
 
   // Mode B Polling Lifecycle
   useEffect(() => {
@@ -98,14 +124,15 @@ function TryOn() {
     setCartSuccess(false);
     try {
       await addToCart({
-        id: 1,
-        name: "WearWise Signature Boxy Crew Tee",
-        price: 2999,
+        id: catalogProduct?.id || 1,
+        name: catalogProduct?.name || "WearWise Signature Boxy Crew Tee",
+        price: catalogProduct?.price || 2999,
         size: selectedSize,
-        sku: "TSH-WW-CREW-001",
-        className: "product-pink",
-        colors: ["#ff3d9a", "#ffffff", "#1d1d1d"],
-        brand: "WEARWISE EDIT",
+        sku: catalogProduct?.sku || "TSH-WW-CREW-001",
+        className: catalogProduct?.className || "product-pink",
+        colors: catalogProduct?.colors || ["#ff3d9a", "#ffffff", "#1d1d1d"],
+        brand: catalogProduct?.brand || "WEARWISE EDIT",
+        published_revision: catalogProduct?.published_revision || null,
       });
       setCartSuccess(true);
       setTimeout(() => setCartSuccess(false), 4000);
@@ -276,16 +303,37 @@ function TryOn() {
                 </button>
               </div>
 
-              <AvatarViewer
-                assetUrl={currentAvatarUrl}
-                garmentUrl={`/garments/TSH-WW-CREW-001_${['S', 'M', 'L'].includes(selectedSize) ? selectedSize : 'M'}.glb`}
-                garmentScale={SIZE_SCALES[selectedSize]}
-                showGarment={showGarmentMesh}
-                armAngle={armAngle}
-                studioBackground="#720e2c"
-                fabricProfile={fabricProfile}
-                height="560px"
-              />
+              {(() => {
+                const safeSize = ["S", "M", "L"].includes(selectedSize) ? selectedSize : "M";
+                const resolvedVariant = catalogProduct?.size_variants?.[safeSize];
+                const resolvedUrl = querySku
+                  ? (resolvedVariant?.asset_url || null)
+                  : `/garments/TSH-WW-CREW-001_${safeSize}.glb`;
+                const resolvedQa = querySku && catalogProduct?.qa_summary
+                  ? {
+                      overall_status: catalogProduct.qa_summary.overall_status,
+                      validation_source: catalogProduct.qa_summary.validation_source,
+                      size_variants: catalogProduct.size_variants,
+                    }
+                  : null;
+                const unavail = querySku && !resolvedUrl
+                  ? (catalogError || `Published GLB unavailable for ${querySku} size ${safeSize}`)
+                  : null;
+                return (
+                  <AvatarViewer
+                    assetUrl={currentAvatarUrl}
+                    garmentUrl={resolvedUrl}
+                    garmentQaReport={resolvedQa}
+                    garmentUnavailableError={unavail}
+                    garmentScale={querySku ? 1.0 : SIZE_SCALES[selectedSize]}
+                    showGarment={showGarmentMesh && Boolean(resolvedUrl)}
+                    armAngle={armAngle}
+                    studioBackground="#720e2c"
+                    fabricProfile={fabricProfile}
+                    height="560px"
+                  />
+                );
+              })()}
 
               {/* Interactive Arm Elevation & XPBD Cloth Deformation Panel */}
               <div className="mode-a-motion-panel">
@@ -329,12 +377,14 @@ function TryOn() {
                 <div className="garment-card-header">
                   <div>
                     <span style={{ fontSize: "11px", letterSpacing: "1px", fontWeight: 900, color: "var(--purple, #8d6bff)" }}>
-                      MERCHANT DIGITAL GARMENT
+                      {catalogProduct?.published_version ? `PUBLISHED CATALOG · ${catalogProduct.published_version}` : "MERCHANT DIGITAL GARMENT"}
                     </span>
-                    <h2 className="garment-card-title">Signature Boxy Crew Tee</h2>
-                    <span style={{ fontSize: "12px", color: "#666" }}>SKU: TSH-WW-CREW-001 · 100% Combed Cotton</span>
+                    <h2 className="garment-card-title">{catalogProduct?.name || "Signature Boxy Crew Tee"}</h2>
+                    <span style={{ fontSize: "12px", color: "#666" }}>
+                      SKU: {catalogProduct?.sku || querySku || "TSH-WW-CREW-001"} · {catalogProduct?.material_profile?.composition || "100% Combed Cotton"}
+                    </span>
                   </div>
-                  <div className="garment-card-price">₹2,999</div>
+                  <div className="garment-card-price">₹{(catalogProduct?.price || 2999).toLocaleString("en-IN")}</div>
                 </div>
 
                 {/* Garment Mesh Toggle */}

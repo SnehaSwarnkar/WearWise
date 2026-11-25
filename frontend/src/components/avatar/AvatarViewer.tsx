@@ -15,12 +15,21 @@ import {
   Check,
 } from 'lucide-react';
 
+interface GarmentQaSummary {
+  overall_status?: string;
+  statuses?: Record<string, string>;
+  validation_source?: string;
+  size_variants?: Record<string, { overall_prototype_qa?: string; glb_file?: string; revision?: string }>;
+}
+
 interface AvatarViewerProps {
   avatarId?: string | null;
   assetUrl?: string | null;
   garmentUrl?: string | null;
   garmentScale?: number;
   showGarment?: boolean;
+  garmentQaReport?: GarmentQaSummary | null;
+  garmentUnavailableError?: string | null;
   height?: string | number;
   initialWireframe?: boolean;
   initialAutoRotate?: boolean;
@@ -29,12 +38,125 @@ interface AvatarViewerProps {
   fabricProfile?: string;
 }
 
+/**
+ * Extracts explicit garment size token (S | M | L) from a GLB filename or prototype asset URL
+ * without guessing from unrelated segments.
+ * Supports:
+ * - TSH-WW-CREW-001_S_candidate.glb
+ * - TSH-WW-CREW-001_S_candidate_rev3.glb
+ * - TSH-WW-CREW-001_M_prototype_rev2.glb
+ * - TSH-WW-CREW-001_L.glb
+ * - /api/v1/merchant/garments/prototype-preview/TSH-WW-CREW-001/assets/S?revision=rev3
+ */
+export function extractGarmentSizeFromUrl(garmentUrlOrFilename: string): 'S' | 'M' | 'L' | null {
+  if (!garmentUrlOrFilename || typeof garmentUrlOrFilename !== 'string') return null;
+  const cleanPath = garmentUrlOrFilename.split('?')[0].split('#')[0].trim();
+  if (!cleanPath) return null;
+
+  const protoRouteMatch = cleanPath.match(/\/(?:prototype-preview|revisions)\/[^/]+\/assets\/([SML])$/);
+  if (protoRouteMatch) {
+    return protoRouteMatch[1] as 'S' | 'M' | 'L';
+  }
+
+  const basename = cleanPath.split('/').pop() || cleanPath;
+  const fileMatch = basename.match(/_([SML])(?:_(?:candidate|prototype)(?:_rev\d+)?|_rev\d+)?\.glb$/i);
+  if (fileMatch) {
+    return fileMatch[1].toUpperCase() as 'S' | 'M' | 'L';
+  }
+  return null;
+}
+
+export function extractGarmentAssetLabel(
+  garmentUrl: string,
+  matchedSize: 'S' | 'M' | 'L' | null,
+  garmentQaReport?: GarmentQaSummary | null
+): string {
+  const fromQa = matchedSize ? garmentQaReport?.size_variants?.[matchedSize]?.glb_file : undefined;
+  if (fromQa) return fromQa;
+  const cleanPath = garmentUrl.split('?')[0].split('#')[0];
+  return cleanPath.split('/').pop() || cleanPath;
+}
+
+interface AnalyzedGeometryMetrics {
+  meshCount: number;
+  vertexCount: number;
+  triangleCount: number;
+  nonManifoldEdges: number;
+  boundaryEdges: number;
+  hasTexCoords: boolean;
+}
+
+function analyzeSceneGeometry(root: THREE.Object3D): AnalyzedGeometryMetrics {
+  let meshCount = 0;
+  let vertexCount = 0;
+  let triangleCount = 0;
+  let hasTexCoords = true;
+
+  const posToWeldId = new Map<string, number>();
+  let nextWeldId = 0;
+  const edgeCounts = new Map<string, number>();
+
+  root.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh) {
+      const mesh = child as THREE.Mesh;
+      meshCount += 1;
+      const geo = mesh.geometry;
+      if (!geo) return;
+      const posAttr = geo.attributes.position;
+      if (!posAttr) return;
+      if (!geo.attributes.uv) hasTexCoords = false;
+
+      vertexCount += posAttr.count;
+      const indexAttr = geo.index;
+      const triCount = indexAttr ? Math.floor(indexAttr.count / 3) : Math.floor(posAttr.count / 3);
+      triangleCount += triCount;
+
+      const localWeldIds = new Int32Array(posAttr.count);
+      for (let i = 0; i < posAttr.count; i++) {
+        const key = `${Math.round(posAttr.getX(i) * 1e4)},${Math.round(posAttr.getY(i) * 1e4)},${Math.round(posAttr.getZ(i) * 1e4)}`;
+        let wid = posToWeldId.get(key);
+        if (wid === undefined) {
+          wid = nextWeldId++;
+          posToWeldId.set(key, wid);
+        }
+        localWeldIds[i] = wid;
+      }
+
+      for (let t = 0; t < triCount; t++) {
+        const i0 = indexAttr ? indexAttr.getX(t * 3) : t * 3;
+        const i1 = indexAttr ? indexAttr.getX(t * 3 + 1) : t * 3 + 1;
+        const i2 = indexAttr ? indexAttr.getX(t * 3 + 2) : t * 3 + 2;
+        const a = localWeldIds[i0];
+        const b = localWeldIds[i1];
+        const c = localWeldIds[i2];
+        const edges: [number, number][] = [[a, b], [b, c], [c, a]];
+        for (const [u, v] of edges) {
+          if (u === v) continue;
+          const ek = u < v ? `${u}:${v}` : `${v}:${u}`;
+          edgeCounts.set(ek, (edgeCounts.get(ek) || 0) + 1);
+        }
+      }
+    }
+  });
+
+  let nonManifoldEdges = 0;
+  let boundaryEdges = 0;
+  edgeCounts.forEach((cnt) => {
+    if (cnt > 2) nonManifoldEdges += 1;
+    else if (cnt === 1) boundaryEdges += 1;
+  });
+
+  return { meshCount, vertexCount, triangleCount, nonManifoldEdges, boundaryEdges, hasTexCoords };
+}
+
 export const AvatarViewer: React.FC<AvatarViewerProps> = ({
   avatarId,
   assetUrl,
   garmentUrl,
   garmentScale = 1.0,
   showGarment = true,
+  garmentQaReport = null,
+  garmentUnavailableError = null,
   height = '560px',
   initialWireframe = false,
   initialAutoRotate = false,
@@ -56,12 +178,29 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
   const [loadError, setLoadError] = useState<string | null>(null);
   const [wireframe, setWireframe] = useState<boolean>(initialWireframe);
   const [autoRotate, setAutoRotate] = useState<boolean>(initialAutoRotate);
-  const [meshMetrics, setMeshMetrics] = useState<{
+  const [avatarMetrics, setAvatarMetrics] = useState<{
+    assetName: string;
+    meshCount: number;
     vertexCount: number;
     triangleCount: number;
-    isManifold: boolean;
-    sha256?: string;
+    nonManifoldEdges: number;
+    boundaryEdges: number;
+    topologyLabel: string;
+    validationSource: string;
   } | null>(null);
+  const [garmentMetrics, setGarmentMetrics] = useState<{
+    assetName: string;
+    meshCount: number;
+    vertexCount: number;
+    triangleCount: number;
+    nonManifoldEdges: number;
+    boundaryEdges: number;
+    hasTexCoords: boolean;
+    topologyLabel: string;
+    qaStatus: string;
+    qaSource: string;
+  } | null>(null);
+  const [garmentLoadError, setGarmentLoadError] = useState<string | null>(null);
   const [copiedSha, setCopiedSha] = useState(false);
 
   // Extract avatar ID from assetUrl if avatarId is not explicitly provided
@@ -293,10 +432,26 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
             // Dynamically fit camera framing to model bounding box & overlay clearance
             fitCameraToModel(model);
 
-            setMeshMetrics({
-              vertexCount: totalVertices,
-              triangleCount: Math.round(totalTriangles),
-              isManifold: true,
+            const avatarGeoStats = analyzeSceneGeometry(model);
+            const avatarTopoLabel =
+              avatarGeoStats.nonManifoldEdges > 0
+                ? `Non-Manifold (${avatarGeoStats.nonManifoldEdges} edges)`
+                : avatarGeoStats.boundaryEdges === 0
+                  ? 'Watertight Manifold (Runtime)'
+                  : `Open Manifold (${avatarGeoStats.boundaryEdges} boundary)`;
+            const avatarAssetName = assetUrl
+              ? assetUrl.split('/').pop() || 'avatar.glb'
+              : resolvedAvatarId || 'anny_baseline_male.glb';
+
+            setAvatarMetrics({
+              assetName: avatarAssetName,
+              meshCount: avatarGeoStats.meshCount,
+              vertexCount: avatarGeoStats.vertexCount,
+              triangleCount: avatarGeoStats.triangleCount,
+              nonManifoldEdges: avatarGeoStats.nonManifoldEdges,
+              boundaryEdges: avatarGeoStats.boundaryEdges,
+              topologyLabel: avatarTopoLabel,
+              validationSource: 'Runtime glTF Geometry Check',
             });
             setLoading(false);
           },
@@ -331,10 +486,14 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
         sceneRef.current.remove(currentGarmentRef.current);
         currentGarmentRef.current = null;
       }
+      setGarmentMetrics(null);
+      setGarmentLoadError(null);
       return;
     }
 
     let isMounted = true;
+    setGarmentMetrics(null);
+    setGarmentLoadError(null);
     const loader = new GLTFLoader();
     loader.load(
       garmentUrl,
@@ -356,6 +515,49 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
 
         sceneRef.current.add(garment);
 
+        const gStats = analyzeSceneGeometry(garment);
+        const matchedSize = extractGarmentSizeFromUrl(garmentUrl);
+        const garmentFile = extractGarmentAssetLabel(garmentUrl, matchedSize, garmentQaReport);
+
+        let qaStatus = 'UNVERIFIED (Runtime Only)';
+        let qaSource = 'Runtime glTF Check (No Verified QA Report)';
+        if (garmentQaReport) {
+          const sizeStatus =
+            matchedSize && garmentQaReport.size_variants?.[matchedSize]?.overall_prototype_qa;
+          const rawStatus =
+            sizeStatus ||
+            garmentQaReport.statuses?.overall_prototype_qa ||
+            garmentQaReport.overall_status;
+          if (rawStatus) {
+            qaStatus = String(rawStatus).toUpperCase();
+            qaSource = garmentQaReport.validation_source || 'Verified Asset QA Report';
+          }
+        }
+        if (gStats.nonManifoldEdges > 0) {
+          qaStatus = `FAILED (${gStats.nonManifoldEdges} Non-Manifold Edges)`;
+          qaSource = 'Runtime glTF Edge Incidence Check';
+        }
+
+        const garmentTopoLabel =
+          gStats.nonManifoldEdges > 0
+            ? `Non-Manifold (${gStats.nonManifoldEdges})`
+            : gStats.boundaryEdges > 0
+              ? `Open-Shell Manifold (${gStats.boundaryEdges} boundary edges)`
+              : 'Watertight Manifold (Runtime)';
+
+        setGarmentMetrics({
+          assetName: garmentFile,
+          meshCount: gStats.meshCount,
+          vertexCount: gStats.vertexCount,
+          triangleCount: gStats.triangleCount,
+          nonManifoldEdges: gStats.nonManifoldEdges,
+          boundaryEdges: gStats.boundaryEdges,
+          hasTexCoords: gStats.hasTexCoords,
+          topologyLabel: garmentTopoLabel,
+          qaStatus,
+          qaSource,
+        });
+
         // Bind garment to cloth simulator and sync arm angle
         simulatorRef.current.bindGarment(garment);
         if (armAngle > 0) {
@@ -365,13 +567,17 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
       undefined,
       (err) => {
         console.warn('Could not load 3D garment mesh:', err);
+        if (isMounted) {
+          setGarmentMetrics(null);
+          setGarmentLoadError(`Prototype/garment asset unavailable (${garmentUrl})`);
+        }
       }
     );
 
     return () => {
       isMounted = false;
     };
-  }, [garmentUrl, showGarment]);
+  }, [garmentUrl, showGarment, garmentQaReport]);
 
   // Dynamic arm elevation motion
   useEffect(() => {
@@ -452,7 +658,7 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
       {/* Three.js canvas container */}
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
 
-      {/* Top-Left: Mesh Status & Quality Badges */}
+      {/* Top-Left: Separated Avatar & Garment Telemetry HUD */}
       <div
         style={{
           position: 'absolute',
@@ -464,22 +670,27 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
           pointerEvents: 'none',
         }}
       >
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           <span className="badge badge-cyan" style={{ pointerEvents: 'auto' }}>
             <CheckCircle2 size={12} />
             <span>NAVER Anny v0.6.2</span>
           </span>
 
-          {meshMetrics && (
-            <span className="badge badge-emerald" style={{ pointerEvents: 'auto' }}>
-              <CheckCircle2 size={12} />
-              <span>Manifold: Valid</span>
+          {avatarMetrics && (
+            <span
+              className={`badge ${avatarMetrics.nonManifoldEdges === 0 ? 'badge-emerald' : 'badge-rose'}`}
+              style={{ pointerEvents: 'auto' }}
+              title={avatarMetrics.validationSource}
+            >
+              {avatarMetrics.nonManifoldEdges === 0 ? <CheckCircle2 size={12} /> : <AlertTriangle size={12} />}
+              <span>{avatarMetrics.topologyLabel}</span>
             </span>
           )}
         </div>
 
-        {meshMetrics && (
+        {avatarMetrics && (
           <div
+            data-testid="avatar-metrics"
             style={{
               background: 'rgba(15, 23, 42, 0.85)',
               backdropFilter: 'blur(8px)',
@@ -489,19 +700,80 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
               fontSize: '11px',
               color: 'var(--text-muted)',
               display: 'flex',
-              gap: '12px',
+              gap: '10px',
+              flexWrap: 'wrap',
               pointerEvents: 'auto',
             }}
           >
+            <strong style={{ color: 'var(--accent-cyan)' }}>Avatar:</strong>
             <span>
-              Vertices: <strong style={{ color: '#ffffff' }}>{meshMetrics.vertexCount.toLocaleString()}</strong>
+              Meshes: <strong style={{ color: '#ffffff' }}>{avatarMetrics.meshCount}</strong>
             </span>
             <span>
-              Triangles: <strong style={{ color: '#ffffff' }}>{meshMetrics.triangleCount.toLocaleString()}</strong>
+              Vertices: <strong style={{ color: '#ffffff' }}>{avatarMetrics.vertexCount.toLocaleString()}</strong>
             </span>
             <span>
-              Format: <strong style={{ color: 'var(--accent-cyan)' }}>GLB (glTF 2.0)</strong>
+              Triangles: <strong style={{ color: '#ffffff' }}>{avatarMetrics.triangleCount.toLocaleString()}</strong>
             </span>
+            <span>
+              Source: <strong style={{ color: '#cbd5e1' }}>{avatarMetrics.validationSource}</strong>
+            </span>
+      </div>
+        )}
+
+        {garmentMetrics && (
+          <div
+            data-testid="garment-metrics"
+            style={{
+              background: 'rgba(15, 23, 42, 0.88)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(244, 114, 182, 0.45)',
+              borderRadius: '6px',
+              padding: '6px 10px',
+              fontSize: '11px',
+              color: 'var(--text-muted)',
+              display: 'flex',
+              gap: '10px',
+              flexWrap: 'wrap',
+              pointerEvents: 'auto',
+            }}
+          >
+            <strong style={{ color: '#f9a8d4' }}>Garment ({garmentMetrics.assetName}):</strong>
+            <span>
+              Meshes: <strong style={{ color: '#ffffff' }}>{garmentMetrics.meshCount}</strong>
+            </span>
+            <span>
+              Vertices: <strong style={{ color: '#ffffff' }}>{garmentMetrics.vertexCount.toLocaleString()}</strong>
+            </span>
+            <span>
+              Triangles: <strong style={{ color: '#ffffff' }}>{garmentMetrics.triangleCount.toLocaleString()}</strong>
+            </span>
+            <span>
+              Topology: <strong style={{ color: '#cbd5e1' }}>{garmentMetrics.topologyLabel}</strong>
+            </span>
+            <span>
+              QA:{' '}
+              <strong style={{ color: garmentMetrics.qaStatus.startsWith('PASS') ? '#34d399' : '#fbbf24' }}>
+                {garmentMetrics.qaStatus}
+              </strong>{' '}
+              <span style={{ color: '#94a3b8' }}>({garmentMetrics.qaSource})</span>
+            </span>
+      </div>
+        )}
+        {(garmentUnavailableError || garmentLoadError) && (
+          <div
+            data-testid="garment-error"
+            style={{
+              background: 'rgba(127, 29, 29, 0.92)',
+              border: '1px solid #f87171',
+              borderRadius: '6px',
+              padding: '6px 10px',
+              fontSize: '11px',
+              color: '#fecaca',
+              pointerEvents: 'auto',
+            }}
+          >
+            <strong>Garment Unavailable:</strong> {garmentUnavailableError || garmentLoadError}
           </div>
         )}
       </div>
@@ -605,7 +877,7 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
           >
             {copiedSha ? <Check size={12} /> : <Copy size={12} />}
           </button>
-        </div>
+      </div>
       )}
 
       {/* Loading Overlay */}
@@ -626,11 +898,11 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
           <Loader2 size={36} color="var(--accent-cyan)" className="spin" style={{ animation: 'spin 1s linear infinite' }} />
           <div style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff' }}>
             Streaming Private Binary Avatar Asset...
-          </div>
+      </div>
           <div style={{ fontSize: '11px', color: 'var(--text-dim)' }} className="mono">
             GET /api/v1/avatar/assets/{resolvedAvatarId}.glb
-          </div>
-        </div>
+      </div>
+      </div>
       )}
 
       {/* Error Overlay */}
@@ -652,7 +924,7 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
           <AlertTriangle size={36} color="var(--accent-rose)" />
           <div style={{ fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>3D Asset Streaming Error</div>
           <div style={{ fontSize: '12px', color: 'var(--text-muted)', maxWidth: '420px' }}>{loadError}</div>
-        </div>
+      </div>
       )}
 
       {/* Empty State Overlay */}
@@ -684,12 +956,12 @@ export const AvatarViewer: React.FC<AvatarViewerProps> = ({
             }}
           >
             <Maximize2 size={24} color="var(--accent-cyan)" />
-          </div>
+      </div>
           <div style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff' }}>No 3D Avatar Loaded</div>
           <div style={{ fontSize: '12px', color: 'var(--text-muted)', maxWidth: '380px', lineHeight: 1.5 }}>
             Create a body profile and trigger 3D Avatar Generation to synthesize real watertight geometry using NAVER Anny v0.6.2.
-          </div>
-        </div>
+      </div>
+      </div>
       )}
     </div>
   );

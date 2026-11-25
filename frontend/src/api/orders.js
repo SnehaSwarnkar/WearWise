@@ -5,7 +5,7 @@ const STORE_BASE_URL = import.meta.env.VITE_STORE_API_URL || "http://127.0.0.1:8
 
 // ── Place order ───────────────────────────────────────────────────────────────
 
-export function placeOrder(customer, paymentMethod) {
+export function placeOrder(customer, paymentMethod, idempotencyKey = null) {
   const token = getToken();
   return api.post(
     "/api/orders/place",
@@ -13,6 +13,7 @@ export function placeOrder(customer, paymentMethod) {
       session_id: getSessionId(),
       customer,
       paymentMethod,
+      idempotency_key: idempotencyKey,
     },
     token ? { Authorization: `Bearer ${token}` } : {}
   );
@@ -37,7 +38,8 @@ export async function getMyOrders() {
 
 export async function getOrderDetail(orderId) {
   const token = getToken();
-  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const headers = { "X-Session-Id": getSessionId() };
+  if (token) headers.Authorization = `Bearer ${token}`;
   const res = await fetch(`${STORE_BASE_URL}/api/orders/detail/${orderId}`, { headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));

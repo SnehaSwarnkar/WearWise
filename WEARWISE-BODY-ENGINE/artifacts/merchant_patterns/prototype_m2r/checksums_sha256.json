@@ -1,0 +1,74 @@
+{
+  "material_uv_verification.json": {
+    "size_bytes": 423,
+    "sha256": "c72a0821440e196b99ff7e3b0503b97d8dd6bfc4004e326944e5b1da63761003"
+  },
+  "measurement_spec_and_audit.json": {
+    "size_bytes": 6454,
+    "sha256": "fd14846fe4faad1736a9f6ff61a67563d365c64c20a1869c375affa032796483"
+  },
+  "panels_2d/PANEL-BACK-TORSO.svg": {
+    "size_bytes": 3301,
+    "sha256": "c7d1c27edebb0d366eece32af8c60adc3d2344875a18e393a8d424273d8d60eb"
+  },
+  "panels_2d/PANEL-COLLAR-RIB.svg": {
+    "size_bytes": 2068,
+    "sha256": "6b6b109a8d36cb9c71dd8c6cbce9213c7fefb076208523ce9592b073172f7a71"
+  },
+  "panels_2d/PANEL-FRONT-TORSO.svg": {
+    "size_bytes": 3499,
+    "sha256": "3e814ee7cd15d64d20e1e11928e57eb45ca1d2b4ac6fda4a80f4b2e4f5d6b5d8"
+  },
+  "panels_2d/PANEL-HEM-BAND.svg": {
+    "size_bytes": 2187,
+    "sha256": "e28ba1b7c38897090f549aeebe7a84c264811b712b2efec5852bb5aec890e6c2"
+  },
+  "panels_2d/PANEL-POCKET-CHEST.svg": {
+    "size_bytes": 1303,
+    "sha256": "55f6c15e354cffaf9d29a11f240bf022062ffc6ee43c072003576a0aa36c4861"
+  },
+  "panels_2d/PANEL-SLEEVE-L.svg": {
+    "size_bytes": 2177,
+    "sha256": "8c0b51d2699a182e8cee0b4bfa1873c2c1f1a3a0739c72e74e1a9b1c027f7043"
+  },
+  "panels_2d/PANEL-SLEEVE-R.svg": {
+    "size_bytes": 2178,
+    "sha256": "8b0d46b0f91e3faf6aae34de1e7bc5f51fa8a5fa4ce43ec087ecba8ac3464ff4"
+  },
+  "pattern_components.json": {
+    "size_bytes": 88290,
+    "sha256": "7c0b0044518ca05800e5a867d115894279734d6c6fbe64afcc6c845fd47cef26"
+  },
+  "preview_m2r_prototype.png": {
+    "size_bytes": 303993,
+    "sha256": "44b2b212748e6128aee48879c41f22f3109e9d6ee0040ade33a96a7867bdff77"
+  },
+  "preview_m2r_rev2_front.png": {
+    "size_bytes": 396985,
+    "sha256": "3db41c862930944e8e9b1ab0eb95edf5f5e502f2b1af0b515a5940a6888049f6"
+  },
+  "preview_m2r_rev2_rear.png": {
+    "size_bytes": 473370,
+    "sha256": "9135b9093736b3d6c35d65342d250d38d8298e8c04f6f7d0794b5ce8f7e62217"
+  },
+  "preview_m2r_rev2_side.png": {
+    "size_bytes": 257810,
+    "sha256": "ee2ac587c0784810c3a287889d68bb5565ff2f6474abcc3efa3829fe5fb9a587"
+  },
+  "qa_report.json": {
+    "size_bytes": 10698,
+    "sha256": "0dff28c8f3ada5a7d9692d923de2977f8553716e8b23a7d86c1d6a83c5e77c1d"
+  },
+  "seam_edge_map.json": {
+    "size_bytes": 16532,
+    "sha256": "27f7673f6d6c39306465f6d4724f6605ea11e558b2045037681f22854e5da112"
+  },
+  "TSH-WW-CREW-001_M_prototype.glb": {
+    "size_bytes": 249100,
+    "sha256": "ee9990dfe93714a44bce536f677f3c543cf528b643321968a66cda5ac39b9127"
+  },
+  "TSH-WW-CREW-001_M_prototype_rev2.glb": {
+    "size_bytes": 249104,
+    "sha256": "5b73beaf3b8255612b3f259a1df279ec78b36f56215118ef997155fdecfa1f51"
+  }
+}

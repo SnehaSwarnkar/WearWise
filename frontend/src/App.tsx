@@ -34,6 +34,7 @@ import { AvatarStudio } from './pages/AvatarStudio';
 import { GarmentStudio } from './pages/GarmentStudio';
 import { HonestFitPage } from './pages/HonestFit';
 import MerchantGarmentStudio from './pages/MerchantGarmentStudio';
+import Phase10SimPage from './experimental_phase10/Phase10SimPage';
 
 /** Redirect unauthenticated commerce shoppers to /login */
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -87,6 +88,7 @@ export const App: React.FC = () => {
       <Route path="/garments" element={<GarmentStudio />} />
       <Route path="/merchant/garment-studio" element={<MerchantGarmentStudio />} />
       <Route path="/merchant-studio" element={<MerchantGarmentStudio />} />
+      <Route path="/experimental-phase10" element={<Phase10SimPage />} />
 
       {/* ── Catch-all redirects to Home ── */}
       <Route path="*" element={<Navigate to="/" replace />} />

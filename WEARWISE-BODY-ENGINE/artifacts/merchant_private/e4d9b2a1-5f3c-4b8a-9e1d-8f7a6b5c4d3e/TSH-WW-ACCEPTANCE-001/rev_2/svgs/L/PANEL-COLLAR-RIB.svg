@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="759.0" height="330.0" viewBox="0 0 759.0 330.0">
+  <rect width="100%" height="100%" fill="#fdfbf7"/>
+  <text x="16" y="22" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0f172a">SIZE L · PANEL-COLLAR-RIB — Ribbed Crewneck Collar (1x1 Rib)</text>
+  <text x="16" y="38" font-family="sans-serif" font-size="10" fill="#475569">Units: cm | Seam Allowance: 0.7 cm | Algorithmic 2D CAD Spec With Cutline (Verify Before Plotter Cutting)</text>
+  <polygon points="85.00,189.00 111.05,167.14 122.38,157.64 133.70,148.14 146.97,137.00 612.07,137.00 625.34,148.14 636.66,157.64 647.99,167.14 674.04,189.00" fill="none" stroke="#1e293b" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <polygon points="104.23,182.00 126.19,182.00 148.14,182.00 170.10,182.00 192.05,182.00 214.01,182.00 235.97,182.00 257.92,182.00 279.88,182.00 301.83,182.00 323.79,182.00 345.74,182.00 367.70,182.00 389.66,182.00 411.61,182.00 428.98,182.00 446.35,182.00 463.72,182.00 481.10,182.00 498.47,182.00 515.84,182.00 533.21,182.00 550.58,182.00 567.95,182.00 585.32,182.00 602.69,182.00 620.06,182.00 637.44,182.00 654.81,182.00 643.49,172.50 632.16,163.00 620.84,153.50 609.52,144.00 590.35,144.00 571.19,144.00 552.02,144.00 532.85,144.00 513.69,144.00 494.52,144.00 475.35,144.00 456.19,144.00 437.02,144.00 417.85,144.00 398.69,144.00 379.52,144.00 360.35,144.00 341.19,144.00 322.02,144.00 302.85,144.00 283.69,144.00 264.52,144.00 245.35,144.00 226.19,144.00 207.02,144.00 187.85,144.00 168.69,144.00 149.52,144.00 138.20,153.50 126.88,163.00 115.55,172.50" fill="#fce7f3" fill-opacity="0.65" stroke="#be185d" stroke-width="2.0"/>
+  <polyline points="609.52,144.00 590.35,144.00 571.19,144.00 552.02,144.00 532.85,144.00 513.69,144.00 494.52,144.00 475.35,144.00 456.19,144.00 437.02,144.00 417.85,144.00 398.69,144.00 379.52,144.00 360.35,144.00 341.19,144.00 322.02,144.00 302.85,144.00 283.69,144.00 264.52,144.00 245.35,144.00 226.19,144.00 207.02,144.00 187.85,144.00 168.69,144.00 149.52,144.00" fill="none" stroke="#0284c7" stroke-width="2.6"/>
+  <line x1="229.52" y1="168.00" x2="529.52" y2="168.00" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="379.5" y="162.0" font-family="sans-serif" font-size="9" fill="#475569" text-anchor="middle">GRAIN (horizontal_rib_course)</text>
+  <text x="229.2" y="185.9" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">COLLAR_NECK_SEAM_FRONT (30.74cm)</text>
+  <text x="562.0" y="185.5" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">COLLAR_NECK_SEAM_BACK (24.32cm)</text>
+  <text x="661.2" y="162.9" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">COLLAR_JOIN_END (5.91cm)</text>
+  <text x="369.5" y="116.8" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">COLLAR_TOP_OPENING (46.00cm)</text>
+  <text x="97.9" y="162.9" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">COLLAR_JOIN_START (5.91cm)</text>
+  <circle cx="411.62" cy="182.00" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <line x1="16" y1="298.0" x2="38" y2="298.0" stroke="#be185d" stroke-width="2.0"/>
+  <text x="44" y="301.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Stitch Line</text>
+  <line x1="115" y1="298.0" x2="137" y2="298.0" stroke="#1e293b" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <text x="143" y="301.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Cut Line (+0.7 cm SA)</text>
+  <line x1="262" y1="298.0" x2="284" y2="298.0" stroke="#0284c7" stroke-width="2.6"/>
+  <text x="290" y="301.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Open Boundary</text>
+  <circle cx="22" cy="313.0" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <text x="32" y="316.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Notch</text>
+  <line x1="82" y1="313.0" x2="104" y2="313.0" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="110" y="316.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Grainline</text>
+  <line x1="172" y1="313.0" x2="194" y2="313.0" stroke="#2563eb" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="200" y="316.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Topstitch Attachment</text>
+</svg>

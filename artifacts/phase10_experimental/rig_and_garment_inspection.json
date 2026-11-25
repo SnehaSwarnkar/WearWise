@@ -1,0 +1,385 @@
+{
+  "anny_baseline_male": {
+    "label": "anny_baseline_male",
+    "file": "c:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\frontend\\public\\avatars\\anny_baseline_male.glb",
+    "bytes": 494720,
+    "node_count": 1,
+    "nodes": [
+      {
+        "index": 0,
+        "name": "geometry_0",
+        "mesh": 0,
+        "skin": null,
+        "children": [],
+        "translation": null,
+        "rotation": null,
+        "scale": null
+      }
+    ],
+    "skin_count": 0,
+    "skins": [],
+    "animation_count": 0,
+    "mesh_count": 1,
+    "meshes": [
+      {
+        "index": 0,
+        "name": "geometry_0",
+        "primitives": [
+          {
+            "attributes": [
+              "POSITION"
+            ],
+            "has_joints_0": false,
+            "has_weights_0": false,
+            "targets_count": 0
+          }
+        ]
+      }
+    ],
+    "total_vertices": 13718,
+    "total_faces": 27420,
+    "scene_bounds_min_m": [
+      -0.4928,
+      0.0,
+      -0.2109
+    ],
+    "scene_bounds_max_m": [
+      0.4928,
+      1.5597,
+      0.2109
+    ],
+    "geometries": {
+      "geometry_0": {
+        "vertices": 13718,
+        "faces": 27420,
+        "bounds_min_m": [
+          -0.4928,
+          0.0,
+          -0.2109
+        ],
+        "bounds_max_m": [
+          0.4928,
+          1.5597,
+          0.2109
+        ],
+        "is_watertight": true,
+        "has_vertex_normals": true
+      }
+    }
+  },
+  "garment_m_rev3": {
+    "label": "garment_m_rev3",
+    "file": "c:\\Users\\Lenovo\\Documents\\Major Project\\WearWise\\WEARWISE-BODY-ENGINE\\artifacts\\merchant_patterns\\graded_m2rc\\M\\TSH-WW-CREW-001_M_candidate_rev3.glb",
+    "bytes": 249100,
+    "node_count": 7,
+    "nodes": [
+      {
+        "index": 0,
+        "name": "PANEL-FRONT-TORSO",
+        "mesh": 0,
+        "skin": null,
+        "children": [],
+        "translation": null,
+        "rotation": null,
+        "scale": null
+      },
+      {
+        "index": 1,
+        "name": "PANEL-BACK-TORSO",
+        "mesh": 1,
+        "skin": null,
+        "children": [],
+        "translation": null,
+        "rotation": null,
+        "scale": null
+      },
+      {
+        "index": 2,
+        "name": "PANEL-SLEEVE-L",
+        "mesh": 2,
+        "skin": null,
+        "children": [],
+        "translation": null,
+        "rotation": null,
+        "scale": null
+      },
+      {
+        "index": 3,
+        "name": "PANEL-SLEEVE-R",
+        "mesh": 3,
+        "skin": null,
+        "children": [],
+        "translation": null,
+        "rotation": null,
+        "scale": null
+      },
+      {
+        "index": 4,
+        "name": "PANEL-COLLAR-RIB",
+        "mesh": 4,
+        "skin": null,
+        "children": [],
+        "translation": null,
+        "rotation": null,
+        "scale": null
+      },
+      {
+        "index": 5,
+        "name": "PANEL-HEM-BAND",
+        "mesh": 5,
+        "skin": null,
+        "children": [],
+        "translation": null,
+        "rotation": null,
+        "scale": null
+      },
+      {
+        "index": 6,
+        "name": "PANEL-POCKET-CHEST",
+        "mesh": 6,
+        "skin": null,
+        "children": [],
+        "translation": null,
+        "rotation": null,
+        "scale": null
+      }
+    ],
+    "skin_count": 0,
+    "skins": [],
+    "animation_count": 0,
+    "mesh_count": 7,
+    "meshes": [
+      {
+        "index": 0,
+        "name": "PANEL-FRONT-TORSO",
+        "primitives": [
+          {
+            "attributes": [
+              "POSITION",
+              "TEXCOORD_0"
+            ],
+            "has_joints_0": false,
+            "has_weights_0": false,
+            "targets_count": 0
+          }
+        ]
+      },
+      {
+        "index": 1,
+        "name": "PANEL-BACK-TORSO",
+        "primitives": [
+          {
+            "attributes": [
+              "POSITION",
+              "TEXCOORD_0"
+            ],
+            "has_joints_0": false,
+            "has_weights_0": false,
+            "targets_count": 0
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "name": "PANEL-SLEEVE-L",
+        "primitives": [
+          {
+            "attributes": [
+              "POSITION",
+              "TEXCOORD_0"
+            ],
+            "has_joints_0": false,
+            "has_weights_0": false,
+            "targets_count": 0
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "name": "PANEL-SLEEVE-R",
+        "primitives": [
+          {
+            "attributes": [
+              "POSITION",
+              "TEXCOORD_0"
+            ],
+            "has_joints_0": false,
+            "has_weights_0": false,
+            "targets_count": 0
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "name": "PANEL-COLLAR-RIB",
+        "primitives": [
+          {
+            "attributes": [
+              "POSITION",
+              "TEXCOORD_0"
+            ],
+            "has_joints_0": false,
+            "has_weights_0": false,
+            "targets_count": 0
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "name": "PANEL-HEM-BAND",
+        "primitives": [
+          {
+            "attributes": [
+              "POSITION",
+              "TEXCOORD_0"
+            ],
+            "has_joints_0": false,
+            "has_weights_0": false,
+            "targets_count": 0
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "name": "PANEL-POCKET-CHEST",
+        "primitives": [
+          {
+            "attributes": [
+              "POSITION",
+              "TEXCOORD_0"
+            ],
+            "has_joints_0": false,
+            "has_weights_0": false,
+            "targets_count": 0
+          }
+        ]
+      }
+    ],
+    "total_vertices": 3384,
+    "total_faces": 6096,
+    "scene_bounds_min_m": [
+      -0.3689,
+      0.685,
+      -0.2439
+    ],
+    "scene_bounds_max_m": [
+      0.3689,
+      1.383,
+      0.0507
+    ],
+    "geometries": {
+      "PANEL-FRONT-TORSO": {
+        "vertices": 1089,
+        "faces": 2048,
+        "bounds_min_m": [
+          -0.25,
+          0.713,
+          -0.114
+        ],
+        "bounds_max_m": [
+          0.25,
+          1.355,
+          0.0507
+        ],
+        "is_watertight": false,
+        "has_vertex_normals": true
+      },
+      "PANEL-BACK-TORSO": {
+        "vertices": 1089,
+        "faces": 2048,
+        "bounds_min_m": [
+          -0.25,
+          0.713,
+          -0.2439
+        ],
+        "bounds_max_m": [
+          0.25,
+          1.355,
+          -0.084
+        ],
+        "is_watertight": false,
+        "has_vertex_normals": true
+      },
+      "PANEL-SLEEVE-L": {
+        "vertices": 319,
+        "faces": 560,
+        "bounds_min_m": [
+          0.1938,
+          1.0034,
+          -0.166
+        ],
+        "bounds_max_m": [
+          0.3689,
+          1.275,
+          0.0124
+        ],
+        "is_watertight": false,
+        "has_vertex_normals": true
+      },
+      "PANEL-SLEEVE-R": {
+        "vertices": 319,
+        "faces": 560,
+        "bounds_min_m": [
+          -0.3689,
+          1.0034,
+          -0.166
+        ],
+        "bounds_max_m": [
+          -0.1938,
+          1.275,
+          0.0124
+        ],
+        "is_watertight": false,
+        "has_vertex_normals": true
+      },
+      "PANEL-COLLAR-RIB": {
+        "vertices": 165,
+        "faces": 256,
+        "bounds_min_m": [
+          -0.074,
+          1.28,
+          -0.154
+        ],
+        "bounds_max_m": [
+          0.074,
+          1.383,
+          -0.0014
+        ],
+        "is_watertight": false,
+        "has_vertex_normals": true
+      },
+      "PANEL-HEM-BAND": {
+        "vertices": 260,
+        "faces": 384,
+        "bounds_min_m": [
+          -0.1902,
+          0.685,
+          -0.2337
+        ],
+        "bounds_max_m": [
+          0.1902,
+          0.713,
+          0.025
+        ],
+        "is_watertight": false,
+        "has_vertex_normals": true
+      },
+      "PANEL-POCKET-CHEST": {
+        "vertices": 143,
+        "faces": 240,
+        "bounds_min_m": [
+          0.045,
+          1.11,
+          -0.0137
+        ],
+        "bounds_max_m": [
+          0.16,
+          1.245,
+          0.0479
+        ],
+        "is_watertight": false,
+        "has_vertex_normals": true
+      }
+    }
+  }
+}

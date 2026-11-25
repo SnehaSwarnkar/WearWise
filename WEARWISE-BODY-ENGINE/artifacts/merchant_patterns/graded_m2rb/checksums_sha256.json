@@ -1,0 +1,230 @@
+{
+  "grading_specification.json": {
+    "size_bytes": 4796,
+    "sha256": "1b21df30071bab3d964d11b11644105d64f8fbc760035a36a720aaf3c31d635f"
+  },
+  "L/fit_qa.json": {
+    "size_bytes": 1127,
+    "sha256": "78ed278743ce5d58035f91323c4dec5a1a2e6c2420ad91a14a6d8c6589cc9247"
+  },
+  "L/geometry_topology_qa.json": {
+    "size_bytes": 1829,
+    "sha256": "3ffa84076596a92e097269036ecbf600fa5ec19cba35faa7742e9344e0ab4234"
+  },
+  "L/material_uv_qa.json": {
+    "size_bytes": 423,
+    "sha256": "4b6e7ed5da60f9362e60e2e970534af4ee8756793dcb36ed063c84df5651272c"
+  },
+  "L/measurement_comparison.json": {
+    "size_bytes": 5957,
+    "sha256": "3b048d3b6fac32a51a8651474c5213b29cec412b90240d6c46a88c0d88ccacad"
+  },
+  "L/panels_2d/PANEL-BACK-TORSO.svg": {
+    "size_bytes": 6220,
+    "sha256": "0d28b6ad65a80f26fb90b039e4bf15718e3adf7e48fdcc36fef98f1bc5fff4a3"
+  },
+  "L/panels_2d/PANEL-COLLAR-RIB.svg": {
+    "size_bytes": 4400,
+    "sha256": "9569067a3ef21121a3270a6fb7f49e52e6bbe28a766be059674642ccf943beb4"
+  },
+  "L/panels_2d/PANEL-FRONT-TORSO.svg": {
+    "size_bytes": 6379,
+    "sha256": "7741dd0f020b6187d8361b532855a9af40a8977210e4b1eb188f41e67ca74702"
+  },
+  "L/panels_2d/PANEL-HEM-BAND.svg": {
+    "size_bytes": 4531,
+    "sha256": "2fd90b6daa2f6a44e38cc7939d76633351ff68c2ffafeddcf46b21f02b2b199c"
+  },
+  "L/panels_2d/PANEL-POCKET-CHEST.svg": {
+    "size_bytes": 3151,
+    "sha256": "154980982f8141acad8f3144e1332bca86aad20f2542d9cbf280f92635ad8369"
+  },
+  "L/panels_2d/PANEL-SLEEVE-L.svg": {
+    "size_bytes": 4797,
+    "sha256": "d18dab95eaa634a1ea16a866cfe3f3c46b76fb5f2a3ba227bc7d50ca712f09e3"
+  },
+  "L/panels_2d/PANEL-SLEEVE-R.svg": {
+    "size_bytes": 4798,
+    "sha256": "9a3d7de13c8c2ea664264147dfe327ef906dc8875382378d7dd2b84824500ae6"
+  },
+  "L/pattern_components.json": {
+    "size_bytes": 106967,
+    "sha256": "63357212748f9a9fc1661a99195a48d58f5fe4963ee662ec86b0869af848f48d"
+  },
+  "L/preview_L_front.png": {
+    "size_bytes": 447855,
+    "sha256": "01cc0d99a140472df135ee6df6b93a745cf481eb9cec2e960821f6491315eb5b"
+  },
+  "L/preview_L_rear.png": {
+    "size_bytes": 537100,
+    "sha256": "66a0f306d105ee463e669a516c4154b9cc60567aed1760796bbc2950b19d8225"
+  },
+  "L/preview_L_side.png": {
+    "size_bytes": 287881,
+    "sha256": "30312bb47962b2f45886e1ad91f28715e09c61a23fa69d9491cacc369ad22fa0"
+  },
+  "L/qa_report.json": {
+    "size_bytes": 11476,
+    "sha256": "4fe387499af44ebaa002c17f240bb4fbf1a7ee27d7aab651a69e4b0385eb1500"
+  },
+  "L/seam_edge_map.json": {
+    "size_bytes": 18485,
+    "sha256": "84ffb93f7e2040cba731e43cfd84f6a72350ac52d7fdc73e0185baeb33492130"
+  },
+  "L/TSH-WW-CREW-001_L_candidate.glb": {
+    "size_bytes": 249164,
+    "sha256": "485023b061a1e4622c7becc2da1ce2d9dd726f4b7aba56f8721fd56b30052267"
+  },
+  "M/fit_qa.json": {
+    "size_bytes": 1127,
+    "sha256": "bb4463ff6f1d1dd9e2d3fd6321083d817733122e42b903e1c9450bce38e3df59"
+  },
+  "M/geometry_topology_qa.json": {
+    "size_bytes": 1829,
+    "sha256": "812d2ab0f660f70e129984d564863b1faf7952682a4398f016444f3fad7cfe14"
+  },
+  "M/material_uv_qa.json": {
+    "size_bytes": 423,
+    "sha256": "c72a0821440e196b99ff7e3b0503b97d8dd6bfc4004e326944e5b1da63761003"
+  },
+  "M/measurement_comparison.json": {
+    "size_bytes": 5971,
+    "sha256": "c57af5661e43f3e915b165fef26de45fe0debef45fae82f22cf89e00ab665a98"
+  },
+  "M/panels_2d/PANEL-BACK-TORSO.svg": {
+    "size_bytes": 6135,
+    "sha256": "3cb2809e9534e46280394a208e1ee3d8f713e94917a66716b29fdda066f014e7"
+  },
+  "M/panels_2d/PANEL-COLLAR-RIB.svg": {
+    "size_bytes": 4372,
+    "sha256": "63914341851caa02a6cf4fcb7d218c69480c5793555547a0a7f13620367dbeed"
+  },
+  "M/panels_2d/PANEL-FRONT-TORSO.svg": {
+    "size_bytes": 6294,
+    "sha256": "2d1bfb06b232af31c5f4483fb6ab2c0685bbbb3fc80ad474e1f726b20dc91427"
+  },
+  "M/panels_2d/PANEL-HEM-BAND.svg": {
+    "size_bytes": 4525,
+    "sha256": "f013c02ef6ec75ba59426a89b433f49ef1045a2c8d8f95de9756a0400223d047"
+  },
+  "M/panels_2d/PANEL-POCKET-CHEST.svg": {
+    "size_bytes": 3151,
+    "sha256": "2dac6387fa444e2351b96627eb93ee80992bee136edc1dbe70bc0337161d3fac"
+  },
+  "M/panels_2d/PANEL-SLEEVE-L.svg": {
+    "size_bytes": 4811,
+    "sha256": "f337cd8bf784f60ec4e98e6d497b2c5cce744d7a423bc202b37ec604134d145e"
+  },
+  "M/panels_2d/PANEL-SLEEVE-R.svg": {
+    "size_bytes": 4812,
+    "sha256": "30573f1a09168853d9e36e2edac658b58be7bd5cd03c39267e5b48fedd25be71"
+  },
+  "M/pattern_components.json": {
+    "size_bytes": 105892,
+    "sha256": "515561bf172852a9a617f2fb14c611ecf7524e07b75cd7aa2a8a2d85b05d8382"
+  },
+  "M/preview_M_front.png": {
+    "size_bytes": 396889,
+    "sha256": "734ee33b84f58a9796e8ed77529a2b8fc2aea1919c071508c88b17495148cc91"
+  },
+  "M/preview_M_rear.png": {
+    "size_bytes": 472541,
+    "sha256": "88ce506fa542b1d3d70299eae98a432c807c576f853937d2afe3823f9f62e9da"
+  },
+  "M/preview_M_side.png": {
+    "size_bytes": 257307,
+    "sha256": "b2a7a4db7cdd9a5f8ec6846f731466c7828c98a72412bf0556aed9b35636e45e"
+  },
+  "M/qa_report.json": {
+    "size_bytes": 11480,
+    "sha256": "77ca229a89c82ca9926ff325d1751396f4dc1b0a6361e62ec6200f53474112f3"
+  },
+  "M/seam_edge_map.json": {
+    "size_bytes": 18418,
+    "sha256": "b6df38f75c97dbaa6baf5c6d200366b871e60df8e698e46dd9e26fc051873af5"
+  },
+  "S/fit_qa.json": {
+    "size_bytes": 1127,
+    "sha256": "ca5a7faa46f159a530b2b8948aa2c4c74354350ae7fbf71620c0140ac8a6c1b0"
+  },
+  "S/geometry_topology_qa.json": {
+    "size_bytes": 1828,
+    "sha256": "d445d0241b8378e28392a3850b95fb1e6925a01a6ecc05008364c81907b3db55"
+  },
+  "S/material_uv_qa.json": {
+    "size_bytes": 423,
+    "sha256": "917c4201f56b0e2891e87224ec27385a1ed22a158577fab50aecfc138768b17f"
+  },
+  "S/measurement_comparison.json": {
+    "size_bytes": 5954,
+    "sha256": "277e974c385287d8d9d5ca169979da4b93bc7266673a9b8ad9252e45e9a421b0"
+  },
+  "S/panels_2d/PANEL-BACK-TORSO.svg": {
+    "size_bytes": 6215,
+    "sha256": "f94835e5bcdcc11a21c54070bb67741700331e986eed9789ca769c6c5137bfd9"
+  },
+  "S/panels_2d/PANEL-COLLAR-RIB.svg": {
+    "size_bytes": 4345,
+    "sha256": "47b1ef63bac1e28ed099a32ceaf44ea4fcc3ceededd93d22f2dd99f3e86fdb70"
+  },
+  "S/panels_2d/PANEL-FRONT-TORSO.svg": {
+    "size_bytes": 6374,
+    "sha256": "ea580f7ec3404d23a5670b0803cb8295cb8a8b264b0366ff104fc818ec019577"
+  },
+  "S/panels_2d/PANEL-HEM-BAND.svg": {
+    "size_bytes": 4517,
+    "sha256": "650a04597f978bff18c2c5ce18b8aed51b37c4f195e7d20e442a9610a66be17c"
+  },
+  "S/panels_2d/PANEL-POCKET-CHEST.svg": {
+    "size_bytes": 3151,
+    "sha256": "e2c150726f71d98d6286de514b8c4cd6668f3ac0eedefaa44ac1736964db271b"
+  },
+  "S/panels_2d/PANEL-SLEEVE-L.svg": {
+    "size_bytes": 4793,
+    "sha256": "6adc0bb462075b1e76f12ee4d9fc460393e9d8ab343dbbff9d04a77763ee0a3a"
+  },
+  "S/panels_2d/PANEL-SLEEVE-R.svg": {
+    "size_bytes": 4794,
+    "sha256": "a87acf4bed567545900a4319708aa4f3d985641a97faa609ef3146b68f48a343"
+  },
+  "S/pattern_components.json": {
+    "size_bytes": 106691,
+    "sha256": "0095fddb0b22f29b0d2fbc03f1b25ca3f47a1994f15c7ef662046ba90df071c5"
+  },
+  "S/preview_S_front.png": {
+    "size_bytes": 358208,
+    "sha256": "46fd4fb98962f79392e8c1094130584ce11f87c4201162605686e8e73cde9a2a"
+  },
+  "S/preview_S_rear.png": {
+    "size_bytes": 425248,
+    "sha256": "b092e0ee79637a197b60601c7578a990b6a74ef97abd6cb92d0e0183081c8b2c"
+  },
+  "S/preview_S_side.png": {
+    "size_bytes": 230531,
+    "sha256": "03b80d231f645d2827aa169cefc7f7eb6cd45e4afb411e71edbe4cb90e41a518"
+  },
+  "S/qa_report.json": {
+    "size_bytes": 11472,
+    "sha256": "111b45985a0f20c31b5705619d23f3266cfe3d56c83f8430c6dc662f34b91af7"
+  },
+  "S/seam_edge_map.json": {
+    "size_bytes": 18470,
+    "sha256": "ecc7beb2316efca582d4b9e9ed5771860e49939b70717b87b147c5d013a363e4"
+  },
+  "S/TSH-WW-CREW-001_S_candidate.glb": {
+    "size_bytes": 249160,
+    "sha256": "098d692e83d935e1395575345d036802db7976f13d28fa4aa6ad2fbc778e8770"
+  },
+  "summary_sml_qa.json": {
+    "size_bytes": 2039,
+    "sha256": "a3a21f959d9d03ed2c04da8f449cc72a0058d8a3e677801bc00158c7ba7396e2"
+  },
+  "viewer_metrics_verification.json": {
+    "size_bytes": 2174,
+    "sha256": "f11f62d4ea2d8c8afa8f31229c391f3f9c3ef9be45c100c95cc1663c6471c046"
+  },
+  "../prototype_m2r/TSH-WW-CREW-001_M_prototype_rev2.glb": {
+    "size_bytes": 249104,
+    "sha256": "5b73beaf3b8255612b3f259a1df279ec78b36f56215118ef997155fdecfa1f51"
+  }
+}

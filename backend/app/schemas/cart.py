@@ -12,6 +12,7 @@ class CartItem(BaseModel):
     color: Optional[str] = None
     size: Optional[str] = None
     sku: Optional[str] = None
+    published_revision: Optional[int] = None
 
 
 class CartAddRequest(BaseModel):

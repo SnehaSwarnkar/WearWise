@@ -1,0 +1,188 @@
+{
+  "sku": "TSH-WW-CREW-001",
+  "size_label": "M",
+  "target_specifications": {
+    "size_label": "M",
+    "half_chest_width_cm": 54.0,
+    "back_length_cm": 67.0,
+    "shoulder_breadth_cm": 50.0,
+    "sleeve_length_cm": 17.0,
+    "sleeve_opening_cm": 20.5,
+    "bicep_width_cm": 22.0,
+    "armhole_depth_cm": 26.5,
+    "collar_circumference_cm": 44.0,
+    "hem_width_cm": 53.0,
+    "dimensional_ease_chest_cm": "+4.5 cm (Recommended)",
+    "measurement_type": "flat_tabletop"
+  },
+  "tolerance_contract": {
+    "2d_pattern_cm": {
+      "flat_half_chest_width_cm": {
+        "tolerance_cm": 0.25,
+        "definition": "2D front/back torso panel width between underarm seam points"
+      },
+      "back_length_hps_to_hem_cm": {
+        "tolerance_cm": 0.25,
+        "definition": "2D back panel HPS-to-hem-seam height + 2.8 cm hem band height"
+      },
+      "shoulder_breadth_cm": {
+        "tolerance_cm": 0.25,
+        "definition": "2D across-shoulder span between left and right dropped shoulder points"
+      },
+      "sleeve_centerline_length_cm": {
+        "tolerance_cm": 0.25,
+        "definition": "2D sleeve centerline height from cuff opening midpoint to cap apex"
+      },
+      "finished_collar_opening_circumference_cm": {
+        "tolerance_cm": 0.25,
+        "definition": "2D collar band top opening edge length (distinct from collar-to-body seam)"
+      },
+      "flat_bottom_hem_width_cm": {
+        "tolerance_cm": 0.25,
+        "definition": "2D hem band flat width (0.5 x total hem circumference)"
+      },
+      "flat_sleeve_opening_width_cm": {
+        "tolerance_cm": 0.25,
+        "definition": "2D sleeve cuff opening flat width (0.5 x cuff circumference)"
+      }
+    },
+    "3d_assembled_cm": {
+      "torso_chest_circumference_cm": {
+        "tolerance_cm": 1.5,
+        "definition": "Closed horizontal torso cross-section perimeter at y = underarm - 1.5 cm (excludes sleeves)"
+      },
+      "back_length_hps_to_hem_cm": {
+        "tolerance_cm": 1.0,
+        "definition": "Vertical span from back torso HPS (y_max) to bottom hem band opening (y_min)"
+      },
+      "shoulder_breadth_seam_to_seam_cm": {
+        "tolerance_cm": 1.0,
+        "definition": "Span across back between left and right dropped shoulder-armhole junctions"
+      },
+      "sleeve_centerline_length_cm": {
+        "tolerance_cm": 1.0,
+        "definition": "3D centerline Euclidean span from armhole cap midpoint to distal cuff opening centroid along A-pose arm axis (separate from 10.36 cm tapered underarm edge)"
+      },
+      "collar_opening_circumference_cm": {
+        "tolerance_cm": 0.75,
+        "definition": "Perimeter of finished top Neckline Opening boundary loop (distinct from 51.14 cm collar seam loop)"
+      },
+      "bottom_hem_perimeter_cm": {
+        "tolerance_cm": 1.5,
+        "definition": "Perimeter of Bottom Hem Opening boundary loop (compared to 2 x flat hem width)"
+      },
+      "sleeve_cuff_circumference_cm": {
+        "tolerance_cm": 1.0,
+        "definition": "Perimeter of Left/Right Sleeve Cuff Opening boundary loop (compared to 2 x flat cuff opening)"
+      }
+    }
+  },
+  "pattern_2d_measurements": {
+    "flat_half_chest_width_cm": {
+      "actual_cm": 54.0,
+      "target_cm": 54.0,
+      "abs_error_cm": 0.0,
+      "tolerance_cm": 0.25,
+      "passed": true
+    },
+    "back_length_hps_to_hem_cm": {
+      "actual_cm": 67.0,
+      "target_cm": 67.0,
+      "abs_error_cm": 0.0,
+      "tolerance_cm": 0.25,
+      "passed": true
+    },
+    "shoulder_breadth_cm": {
+      "actual_cm": 50.0,
+      "target_cm": 50.0,
+      "abs_error_cm": 0.0,
+      "tolerance_cm": 0.25,
+      "passed": true
+    },
+    "sleeve_centerline_length_cm": {
+      "actual_cm": 17.0,
+      "target_cm": 17.0,
+      "abs_error_cm": 0.0,
+      "tolerance_cm": 0.25,
+      "passed": true
+    },
+    "finished_collar_opening_circumference_cm": {
+      "actual_cm": 44.0,
+      "target_cm": 44.0,
+      "abs_error_cm": 0.0,
+      "tolerance_cm": 0.25,
+      "passed": true
+    },
+    "flat_bottom_hem_width_cm": {
+      "actual_cm": 53.0,
+      "target_cm": 53.0,
+      "abs_error_cm": 0.0,
+      "tolerance_cm": 0.25,
+      "passed": true
+    },
+    "flat_sleeve_opening_width_cm": {
+      "actual_cm": 20.5,
+      "target_cm": 20.5,
+      "abs_error_cm": 0.0,
+      "tolerance_cm": 0.25,
+      "passed": true
+    }
+  },
+  "assembled_3d_measurements": {
+    "passed": true,
+    "errors": [],
+    "dimensions_3d_assembled_cm": {
+      "torso_chest_circumference_cm": {
+        "actual": 107.82,
+        "target": 108.0,
+        "abs_error_cm": 0.18,
+        "tolerance_cm": 1.5,
+        "passed": true,
+        "torso_x_span_cm": 38.71,
+        "torso_z_span_cm": 26.33
+      },
+      "back_length_hps_to_hem_cm": {
+        "actual": 67.0,
+        "target": 67.0,
+        "abs_error_cm": 0.0,
+        "tolerance_cm": 1.0,
+        "passed": true
+      },
+      "shoulder_breadth_seam_to_seam_cm": {
+        "actual": 50.0,
+        "target": 50.0,
+        "abs_error_cm": 0.0,
+        "tolerance_cm": 1.0,
+        "passed": true
+      },
+      "sleeve_centerline_length_cm": {
+        "actual": 17.0,
+        "target": 17.0,
+        "abs_error_cm": 0.0,
+        "tolerance_cm": 1.0,
+        "passed": true
+      },
+      "collar_opening_circumference_cm": {
+        "actual": 44.0,
+        "target": 44.0,
+        "abs_error_cm": 0.0,
+        "tolerance_cm": 0.75,
+        "passed": true
+      },
+      "bottom_hem_perimeter_cm": {
+        "actual": 105.94,
+        "target": 106.0,
+        "abs_error_cm": 0.06,
+        "tolerance_cm": 1.5,
+        "passed": true
+      },
+      "sleeve_cuff_circumference_cm": {
+        "actual": 40.91,
+        "target": 41.0,
+        "abs_error_cm": 0.09,
+        "tolerance_cm": 1.0,
+        "passed": true
+      }
+    }
+  }
+}
