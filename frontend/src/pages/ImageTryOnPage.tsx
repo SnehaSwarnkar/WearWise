@@ -3,12 +3,9 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Header from './Header';
 import { fetchProductBySku } from '../api/products';
 import { addToCart } from '../api/cart';
-import { devAuthHeaderProvider } from '../api/client';
+import { devAuthHeaderProvider, getBodyApiBase, getCsrfToken } from '../api/client';
 
-const BODY_ENGINE_BASE =
-  import.meta.env?.VITE_BODY_API_URL ||
-  import.meta.env?.VITE_API_URL ||
-  'http://127.0.0.1:8000';
+const BODY_ENGINE_BASE = getBodyApiBase();
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MIN_BYTES = 10 * 1024;

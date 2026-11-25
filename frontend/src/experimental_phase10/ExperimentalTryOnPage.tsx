@@ -5,11 +5,12 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import Header from '../pages/Header';
 import { addToCart } from '../api/cart';
+import { getBodyApiBase } from '../api/client';
 import { fetchProductBySku } from '../api/products';
 import { ARTICULATED_POSES } from './ArticulatedPoseLibrary';
 import { WorkerClothClient } from './WorkerClothClient';
 
-const BODY_ENGINE_BASE = 'http://127.0.0.1:8000';
+const BODY_ENGINE_BASE = getBodyApiBase();
 
 interface AvatarOption {
   id: string;

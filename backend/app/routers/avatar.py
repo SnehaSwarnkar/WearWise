@@ -10,11 +10,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from app.core.security import reject_seller_portal_access
 from app.schemas.avatar import AvatarProfile, AvatarProfileResponse
 from app import database as db
 
-router = APIRouter(prefix="/api/avatar", tags=["Avatar & Style Profile"])
+router = APIRouter(
+    prefix="/api/avatar",
+    tags=["Avatar & Style Profile"],
+    dependencies=[Depends(reject_seller_portal_access)],
+)
 
 UPLOAD_DIR = Path(__file__).parent.parent.parent / "uploads" / "avatars"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)

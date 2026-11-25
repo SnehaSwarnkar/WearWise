@@ -46,7 +46,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 
-export default function MerchantGarmentStudio() {
+export default function MerchantGarmentStudio({ embedded = false } = {}) {
   const navigate = useNavigate();
 
   const [activeStep, setActiveStep] = useState(1);
@@ -600,9 +600,9 @@ export default function MerchantGarmentStudio() {
 
   return (
     <div className="merchant-studio-page">
-      <Header />
+      {!embedded && <Header />}
 
-      <main className="merchant-studio-main">
+      <main className="merchant-studio-main" style={embedded ? { paddingTop: '8px' } : undefined}>
         {/* Header Title */}
         <div className="merchant-studio-header">
           <div className="merchant-studio-pretitle">SELLER STUDIO · PRODUCT SETUP</div>

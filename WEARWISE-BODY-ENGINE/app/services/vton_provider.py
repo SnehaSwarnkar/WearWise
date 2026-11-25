@@ -18,10 +18,22 @@ import time
 from typing import Any, Dict, Optional, Tuple
 
 import httpx
-import torch
 from PIL import Image
 
 logger = logging.getLogger("wearwise.vton.provider")
+
+
+def _detect_cuda_hardware() -> Tuple[str, float]:
+    """Safely probes CUDA availability without failing startup if PyTorch DLLs cannot load."""
+    try:
+        import torch  # noqa: PLC0415
+
+        if torch.cuda.is_available():
+            vram_gb = torch.cuda.get_device_properties(0).total_memory / (1024 ** 3)
+            return "cuda", float(vram_gb)
+    except (ImportError, OSError, RuntimeError) as exc:
+        logger.debug("PyTorch hardware probe skipped (%s)", exc)
+    return "cpu", 0.0
 
 DEFAULT_FASHN_RUN_URL = "https://api.fashn.ai/v1/run"
 DEFAULT_FASHN_STATUS_URL = "https://api.fashn.ai/v1/status/{prediction_id}"
@@ -80,12 +92,7 @@ class HonestVTONProviderAdapter(BaseVTONProvider):
         self.explicit_api_key = api_key
         self.explicit_provider_name = provider_name
         self.explicit_timeout = timeout_seconds
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.vram_gb = (
-            torch.cuda.get_device_properties(0).total_memory / (1024 ** 3)
-            if torch.cuda.is_available()
-            else 0.0
-        )
+        self.device, self.vram_gb = _detect_cuda_hardware()
 
     def _resolve_config(self) -> Dict[str, Any]:
         mode_override = os.getenv("VTON_PROVIDER_MODE", "auto").strip().lower()

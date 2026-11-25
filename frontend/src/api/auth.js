@@ -1,113 +1,136 @@
-import { api } from "./client";
+import { getCsrfToken, getStoreApiBase } from "./client";
 
-const TOKEN_KEY = "ww-auth-token";
-const USER_KEY  = "ww-user";
-const STORE_BASE_URL = import.meta.env.VITE_STORE_API_URL || "http://127.0.0.1:8001";
+function cleanErrorDetail(err, fallback) {
+  if (!err || !err.detail) return fallback;
+  if (typeof err.detail === "string") return err.detail;
+  if (typeof err.detail === "object" && err.detail.message) return err.detail.message;
+  return fallback;
+}
 
-// ── token helpers ──────────────────────────────────────────────────────────
+async function authFetch(path, options = {}) {
+  const method = (options.method || "GET").toUpperCase();
+  const headers = { ...(options.headers || {}) };
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+    const csrf = getCsrfToken();
+    if (csrf && !headers["X-CSRF-Token"]) {
+      headers["X-CSRF-Token"] = csrf;
+    }
+  }
+  return fetch(`${getStoreApiBase()}${path}`, {
+    ...options,
+    credentials: "include",
+    headers,
+  });
+}
 
-export function saveToken(token) {
-  localStorage.setItem(TOKEN_KEY, token);
+// Clear any legacy localStorage token remnants safely (auth now uses HTTP-only cookies)
+export function clearLegacyAuthStorage() {
+  if (typeof localStorage !== "undefined") {
+    localStorage.removeItem("ww-auth-token");
+    localStorage.removeItem("ww-user");
+    localStorage.removeItem("wearwise_jwt");
+    localStorage.removeItem("wearwise_role");
+  }
 }
 
 export function getToken() {
-  return localStorage.getItem(TOKEN_KEY);
-}
-
-export function clearToken() {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
-}
-
-export function saveUser(user) {
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  return null;
 }
 
 export function getStoredUser() {
-  const raw = localStorage.getItem(USER_KEY);
-  return raw ? JSON.parse(raw) : null;
+  return null;
 }
 
-function authHeaders() {
-  const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
+export function saveUser() {
+  // User session is authoritative via server /api/auth/me HTTP-only cookie
 }
 
-// ── API calls ──────────────────────────────────────────────────────────────
+// ── Shopper & Seller API calls ─────────────────────────────────────────────
 
 export async function signup(name, email, password) {
-  const res = await fetch(
-    `${STORE_BASE_URL}/api/auth/signup`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
-    }
-  );
+  const res = await authFetch("/api/auth/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password }),
+  });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || "Signup failed");
+    throw new Error(cleanErrorDetail(err, "Signup failed"));
   }
   const data = await res.json();
-  saveToken(data.access_token);
-  saveUser(data.user);
+  clearLegacyAuthStorage();
   return data.user;
 }
 
 export async function login(email, password) {
-  const res = await fetch(
-    `${STORE_BASE_URL}/api/auth/login`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    }
-  );
+  const res = await authFetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || "Login failed");
+    throw new Error(cleanErrorDetail(err, "Login failed"));
   }
   const data = await res.json();
-  saveToken(data.access_token);
-  saveUser(data.user);
+  clearLegacyAuthStorage();
   return data.user;
 }
 
+export async function sellerLogin(email, password) {
+  const res = await authFetch("/api/auth/seller/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(cleanErrorDetail(err, "Seller login failed"));
+  }
+  const data = await res.json();
+  clearLegacyAuthStorage();
+  return data.user;
+}
+
+export async function applyForSeller(payload) {
+  const res = await authFetch("/api/auth/seller/apply", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(cleanErrorDetail(err, "Seller onboarding application failed"));
+  }
+  return res.json();
+}
+
 export async function getMe() {
-  const token = getToken();
-  if (!token) return null;
-  const res = await fetch(
-    `${STORE_BASE_URL}/api/auth/me`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+  const res = await authFetch("/api/auth/me");
   if (!res.ok) return null;
-  const user = await res.json();
-  saveUser(user);
-  return user;
+  const data = await res.json().catch(() => null);
+  if (!data || !data.id || !data.email) return null;
+  return data;
 }
 
 export async function updateProfile(updates) {
-  const token = getToken();
-  const res = await fetch(
-    `${STORE_BASE_URL}/api/auth/profile`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(updates),
-    }
-  );
+  const res = await authFetch("/api/auth/profile", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updates),
+  });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || "Profile update failed");
+    throw new Error(cleanErrorDetail(err, "Profile update failed"));
   }
-  const user = await res.json();
-  saveUser(user);
-  return user;
+  return res.json();
 }
 
-export function logout() {
-  clearToken();
+export async function logout() {
+  try {
+    await authFetch("/api/auth/logout", { method: "POST" });
+  } catch {
+    // Best-effort clear even if network unavailable
+  }
+  clearLegacyAuthStorage();
 }

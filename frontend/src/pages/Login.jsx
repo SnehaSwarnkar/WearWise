@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
-import { login } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { login } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,14 +19,12 @@ function Login() {
     setLoading(true);
     try {
       const user = await login(form.email, form.password);
-      setUser(user);
-      // Route based on onboarding state
-      if (!user.gender) navigate("/select-gender");
+      if (!user.gender) navigate("/explore");
       else if (user.gender === "kids") navigate("/kids-shop");
-      else if (user.gender === "men")  navigate("/men-shop");
-      else                              navigate("/women-shop");
+      else if (user.gender === "men") navigate("/men-shop");
+      else navigate("/women-shop");
     } catch (err) {
-      setError(err.message || "Login failed. Please try again.");
+      setError(err.message || "Shopper login failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -35,18 +32,31 @@ function Login() {
 
   return (
     <div className="auth-page">
-      {/* DECORATIVE SHAPES */}
       <div className="auth-shape auth-shape-purple" />
       <div className="auth-shape auth-shape-lime" />
       <div className="auth-shape auth-shape-orange" />
 
-      <div className="auth-card">
-        {/* LOGO */}
-        <Link to="/" className="auth-logo">
-          Wear<span>Wise</span>
-        </Link>
+      <div className="auth-card" data-testid="shopper-login-card">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "22px" }}>
+          <Link to="/" className="auth-logo" style={{ marginBottom: 0 }}>
+            Wear<span>Wise</span>
+          </Link>
+          <span
+            style={{
+              background: "#d8ff3f",
+              color: "#151515",
+              border: "2px solid #151515",
+              padding: "4px 10px",
+              fontSize: "11px",
+              fontWeight: 900,
+              letterSpacing: "0.08em",
+            }}
+          >
+            SHOPPER PORTAL
+          </span>
+        </div>
 
-        <div className="auth-eyebrow">✦ WELCOME BACK</div>
+        <div className="auth-eyebrow">✦ SHOPPER LOGIN</div>
 
         <h1 className="auth-title">
           LOG
@@ -55,7 +65,7 @@ function Login() {
         </h1>
 
         <p className="auth-subtitle">
-          Your style profile, wardrobe and saved looks are waiting.
+          Discover fashion, find your fit and shop with WearWise.
         </p>
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
@@ -66,7 +76,7 @@ function Login() {
               name="email"
               value={form.email}
               onChange={update}
-              placeholder="you@example.com"
+              placeholder="shopper@example.com"
               required
               autoComplete="email"
             />
@@ -85,16 +95,20 @@ function Login() {
             />
           </div>
 
-          {error && <p className="auth-error">{error}</p>}
+          {error && <p className="auth-error" data-testid="shopper-login-error">{error}</p>}
 
-          <button className="auth-submit" type="submit" disabled={loading}>
-            {loading ? "Signing in…" : "SIGN IN ✦"}
+          <button className="auth-submit" type="submit" disabled={loading} data-testid="shopper-login-submit">
+            {loading ? "Signing in…" : "SIGN IN AS SHOPPER ✦"}
           </button>
         </form>
 
         <p className="auth-switch">
           New to WearWise?{" "}
-          <Link to="/signup">Create an account →</Link>
+          <Link to="/register">Create a shopper account →</Link>
+        </p>
+        <p className="auth-switch" style={{ marginTop: "8px", fontSize: "12px" }}>
+          Are you a merchant?{" "}
+          <Link to="/seller/login" style={{ color: "#8d6bff" }}>Switch to Seller Login →</Link>
         </p>
       </div>
     </div>

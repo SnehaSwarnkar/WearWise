@@ -1,20 +1,31 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import {
-  getStoredUser,
+  clearLegacyAuthStorage,
   getMe,
   logout as apiLogout,
   login as apiLogin,
+  sellerLogin as apiSellerLogin,
   signup as apiSignup,
   updateProfile as apiUpdateProfile,
-  getToken,
-  saveUser,
 } from '../api/auth';
 import { getSessionId } from '../api/client';
+
+export type AccountRole = 'shopper' | 'seller' | 'admin';
 
 export interface StoreUser {
   id: string;
   name: string;
   email: string;
+  role: AccountRole;
+  status?: string;
+  is_active?: boolean;
+  seller_approved?: boolean;
+  brand_id?: string | null;
+  store_name?: string | null;
+  store_slug?: string | null;
+  business_email?: string | null;
+  store_description?: string | null;
+  brand_tagline?: string | null;
   gender?: string | null;
   bodyType?: string | null;
   kidsGender?: string | null;
@@ -26,11 +37,14 @@ export interface StoreAuthContextType {
   user: StoreUser | null;
   setUser: React.Dispatch<React.SetStateAction<StoreUser | null>>;
   loading: boolean;
-  storeToken: string | null;
+  isShopper: boolean;
+  isSeller: boolean;
+  isAdmin: boolean;
   sessionId: string;
   login: (email: string, password: string) => Promise<StoreUser>;
+  sellerLogin: (email: string, password: string) => Promise<StoreUser>;
   signup: (name: string, email: string, password: string) => Promise<StoreUser>;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateProfile: (updates: Partial<StoreUser>) => Promise<StoreUser>;
   refreshUser: () => Promise<StoreUser | null>;
   mappedBodyEnginePrincipalId: string;
@@ -47,66 +61,59 @@ export function deriveBodyEnginePrincipalId(storeUserId?: string | null): string
 const StoreAuthContext = createContext<StoreAuthContextType | undefined>(undefined);
 
 export const StoreAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<StoreUser | null>(() => getStoredUser());
+  const [user, setUser] = useState<StoreUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [storeToken, setStoreToken] = useState<string | null>(() => getToken());
   const sessionId = getSessionId();
 
   const mappedBodyEnginePrincipalId = deriveBodyEnginePrincipalId(user?.id);
-
-  // Sync mapped principal id to localStorage for Body Engine dev auth boundary
-  useEffect(() => {
-    if (user?.id) {
-      localStorage.setItem('wearwise_user_id', mappedBodyEnginePrincipalId);
-    }
-  }, [user?.id, mappedBodyEnginePrincipalId]);
+  const isShopper = Boolean(user && user.role === 'shopper' && user.status !== 'suspended');
+  const isSeller = Boolean(
+    user && user.role === 'seller' && user.seller_approved && user.status === 'active'
+  );
+  const isAdmin = Boolean(user && user.role === 'admin' && user.status === 'active');
 
   useEffect(() => {
+    clearLegacyAuthStorage();
     getMe()
       .then((u) => {
-        if (u) {
-          setUser(u);
-          setStoreToken(getToken());
-        }
+        setUser(u || null);
       })
-      .catch(() => {})
+      .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
 
   const login = async (email: string, password: string): Promise<StoreUser> => {
     const loggedIn = await apiLogin(email, password);
     setUser(loggedIn);
-    setStoreToken(getToken());
+    return loggedIn;
+  };
+
+  const sellerLogin = async (email: string, password: string): Promise<StoreUser> => {
+    const loggedIn = await apiSellerLogin(email, password);
+    setUser(loggedIn);
     return loggedIn;
   };
 
   const signup = async (name: string, email: string, password: string): Promise<StoreUser> => {
     const registered = await apiSignup(name, email, password);
     setUser(registered);
-    setStoreToken(getToken());
     return registered;
   };
 
-  const logout = () => {
-    apiLogout();
+  const logout = async (): Promise<void> => {
+    await apiLogout();
     setUser(null);
-    setStoreToken(null);
-    localStorage.setItem('wearwise_user_id', DEFAULT_DEV_USER_ID);
   };
 
   const updateProfile = async (updates: Partial<StoreUser>): Promise<StoreUser> => {
     const updated = await apiUpdateProfile(updates);
     setUser(updated);
-    saveUser(updated);
     return updated;
   };
 
   const refreshUser = async (): Promise<StoreUser | null> => {
     const u = await getMe();
-    if (u) {
-      setUser(u);
-      setStoreToken(getToken());
-    }
+    setUser(u || null);
     return u;
   };
 
@@ -116,9 +123,12 @@ export const StoreAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
         user,
         setUser,
         loading,
-        storeToken,
+        isShopper,
+        isSeller,
+        isAdmin,
         sessionId,
         login,
+        sellerLogin,
         signup,
         logout,
         updateProfile,

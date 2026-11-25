@@ -115,9 +115,11 @@ class VTONJobService:
                     confidence_score=view_spec.get("confidence", 0.95),
                 )
 
+            self._cleanup_temp_upload(job_id, person_image_path)
             self.repo.update_job_status(job_id, status="completed", progress_percent=100)
         except Exception as exc:
             logger.error("Job %s failed: %s", job_id, exc, exc_info=True)
+            self._cleanup_temp_upload(job_id, person_image_path)
             self.repo.update_job_status(
                 job_id,
                 status="failed",
@@ -125,7 +127,8 @@ class VTONJobService:
                 error_message=str(exc),
             )
         finally:
-            self._cleanup_temp_upload(job_id, person_image_path)
+            if person_image_path and os.path.exists(person_image_path):
+                self._cleanup_temp_upload(job_id, person_image_path)
 
     def get_job(self, job_id: str) -> Optional[Dict[str, Any]]:
         return self.repo.get_job(job_id)

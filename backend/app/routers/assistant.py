@@ -6,11 +6,16 @@ Each response is tailored to the user's saved avatar profile and wardrobe.
 Swap the _generate_reply() function body for an LLM call when ready.
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from app.core.security import reject_seller_portal_access
 from app.schemas.assistant import ChatRequest, ChatResponse
 from app import database as db
 
-router = APIRouter(prefix="/api/assistant", tags=["Fashion Assistant"])
+router = APIRouter(
+    prefix="/api/assistant",
+    tags=["Fashion Assistant"],
+    dependencies=[Depends(reject_seller_portal_access)],
+)
 
 
 # ── INTENT PATTERNS ──────────────────────────────────────────────────────────

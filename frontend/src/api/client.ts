@@ -89,8 +89,34 @@ class DefaultDevAuthHeaderProvider implements AuthHeaderProvider {
 
 export const devAuthHeaderProvider = new DefaultDevAuthHeaderProvider();
 
+// ── Cookie & CSRF helpers ────────────────────────────────────────────────────
+export function getCsrfToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|;\s*)ww_csrf_token=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+export function getStoreApiBase(): string {
+  if (typeof window !== 'undefined' && ['3000', '4173', '4174', '4175', '5173'].includes(window.location.port)) {
+    return '';
+  }
+  return import.meta.env?.VITE_STORE_API_URL || 'http://127.0.0.1:8001';
+}
+
+export function getBodyApiBase(): string {
+  if (typeof window !== 'undefined' && ['3000', '4173', '4174', '4175', '5173'].includes(window.location.port)) {
+    return '';
+  }
+  return (
+    import.meta.env?.VITE_BODY_API_URL ||
+    import.meta.env?.VITE_API_URL ||
+    import.meta.env?.VITE_API_BASE_URL ||
+    'http://127.0.0.1:8000'
+  );
+}
+
 // ── Store API Support (for Commerce endpoints on Port 8001) ─────────────────
-export const STORE_API_BASE = import.meta.env?.VITE_STORE_API_URL || 'http://127.0.0.1:8001';
+export const STORE_API_BASE = getStoreApiBase();
 
 export function getSessionId(): string {
   let id = sessionStorage.getItem('ww-session-id');
@@ -106,10 +132,17 @@ async function storeRequest(method: string, path: string, body: any = null, isFo
   if (body && !isFormData) {
     headers['Content-Type'] = 'application/json';
   }
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())) {
+    const csrf = getCsrfToken();
+    if (csrf && !headers['X-CSRF-Token']) {
+      headers['X-CSRF-Token'] = csrf;
+    }
+  }
 
-  const res = await fetch(`${STORE_API_BASE}${path}`, {
+  const res = await fetch(`${getStoreApiBase()}${path}`, {
     method,
     headers,
+    credentials: 'include',
     body: body
       ? isFormData
         ? body
@@ -139,13 +172,7 @@ export class WearWiseApiClient {
   private authProvider: AuthHeaderProvider;
 
   constructor(baseUrl?: string, authProvider?: AuthHeaderProvider) {
-    // Prefer explicit VITE_BODY_API_URL or VITE_API_URL, then legacy VITE_API_BASE_URL, defaulting to localhost:8000
-    this.baseUrl = baseUrl ?? (
-      import.meta.env?.VITE_BODY_API_URL ||
-      import.meta.env?.VITE_API_URL ||
-      import.meta.env?.VITE_API_BASE_URL ||
-      'http://127.0.0.1:8000'
-    );
+    this.baseUrl = baseUrl ?? getBodyApiBase();
     this.authProvider = authProvider ?? devAuthHeaderProvider;
   }
 
@@ -163,9 +190,17 @@ export class WearWiseApiClient {
       ...this.authProvider.getAuthHeaders(),
       ...(options.headers as Record<string, string> || {}),
     };
+    const method = (options.method || 'GET').toUpperCase();
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+      const csrf = getCsrfToken();
+      if (csrf && !headers['X-CSRF-Token']) {
+        headers['X-CSRF-Token'] = csrf;
+      }
+    }
 
     const response = await fetch(url, {
       ...options,
+      credentials: options.credentials ?? 'include',
       headers,
     });
 

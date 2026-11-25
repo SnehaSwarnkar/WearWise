@@ -1,13 +1,16 @@
-import { getSessionId } from "./client";
+import { getBodyApiBase, getCsrfToken, getSessionId, getStoreApiBase } from "./client";
 
-const STORE_BASE_URL = import.meta.env.VITE_STORE_API_URL || "http://127.0.0.1:8001";
+const STORE_BASE_URL = getStoreApiBase();
 
 export async function uploadTryOnPhoto(file) {
   const form = new FormData();
   form.append("session_id", getSessionId());
   form.append("file", file);
+  const csrf = getCsrfToken();
   const res = await fetch(`${STORE_BASE_URL}/api/tryon/upload-photo`, {
     method: "POST",
+    credentials: "include",
+    headers: csrf ? { "X-CSRF-Token": csrf } : {},
     body: form,
   });
   if (!res.ok) throw new Error("Photo upload failed");
@@ -20,8 +23,11 @@ export async function processTryOn(photoId, look) {
   form.append("photo_id", photoId);
   form.append("look_id", look.id);
   form.append("look_name", look.name);
+  const csrf = getCsrfToken();
   const res = await fetch(`${STORE_BASE_URL}/api/tryon/process`, {
     method: "POST",
+    credentials: "include",
+    headers: csrf ? { "X-CSRF-Token": csrf } : {},
     body: form,
   });
   if (!res.ok) throw new Error("Try-on processing failed");
@@ -29,23 +35,26 @@ export async function processTryOn(photoId, look) {
 }
 
 export async function getTryOnResult() {
-  const res = await fetch(`${STORE_BASE_URL}/api/tryon/${getSessionId()}`);
+  const res = await fetch(`${STORE_BASE_URL}/api/tryon/${getSessionId()}`, { credentials: "include" });
   if (!res.ok) return null;
   return res.json();
 }
 
 // ── Mode B: AI Photo VTON (Body Engine Port 8000) ───────────────────────────
-const BODY_BASE_URL = import.meta.env.VITE_BODY_API_URL || "http://127.0.0.1:8000";
+const BODY_BASE_URL = getBodyApiBase();
 
 export async function createVtonJob(file, garmentSku = "TSH-WW-CREW-001", consent = true) {
   const form = new FormData();
   form.append("file", file);
   form.append("garment_sku", garmentSku);
   form.append("consent", consent ? "true" : "false");
+  const csrf = getCsrfToken();
 
   const res = await fetch(`${BODY_BASE_URL}/api/v1/try-on/vton/jobs`, {
     method: "POST",
+    credentials: "include",
     headers: {
+      ...(csrf ? { "X-CSRF-Token": csrf } : {}),
       "X-User-Id": "c1f7a28e-8e3b-48d9-a791-03f4439c1b3e",
     },
     body: form,

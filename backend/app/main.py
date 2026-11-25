@@ -5,15 +5,23 @@ Entry point. Registers all routers, configures CORS for the Vite dev server,
 and mounts the uploads directory as a static file endpoint.
 """
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from app.routers import products, cart, orders, avatar, wardrobe, saved, assistant, tryon, auth, catalogue
+from app.routers import products, cart, orders, avatar, wardrobe, saved, assistant, tryon, auth, catalogue, seller
+from app.core.security import ensure_auth_seed_and_migration
 from app import database as db
 
 # ── App instance ──────────────────────────────────────────────────────────────
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    ensure_auth_seed_and_migration()
+    yield
+
 
 app = FastAPI(
     title="WearWise API",
@@ -25,6 +33,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 
@@ -68,6 +77,7 @@ app.include_router(saved.router)
 app.include_router(assistant.router)
 app.include_router(tryon.router)
 app.include_router(auth.router)
+app.include_router(seller.router)
 app.include_router(catalogue.router)
 
 

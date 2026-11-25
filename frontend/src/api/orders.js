@@ -1,46 +1,32 @@
-import { api, getSessionId } from "./client";
-import { getToken } from "./auth";
-
-const STORE_BASE_URL = import.meta.env.VITE_STORE_API_URL || "http://127.0.0.1:8001";
+import { api, getCsrfToken, getSessionId, getStoreApiBase } from "./client";
 
 // ── Place order ───────────────────────────────────────────────────────────────
 
 export function placeOrder(customer, paymentMethod, idempotencyKey = null) {
-  const token = getToken();
-  return api.post(
-    "/api/orders/place",
-    {
-      session_id: getSessionId(),
-      customer,
-      paymentMethod,
-      idempotency_key: idempotencyKey,
-    },
-    token ? { Authorization: `Bearer ${token}` } : {}
-  );
+  return api.post("/api/orders/place", {
+    session_id: getSessionId(),
+    customer,
+    paymentMethod,
+    idempotency_key: idempotencyKey,
+  });
 }
 
-// ── My orders (authenticated) ─────────────────────────────────────────────────
+// ── My orders (authenticated shopper) ─────────────────────────────────────────
 
 export async function getMyOrders() {
-  const token = getToken();
-  if (!token) throw new Error("Not authenticated");
-  const res = await fetch(`${STORE_BASE_URL}/api/orders/my`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || "Failed to load orders");
-  }
-  return res.json();
+  return api.get("/api/orders/my");
 }
 
-// ── Order detail (authenticated) ──────────────────────────────────────────────
+// ── Order detail (authenticated shopper or matching session) ──────────────────
 
 export async function getOrderDetail(orderId) {
-  const token = getToken();
-  const headers = { "X-Session-Id": getSessionId() };
-  if (token) headers.Authorization = `Bearer ${token}`;
-  const res = await fetch(`${STORE_BASE_URL}/api/orders/detail/${orderId}`, { headers });
+  const res = await fetch(`${getStoreApiBase()}/api/orders/detail/${orderId}`, {
+    credentials: "include",
+    headers: {
+      "X-Session-Id": getSessionId(),
+      ...(getCsrfToken() ? { "X-CSRF-Token": getCsrfToken() } : {}),
+    },
+  });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || "Order not found");

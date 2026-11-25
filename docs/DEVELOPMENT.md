@@ -62,11 +62,23 @@ Set-Location frontend
 npm run dev -- --port 3000
 ```
 
-Vite proxies `/api/products` to `127.0.0.1:8001` and `/api/*` to `127.0.0.1:8000` (see `frontend/vite.config.js`).
+Vite proxies Commerce endpoints (`/api/auth`, `/api/seller`, `/api/products`, `/api/cart`, `/api/orders`, `/api/wardrobe`, `/api/saved`, `/api/avatar`, `/api/assistant`, `/api/catalogue`, `/api/tryon`) to `127.0.0.1:8001` and `/api/*` (Body Engine `/api/v1/...`) to `127.0.0.1:8000` (see `frontend/vite.config.js`), keeping HTTP-only `ww_auth_session` cookies same-origin across both backends.
 
 ---
 
-## 5. Verification Commands
+## 5. Shopper & Seller Portals (Staging Seed Accounts)
+
+- **Auth Portal Entry:** `/auth`
+- **Shopper Login / Register:** `/login`, `/register` (default staging shopper: `shopper@wearwise.test` / `WearWiseShopper#2026`, or register a new shopper)
+- **Seller Login / Application:** `/seller/login`, `/seller/register`
+  - **Approved Seller 1 (`WearWise Official Studio`):** `seller@wearwise.studio` / `WearWiseSeller#2026` (`brand_id: e4d9b2a1-5f3c-4b8a-9e1d-8f7a6b5c4d3e`)
+  - **Approved Seller 2 (`Atelier Two Collective`):** `studio.two@wearwise.studio` / `WearWiseSeller#2026` (`brand_id: f7a1c3d2-4e5b-4a8c-9d1e-2b3c4d5e6f70`)
+  - **Pending Approval Seller:** `pending.seller@wearwise.studio` (rejected on Seller Login until approved by Admin)
+- *(Passwords above apply only when `APP_ENV != "production"` via idempotent staging migration/seeding, overridable via `SEED_SHOPPER_PASSWORD`, `SEED_SELLER_PASSWORD`, and `SEED_ADMIN_PASSWORD`.)*
+
+---
+
+## 6. Verification Commands
 
 ```powershell
 # Frontend unit tests + production bundle
@@ -80,7 +92,7 @@ $env:MONGODB_COMMERCE_DB="wearwise_commerce_staging"
 $env:MONGODB_BODY_ENGINE_DB="wearwise_body_engine_staging"
 ..\WEARWISE-BODY-ENGINE\.venv-anny\Scripts\python.exe -m pytest tests -v
 
-# Body Engine security, capability, VTON, and lifecycle tests (run with WEARWISE-BODY-ENGINE/ as Cwd)
+# Body Engine security, RBAC, capability, VTON, and lifecycle tests (run with WEARWISE-BODY-ENGINE/ as Cwd)
 Set-Location ..\WEARWISE-BODY-ENGINE
-.\.venv-anny\Scripts\python.exe -m pytest tests/api/test_phase12_vton_and_capabilities.py tests/api/test_auth_security.py tests/api/test_merchant_lifecycle_m4_m5b.py -v
+.\.venv-anny\Scripts\python.exe -m pytest tests/api/test_phase13_body_engine_rbac.py tests/api/test_phase12_vton_and_capabilities.py tests/api/test_auth_security.py tests/api/test_merchant_lifecycle_m4_m5b.py -v
 ```

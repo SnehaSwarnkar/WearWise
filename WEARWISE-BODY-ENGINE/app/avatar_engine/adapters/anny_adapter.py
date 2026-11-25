@@ -4,16 +4,32 @@ Strictly encapsulates all NAVER Anny, PyTorch, and low-level morph dependencies.
 Conforms strictly to AvatarEngine, LandmarkProvider, and ShapeEvaluationPort protocols.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 import io
 import math
 import time
-from typing import Dict, List, Optional, Set, Tuple, Union, Any
+from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple, Union, Any
 import numpy as np
-import torch
 import trimesh
 
-import anny
+if TYPE_CHECKING:
+    import anny
+    import torch
+
+
+def _load_anny_runtime() -> Tuple[Any, Any]:
+    """Lazily loads PyTorch and NAVER Anny so API boot does not crash if torch DLLs are blocked."""
+    try:
+        import torch  # noqa: PLC0415
+        import anny  # noqa: PLC0415
+
+        return torch, anny
+    except (ImportError, OSError) as exc:
+        raise EngineNotReadyError(
+            f"NAVER Anny / PyTorch runtime is unavailable in this environment: {exc}"
+        ) from exc
 
 from app.domain.entities.avatar import (
     AvatarShapeSpec,
@@ -291,6 +307,7 @@ class AnnyAdapter:
         if self._ready and self._model is not None:
             return True
 
+        torch, anny = _load_anny_runtime()
         t0 = time.perf_counter()
         # Initialize native Anny with lbs skinning
         self._model = anny.Anny(
@@ -491,6 +508,7 @@ class AnnyAdapter:
         t_waist = target_m_dict.get("waist_planar_circumference") or target_m_dict.get("waist_circumference")
 
         def run_forward(pheno: Dict[str, float], loc: Dict[str, float]):
+            torch, _ = _load_anny_runtime()
             with torch.no_grad():
                 out_t = model(
                     pose_parameters=self._pose_params,
@@ -700,6 +718,7 @@ class AnnyAdapter:
             bone_poses_zup = getattr(self, "_last_bone_poses_zup", None)
             scale_f = float(getattr(self, "_last_scale_factor", 1.0))
             if bone_poses_zup is None:
+                torch, _ = _load_anny_runtime()
                 with torch.no_grad():
                     out = model(pose_parameters=self._pose_params)
                     bp = out["bone_poses"]

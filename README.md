@@ -1,19 +1,26 @@
-# WearWise — Dual-Mode Virtual Try-On & Digital Fitting Marketplace
+# WearWise — Dual-Mode Virtual Try-On, Portal RBAC & Anthropometric Fitting Platform
 
-WearWise is a fashion-commerce platform that lets sellers offer **Image-Based Try-On (VTON)**, **Interactive 3D Try-On**, or **Both (`IMAGE_AND_THREE_D`)** on a canonical product catalog, backed by closed-loop NAVER Anny parametric avatars, a Web Worker XPBD cloth simulator, and FastAPI + MongoDB + SQLite microservices.
+**WearWise** is a full-stack digital apparel platform uniting:
+- **Deterministic Body & Fit Intelligence (`WEARWISE-BODY-ENGINE/`):** Engine-neutral Body Intelligence (`BICE`), closed-loop **NAVER Anny v0.6.2** parametric avatars, exact triangle-mesh-plane anthropometry (`AnthropometryEngine`), `HonestFitEngine` ease scoring, and 5-gate Pattern-First 3D garment twins (`M2R-C`).
+- **Real-Time Browser Cloth Simulation (`frontend/`):** React 19 + TypeScript + Three.js WebGL viewport running an off-main-thread Web Worker **XPBD** cloth solver (`WeldedClothSolver.ts`, `3,145` particles, `18,288` constraints) paired with broad-phase bone capsules, swept CCD, and narrow-phase mesh collisions (`AnatomicalCollider.ts`).
+- **Dual-Mode Marketplace & Portal-Separated RBAC (`backend/` + `frontend/`):** Separate **Shopper** and **Seller** portals (`shopper`, `seller`, `admin`) enforced via HTTP-only `ww_auth_session` cookies, double-submit `ww_csrf_token` CSRF tokens, cross-service `auth_sessions` revocation, and explicit **`tryOnCapabilities`** readiness gating (`IMAGE_ONLY`, `THREE_D_ONLY`, `IMAGE_AND_THREE_D`).
+
+> **Canonical Evidence & Academic Reference:** See **[WEARWISE_MASTER_PROJECT_DOSSIER.md](WEARWISE_MASTER_PROJECT_DOSSIER.md)** for the full end-to-end engineering dossier, 12 Mermaid architecture diagrams, extracted algorithms/equations, IEEE literature review, hardware/XPBD benchmarks, and thesis chapter mapping.
 
 ---
 
 ## Documentation Hub
 
-| Document | Coverage |
+| Document | Scope |
 | :--- | :--- |
-| [docs/ARCHITECTURE.md](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/docs/ARCHITECTURE.md) | System topology, staging DB isolation, M3–M5 versioning, Phase 10–11.5 3D/XPBD/Anny calibration baseline, dual-mode `tryOnCapabilities` |
-| [docs/DEVELOPMENT.md](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/docs/DEVELOPMENT.md) | Clean-checkout prerequisites, `.env` variables, VTON provider activation, service startup (`3000`/`8000`/`8001`), and test commands |
-| [docs/SECURITY_AND_PRIVACY.md](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/docs/SECURITY_AND_PRIVACY.md) | Photo consent, EXIF pixel stripping, temp upload cleanup, ownership access controls (`401`/`403`), and staging DB boundaries |
-| [WEARWISE_PHASE12_1_CONSOLIDATED_REPORT.md](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE_PHASE12_1_CONSOLIDATED_REPORT.md) | Current Phase 12.1 verification results, VTON provider evaluation, and honest feature classifications |
-| [WEARWISE_PROJECT_CLEANUP_REPORT.md](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE_PROJECT_CLEANUP_REPORT.md) | Complete Phase 12 + 12.1 cleanup audit, retained/removed manifests, and storage savings |
-| [WEARWISE_PHASE11_5_CONSOLIDATED_REPORT.md](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/WEARWISE_PHASE11_5_CONSOLIDATED_REPORT.md) | Historical baseline covering closed-loop Anny calibration (`5×3` fit matrix) and XPBD collision remediation |
+| [WEARWISE_MASTER_PROJECT_DOSSIER.md](WEARWISE_MASTER_PROJECT_DOSSIER.md) | **Canonical Master Dossier:** Architecture, 12 Mermaid diagrams, equations, IEEE references, test/benchmark matrices, verified screenshots, and thesis mapping |
+| [WEARWISE_PHASE13_CONSOLIDATED_REPORT.md](WEARWISE_PHASE13_CONSOLIDATED_REPORT.md) | **Phase 13 Report:** Separate Shopper & Seller portals, HTTP-only cookies, CSRF, cross-service RBAC, Playwright E2E, and verification counts |
+| [WEARWISE_PHASE12_1_CONSOLIDATED_REPORT.md](WEARWISE_PHASE12_1_CONSOLIDATED_REPORT.md) | **Phase 12.1 Report:** Dual-mode `tryOnCapabilities` validation, VTON provider comparison (FASHN AI v1 vs Vertex AI India), and Rev3 verification |
+| [WEARWISE_PROJECT_CLEANUP_REPORT.md](WEARWISE_PROJECT_CLEANUP_REPORT.md) | **Cleanup Audit:** Phase 12 + 12.1 workspace pruning (`1,125 -> 751` files), retained baseline GLBs, and manifest |
+| [WEARWISE_PHASE11_5_CONSOLIDATED_REPORT.md](WEARWISE_PHASE11_5_CONSOLIDATED_REPORT.md) | **Phase 11.5 Baseline:** Closed-loop Anny calibration (`5×3` fit matrix) and XPBD collision pass ordering fix |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Service topology, staging DB isolation, M3–M5 lifecycle, and dual-mode marketplace contracts |
+| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Prerequisites, `.env.example` configuration, staging startup commands, portal test accounts, and VTON setup |
+| [docs/SECURITY_AND_PRIVACY.md](docs/SECURITY_AND_PRIVACY.md) | Phase 13 RBAC/CSRF/cookie rules, EXIF stripping, ephemeral temp upload cleanup, and private GLB delivery |
 
 ---
 
@@ -21,32 +28,34 @@ WearWise is a fashion-commerce platform that lets sellers offer **Image-Based Tr
 
 ```text
 WearWise/
-├── frontend/                  # React 19 + TypeScript + Three.js WebGL + XPBD Cloth Worker (port 3000 / 4173)
-├── backend/                   # FastAPI Commerce API: products, capabilities, reviews, cart, demo orders, auth (port 8001)
-├── WEARWISE-BODY-ENGINE/      # FastAPI Body & Garment Engine: Anny v0.6.2, BICE, M3–M5 lifecycle, VTON boundary (port 8000)
-├── docs/                      # Architecture, Development, and Security & Privacy documentation
-├── scripts/                   # Standalone benchmark, migration, avatar export, and garment verification utilities
-└── artifacts/phase12/         # Representative desktop & mobile browser E2E evidence screenshots
+├── frontend/                          # React 19 + TS + Three.js + Web Worker XPBD (Vite dev :5173 / preview :4173 / :3000)
+├── backend/                           # FastAPI Commerce API: RBAC auth, seller store APIs, products, reviews, cart, demo orders (:8001)
+├── WEARWISE-BODY-ENGINE/              # FastAPI Body & Garment Engine: Anny v0.6.2, BICE, Anthropometry, Fit, M3–M5 QA, VTON (:8000)
+├── docs/                              # Architecture, Development, and Security & Privacy guides
+├── scripts/                           # Seeding, calibration verification, skinning audit & benchmark utilities
+├── artifacts/phase12/                 # Phase 12 dual-mode desktop & mobile Playwright screenshots (9 files)
+├── artifacts/phase13/                 # Phase 13 dual-portal desktop & mobile Playwright screenshots (10 files)
+└── WEARWISE_MASTER_PROJECT_DOSSIER.md # Complete project dossier & academic evidence hub
 ```
 
 ---
 
-## Active Application Routes
+## Current Application Routes & Status
 
-| Feature | Route(s) | Status | Notes |
+| Capability | Key Route(s) | Honest Status | Notes |
 | :--- | :--- | :--- | :--- |
-| **Marketplace & PDP** | `/explore`, `/product/:sku` | Active (Staging) | Category browsing (`T-Shirts & Tops`, `Shirts`, `Trousers`, `Jeans`, `Skirts`, `Dresses`, `Jackets`), real review empty state, dual-mode `TRY ON` chooser |
-| **Interactive 3D Fitting Room** | `/experimental-try-on` | Staging | Anny 104-bone rigged avatar + Web Worker XPBD cloth + size/pose controls + shared `ww-session-id` bag |
-| **Image-Based Try-On (VTON)** | `/image-try-on` | Provider-Pending Boundary | Explicit consent, EXIF strip, temp upload deletion; blocked cleanly on PDP & `/image-try-on` when external provider (`FASHN_API_KEY` / `VTON_API_URL`) is unconfigured |
-| **Seller Product Studio** | `/merchant-studio` | Staging | `Choose Virtual Try-On Options` (`IMAGE_ONLY`, `THREE_D_ONLY`, `IMAGE_AND_THREE_D`), `prepare-image-tryon`, 3D generation, approval & publication |
-| **Legacy Static 3D Viewer** | `/try-on` | Protected Legacy | Preserved read-only for backward compatibility |
-| **Bag & Demo Checkout** | `/cart`, `/checkout`, `/order-confirmation`, `/orders` | Staging | Shared `ww-session-id` across browsing and try-on modes; demo checkout only |
+| **Dual-Portal Entry & Auth** | `/auth`, `/login`, `/signup`, `/seller/login`, `/seller/register` | **Staging Verified** | Backend `403` cross-portal blocks; pending seller approval gating (`status="pending"`). |
+| **Seller Console Portal** | `/seller/dashboard`, `/seller/products`, `/seller/orders`, `/seller/studio` (`/merchant-studio`) | **Staging Verified** | Brand-scoped products/orders, `Choose Virtual Try-On Options`, 5-gate QA, `_publish_lock`. |
+| **Marketplace & PDP** | `/explore`, `/product/:sku` | **Staging Verified** | 8 categories, real reviews (`"No customer reviews yet"` when empty), zero AI recommendations, `tryOnCapabilities`. |
+| **Interactive 3D Fitting Room** | `/experimental-try-on`, `/try-on` (legacy) | **Staging Verified (Pre-Built Avatars)** | Graded Rev3 `TSH-WW-CREW-001` (`S`/`M`/`L`), Web Worker XPBD physics, `P0–P11` poses, canonical `ww-session-id` bag. *(On-the-fly PyTorch regeneration on Windows hosts hits `[WinError 4551]` DLL policy block; mitigated safely via lazy import.)* |
+| **Image-Based Try-On (VTON)** | `/image-try-on`, `/api/v1/try-on/vton/jobs` | **Contract-Tested; Key Pending (`503`)** | Consent gate, EXIF pixel strip, FASHN AI v1 / HTTP `VTON_API_URL` adapter, `finally` temp upload cleanup; fails closed with `503` when keys are unset. |
+| **Bag & Demo Checkout** | `/cart`, `/checkout`, `/order-confirmation`, `/orders` | **Staging Verified (Demo Payment)** | Canonical `ww-session-id` bag persistence; checkout persists `DEMO_NO_PAYMENT_CAPTURED` demo orders cleanly. |
 
 ---
 
-## Quick Start (Staging)
+## Quick Start (Local Staging)
 
-See [docs/DEVELOPMENT.md](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/docs/DEVELOPMENT.md) for complete setup and VTON activation steps:
-1. Copy `.env.example` to `.env` and populate `MONGODB_URI` cleanly.
-2. Start Body Engine (`127.0.0.1:8000`), Commerce API (`127.0.0.1:8001`), and Vite frontend (`127.0.0.1:3000`).
-3. Verify protected staging isolation (`MONGODB_BODY_ENGINE_DB=wearwise_body_engine_staging`, `MONGODB_COMMERCE_DB=wearwise_commerce_staging`).
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for complete setup details:
+1. Copy `.env.example` to `.env` and set `MONGODB_URI` (leave `FASHN_API_KEY` / `VTON_API_URL` blank to keep Image VTON safely fail-closed).
+2. Start **Body Engine** (`:8000`) and **Commerce API** (`:8001`) using `WEARWISE-BODY-ENGINE\.venv-anny\Scripts\python.exe` with `MONGODB_BODY_ENGINE_DB=wearwise_body_engine_staging` and `MONGODB_COMMERCE_DB=wearwise_commerce_staging`.
+3. Start **Frontend** (`npm run dev` inside `frontend/`) and open `http://localhost:5173`.

@@ -8,9 +8,14 @@ GET  /api/orders/detail/{id}    — single order detail (auth-protected)
 from datetime import datetime, timezone
 import re
 import uuid
-from fastapi import APIRouter, HTTPException, Header
+from fastapi import APIRouter, Depends, HTTPException, Header, Request
 from typing import Optional
 
+from app.core.security import (
+    CANONICAL_DEFAULT_BRAND_ID,
+    get_optional_authenticated_user,
+    require_shopper,
+)
 from app.routers.products import resolve_catalog_item
 from app.schemas.orders import PlaceOrderRequest, OrderResponse
 from app import database as db
@@ -19,20 +24,6 @@ router = APIRouter(prefix="/api/orders", tags=["Orders"])
 
 SHIPPING_FREE_THRESHOLD = 2000
 SHIPPING_FEE = 99
-
-
-# ── helpers ───────────────────────────────────────────────────────────────────
-
-def _make_token(user_id: str) -> str:
-    import hashlib
-    return hashlib.sha256(f"wearwise-{user_id}".encode()).hexdigest()
-
-
-def _user_from_token(token: str) -> dict | None:
-    for user in db.find_all("users"):
-        if _make_token(user["id"]) == token:
-            return user
-    return None
 
 
 # ── routes ────────────────────────────────────────────────────────────────────
@@ -59,6 +50,7 @@ def _order_to_response(order: dict) -> OrderResponse:
 @router.post("/place", response_model=OrderResponse)
 def place_order(
     payload: PlaceOrderRequest,
+    request: Request,
     authorization: Optional[str] = Header(default=None),
 ):
     """
@@ -67,6 +59,10 @@ def place_order(
     """
     if payload.paymentMethod not in ("upi", "card", "cod"):
         raise HTTPException(status_code=400, detail="Invalid payment method")
+
+    auth_user = get_optional_authenticated_user(request, authorization)
+    if auth_user and auth_user.get("role") == "seller":
+        raise HTTPException(status_code=403, detail="Seller accounts cannot place shopper orders.")
 
     _validate_customer(payload.customer)
 
@@ -89,15 +85,9 @@ def place_order(
     if not cart or not cart.get("items"):
         raise HTTPException(status_code=400, detail="Cart is empty")
 
-    # Resolve authenticated user if token provided
-    user_id = None
-    if authorization:
-        token = authorization.removeprefix("Bearer ").strip()
-        user = _user_from_token(token)
-        if user:
-            user_id = user["id"]
+    user_id = auth_user["id"] if auth_user else None
 
-    # Re-resolve authoritative catalog prices & revisions for every cart item
+    # Re-resolve authoritative catalog prices, seller brand attribution & revisions for every cart item
     items = []
     for raw_it in cart["items"]:
         it = dict(raw_it)
@@ -108,6 +98,7 @@ def place_order(
             it["price"] = int(resolved["price"])
             it["name"] = resolved["name"]
             it["published_revision"] = resolved.get("published_revision")
+            it["seller_brand_id"] = resolved.get("brand_id") or CANONICAL_DEFAULT_BRAND_ID
         items.append(it)
 
     subtotal = sum(it["price"] * it.get("quantity", 1) for it in items)
@@ -144,17 +135,10 @@ def place_order(
 
 
 @router.get("/my", response_model=list[OrderResponse])
-def list_my_orders(authorization: str = Header(...)):
+def list_my_orders(user: dict = Depends(require_shopper)):
     """
-    Return all orders for the authenticated user (identified by Bearer token).
-    Merges orders matched by user_id (new) and by session_id (legacy guest orders
-    whose session_id matches the user's stored session).
+    Return all orders for the authenticated shopper (identified via cookie or Bearer token).
     """
-    token = authorization.removeprefix("Bearer ").strip()
-    user = _user_from_token(token)
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
-
     all_orders = db.find_all("orders")
 
     # Orders explicitly tied to this user_id
@@ -190,22 +174,22 @@ def list_orders(session_id: str):
 @router.get("/detail/{order_id}", response_model=OrderResponse)
 def get_order(
     order_id: str,
+    request: Request,
     authorization: Optional[str] = Header(default=None),
     x_session_id: Optional[str] = Header(default=None),
 ):
     """
-    Return a specific order by its ID, restricted to the owning user or session.
+    Return a specific order by its ID, restricted to the owning shopper or session.
     """
     all_orders = db.find_all("orders")
     order = next((o for o in all_orders if o["id"] == order_id), None)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
-    if authorization:
-        token = authorization.removeprefix("Bearer ").strip()
-        user = _user_from_token(token)
-        if not user:
-            raise HTTPException(status_code=401, detail="Invalid or expired token")
+    user = get_optional_authenticated_user(request, authorization)
+    if user:
+        if user.get("role") == "seller":
+            raise HTTPException(status_code=403, detail="Use Seller Orders endpoint to inspect seller orders.")
         belongs = (
             order.get("user_id") == user["id"]
             or (order.get("user_id") is None and order.get("customer", {}).get("email", "").lower() == user["email"].lower())

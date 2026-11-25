@@ -17,9 +17,10 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
-from fastapi import APIRouter, Header, HTTPException, Query, status
+from fastapi import APIRouter, Header, HTTPException, Query, Request, status
 from fastapi.responses import FileResponse
 from app import database as db
+from app.core.security import CANONICAL_DEFAULT_BRAND_ID, get_optional_authenticated_user
 from app.schemas.products import Product, ReviewCreateRequest
 
 router = APIRouter(prefix="/api/products", tags=["Products"])
@@ -247,6 +248,7 @@ def _pub_doc_to_product(pub: dict) -> dict:
         "colors": clean_colors,
         "image": lead_img,
         "brand": pub.get("seller_name") or "WEARWISE STUDIO",
+        "brand_id": pub.get("brand_id") or CANONICAL_DEFAULT_BRAND_ID,
         "seller_name": pub.get("seller_name") or "WEARWISE STUDIO",
         "description": pub.get("description") or f"Published {pub.get('published_version', 'v1.0')} garment listing.",
         "sku": sku,
@@ -485,23 +487,9 @@ def get_product_by_sku(sku: str):
     raise HTTPException(status_code=404, detail=f"Published product not found for SKU '{sku}'.")
 
 
-def _extract_user_from_header(authorization: Optional[str]) -> Optional[dict]:
-    if not authorization or not authorization.startswith("Bearer "):
-        return None
-    token = authorization.removeprefix("Bearer ").strip()
-    if not token:
-        return None
-    for user in db.find_all("users"):
-        expected = hashlib.sha256(f"wearwise-{user['id']}".encode()).hexdigest()
-        if expected == token:
-            return user
-    return None
-
-
 @router.get("/sku/{sku}/reviews")
 def get_product_reviews(sku: str):
     """Returns authentic persisted customer reviews for a SKU (empty list if none exist)."""
-    # Ensure product exists first
     get_product_by_sku(sku)
     rows = db.filter_by("product_reviews", sku=sku)
     rows = sorted(rows, key=lambda r: r.get("created_at", ""), reverse=True)
@@ -519,6 +507,7 @@ def get_product_reviews(sku: str):
 def create_product_review(
     sku: str,
     payload: ReviewCreateRequest,
+    request: Request,
     authorization: Optional[str] = Header(None),
 ):
     """Persists a genuine shopper review for an existing product SKU."""
@@ -527,7 +516,9 @@ def create_product_review(
     if len(comment_clean) < 3:
         raise HTTPException(status_code=400, detail="Review comment must contain at least 3 characters.")
 
-    auth_user = _extract_user_from_header(authorization)
+    auth_user = get_optional_authenticated_user(request, authorization)
+    if auth_user and auth_user.get("role") == "seller":
+        raise HTTPException(status_code=403, detail="Seller accounts cannot post customer reviews.")
     author = (payload.author_name or (auth_user.get("name") if auth_user else None) or "Verified Shopper").strip()
 
     verified_purchase = False

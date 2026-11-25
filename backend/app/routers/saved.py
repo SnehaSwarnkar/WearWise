@@ -13,7 +13,8 @@ DELETE /api/saved/wishlist/{item_id}          — remove from wishlist
 import uuid
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from app.core.security import reject_seller_portal_access
 from app.schemas.saved import (
     SavedLook,
     WishlistItem,
@@ -22,7 +23,11 @@ from app.schemas.saved import (
 )
 from app import database as db
 
-router = APIRouter(prefix="/api/saved", tags=["Saved Looks & Wishlist"])
+router = APIRouter(
+    prefix="/api/saved",
+    tags=["Saved Looks & Wishlist"],
+    dependencies=[Depends(reject_seller_portal_access)],
+)
 
 
 # ── SAVED LOOKS ──────────────────────────────────────────────────────────────

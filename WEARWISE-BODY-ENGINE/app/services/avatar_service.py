@@ -42,11 +42,15 @@ class AvatarOrchestrationService:
         self.storage = storage or LocalStorageProvider()
         self.anthropometry_engine = anthropometry_engine or AnthropometryEngine()
 
-        if adapter is not None:
-            self.adapter = adapter
-        else:
-            self.adapter = AnnyAdapter(device="cpu")
-            self.adapter.initialize()
+        self._adapter = adapter
+
+    @property
+    def adapter(self) -> AnnyAdapter:
+        """Lazily instantiates and initializes the Anny adapter only when generation is requested."""
+        if self._adapter is None:
+            self._adapter = AnnyAdapter(device="cpu")
+            self._adapter.initialize()
+        return self._adapter
 
     def generate_avatar_for_profile(
         self,
