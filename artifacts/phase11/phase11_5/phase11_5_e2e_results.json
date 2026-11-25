@@ -1,0 +1,31 @@
+{
+  "shopper_ux": {
+    "recommended_size_athletic": "L",
+    "expected_fit_M_athletic": "Snug fit",
+    "recommended_size_petite": "S",
+    "no_engineering_jargon": true,
+    "cart_banner": "Added Phase 11 Acceptance Crew Tee (Size S) to your bag. Go to Bag"
+  },
+  "commerce_e2e": {
+    "session_id": "sess_oplvejb57",
+    "cart_has_item": true,
+    "cart_persisted_after_reload": true,
+    "qty_updated_total_present": true,
+    "demo_order_placed": true,
+    "confirmation_url": "http://127.0.0.1:4173/login",
+    "orders_page_loaded": true
+  },
+  "seller_ux": {
+    "title_simplified": true,
+    "status_summary": "Status: Published\nYour product is live in the staging catalog for shoppers to try on and purchase."
+  },
+  "mobile": {
+    "rendered": true
+  },
+  "page_errors": [],
+  "protected_rev3_intact": {
+    "S": true,
+    "M": true,
+    "L": true
+  }
+}

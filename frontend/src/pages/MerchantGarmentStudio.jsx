@@ -516,13 +516,33 @@ export default function MerchantGarmentStudio() {
   };
 
   const stepsMeta = [
-    { num: 1, label: 'Identity', sub: 'SKU & Category' },
-    { num: 2, label: 'Images', sub: 'Multi-View & Roles' },
-    { num: 3, label: 'Pattern', sub: 'CAD / Guided / AI' },
-    { num: 4, label: 'Measurements', sub: 'S / M / L Specs' },
-    { num: 5, label: 'Fabric', sub: '8 Presets & GSM' },
-    { num: 6, label: '3D Preview', sub: 'Motion, QA & Publish' },
+    { num: 1, label: 'Add product details', sub: 'Name, price & sizes' },
+    { num: 2, label: 'Upload product photos', sub: 'Front & side views' },
+    { num: 3, label: 'Choose garment style', sub: 'Guided or pattern' },
+    { num: 4, label: 'Add size measurements', sub: 'S / M / L specs' },
+    { num: 5, label: 'Choose fabric', sub: 'Material & feel' },
+    { num: 6, label: 'Preview & publish', sub: 'Review & publish' },
   ];
+
+  const getSellerStatusInfo = () => {
+    if (downstreamStale) {
+      return { label: 'Needs attention', next: 'This preview is outdated after recent edits. Create a new 3D preview before publishing.' };
+    }
+    if (garmentStatus === 'published') {
+      return { label: 'Published', next: 'Your product is live in the staging catalog for shoppers to try on and purchase.' };
+    }
+    if (garmentStatus === 'approved' || qaReport?.overall_status === 'PASSED') {
+      return { label: 'Ready to review', next: 'Review your 3D preview and measurements, then publish when ready.' };
+    }
+    if (qaReport?.overall_status === 'FAILED') {
+      return { label: 'Needs attention', next: 'Check your product measurements or style details before creating the preview again.' };
+    }
+    if (garmentId) {
+      return { label: 'In progress', next: 'Complete your product details, measurements, and fabric, then create your 3D preview.' };
+    }
+    return { label: 'Not started', next: 'Start by adding your product details and saving your draft.' };
+  };
+  const sellerStatus = getSellerStatusInfo();
 
   return (
     <div className="merchant-studio-page">
@@ -531,12 +551,30 @@ export default function MerchantGarmentStudio() {
       <main className="merchant-studio-main">
         {/* Header Title */}
         <div className="merchant-studio-header">
-          <div className="merchant-studio-pretitle">MERCHANT SUITE · DIGITAL GARMENT PLATFORM</div>
-          <h1 className="merchant-studio-title">Merchant Digital Garment Studio</h1>
+          <div className="merchant-studio-pretitle">SELLER STUDIO · PRODUCT SETUP</div>
+          <h1 className="merchant-studio-title">Seller Product Studio</h1>
           <p className="merchant-studio-desc">
-            Transform physical fashion products into structured, size-specific, physically responsive 3D garment packages
-            with automated QA and versioned package manifests.
+            Add your product details, photos, measurements, and fabric to create an interactive 3D preview for shoppers.
           </p>
+          <div
+            data-testid="seller-status-summary"
+            style={{
+              marginTop: '10px',
+              padding: '10px 14px',
+              borderRadius: '10px',
+              background: '#FFF8F1',
+              border: '1.5px solid #151515',
+              fontSize: '13px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '8px',
+            }}
+          >
+            <span><strong>Status:</strong> {sellerStatus.label}</span>
+            <span style={{ color: '#475569' }}>{sellerStatus.next}</span>
+          </div>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '10px', flexWrap: 'wrap' }}>
             <button
               type="button"
@@ -1351,7 +1389,7 @@ export default function MerchantGarmentStudio() {
                 <ArrowLeft size={16} /> BACK
               </button>
               <button type="button" className="btn-primary-merchant" onClick={handleSaveFabric} disabled={loading}>
-                SAVE & CONTINUE TO 3D GENERATION <ArrowRight size={16} />
+                SAVE & CONTINUE TO 3D PREVIEW <ArrowRight size={16} />
               </button>
             </div>
           </div>
@@ -1363,14 +1401,13 @@ export default function MerchantGarmentStudio() {
         {activeStep === 6 && (
           <div className="merchant-card">
             <div className="card-header-badge-row">
-              <h2 className="merchant-card-title">Step 6 — 3D Garment Generation, QA Audit & Package Publication</h2>
+              <h2 className="merchant-card-title">Step 6 — Review 3D Preview &amp; Publish Product</h2>
               <span className={`confidence-badge-lg ${qaReport?.confidence_level || 'PARAMETRIC_TEMPLATE'}`}>
-                {qaReport?.confidence_level || 'PARAMETRIC_TEMPLATE'}
+                {sellerStatus.label}
               </span>
             </div>
             <p className="merchant-card-subtitle">
-              Inspect the physically responsive 3D garment fitted to the upright pearl-white reference mannequin,
-              audit automated QA verification gates, and publish the versioned package manifest.
+              Create your interactive 3D preview, check garment shape and fit across sizes, and publish when ready.
             </p>
 
             {/* Pipeline Trigger & Progress Banner */}
@@ -1382,7 +1419,7 @@ export default function MerchantGarmentStudio() {
                 disabled={isGenerating}
               >
                 {isGenerating ? <Cpu className="animate-spin" size={20} /> : <Sparkles size={20} />}
-                <span>{isGenerating ? 'RUNNING 13-STAGE PIPELINE...' : 'GENERATE SIZE-GRADED 3D GARMENTS & RUN QA'}</span>
+                <span>{isGenerating ? 'CREATING YOUR PREVIEW...' : 'CREATE 3D PREVIEW & CHECK SHAPE'}</span>
               </button>
             </div>
 
@@ -1419,7 +1456,7 @@ export default function MerchantGarmentStudio() {
                       fontWeight: 600,
                     }}
                   >
-                    Stale Downstream Output: {staleReason || 'Inputs modified since last generation'}. Regenerate to produce a new candidate revision before approval.
+                    This preview is outdated because product details changed. Create a new 3D preview before approving and publishing.
                   </div>
                 )}
                 {prototypeError && !garmentData?.size_variants?.[previewSize]?.asset_url && (

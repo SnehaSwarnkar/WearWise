@@ -408,7 +408,8 @@ export class AnatomicalCollider {
     particleCount: number,
     thicknessM = 0.004,
     includeMeshNarrowPhase = true,
-    prevPos?: Float32Array
+    prevPos?: Float32Array,
+    pushFactor = 0.72
   ): CollisionStepStats {
     const t0 = performance.now();
     let capsuleCorrections = 0;
@@ -554,8 +555,8 @@ export class AnatomicalCollider {
         }
 
         if (bestDepth > 0) {
-          // Smooth damped push along outward normal prevents jagged triangle-to-triangle snapping
-          const push = bestDepth * 0.65;
+          // Damped push along outward normal (stronger on final substep to minimize residual penetration)
+          const push = bestDepth * pushFactor;
           pos[ix] += bestNx * push;
           pos[ix + 1] += bestNy * push;
           pos[ix + 2] += bestNz * push;

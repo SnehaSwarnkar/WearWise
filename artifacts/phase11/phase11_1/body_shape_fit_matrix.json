@@ -11,21 +11,21 @@
       "gender": "masculine",
       "sizes": {
         "S": {
-          "chest_ease_cm": 14.26,
-          "waist_ease_cm": 27.91,
-          "shoulder_ease_cm": 3.81,
-          "classification": "Relaxed fit"
+          "chest_ease_cm": 4.51,
+          "waist_ease_cm": 17.16,
+          "shoulder_ease_cm": 2.98,
+          "classification": "Close fit"
         },
         "M": {
-          "chest_ease_cm": 22.26,
-          "waist_ease_cm": 35.91,
-          "shoulder_ease_cm": 6.81,
-          "classification": "Too loose"
+          "chest_ease_cm": 12.51,
+          "waist_ease_cm": 25.16,
+          "shoulder_ease_cm": 5.98,
+          "classification": "Relaxed fit"
         },
         "L": {
-          "chest_ease_cm": 30.26,
-          "waist_ease_cm": 43.91,
-          "shoulder_ease_cm": 9.81,
+          "chest_ease_cm": 20.51,
+          "waist_ease_cm": 33.16,
+          "shoulder_ease_cm": 8.98,
           "classification": "Too loose"
         }
       }
@@ -35,22 +35,22 @@
       "gender": "masculine",
       "sizes": {
         "S": {
-          "chest_ease_cm": 10.56,
-          "waist_ease_cm": 24.7,
-          "shoulder_ease_cm": 1.46,
-          "classification": "Regular fit"
+          "chest_ease_cm": -4.16,
+          "waist_ease_cm": 10.34,
+          "shoulder_ease_cm": 0.25,
+          "classification": "Too tight"
         },
         "M": {
-          "chest_ease_cm": 18.56,
-          "waist_ease_cm": 32.7,
-          "shoulder_ease_cm": 4.46,
-          "classification": "Relaxed fit"
+          "chest_ease_cm": 3.84,
+          "waist_ease_cm": 18.34,
+          "shoulder_ease_cm": 3.25,
+          "classification": "Close fit"
         },
         "L": {
-          "chest_ease_cm": 26.56,
-          "waist_ease_cm": 40.7,
-          "shoulder_ease_cm": 7.46,
-          "classification": "Too loose"
+          "chest_ease_cm": 11.84,
+          "waist_ease_cm": 26.34,
+          "shoulder_ease_cm": 6.25,
+          "classification": "Regular fit"
         }
       }
     },
@@ -59,22 +59,22 @@
       "gender": "masculine",
       "sizes": {
         "S": {
-          "chest_ease_cm": 7.29,
-          "waist_ease_cm": 11.88,
-          "shoulder_ease_cm": -0.68,
-          "classification": "Regular fit"
+          "chest_ease_cm": -13.96,
+          "waist_ease_cm": 1.41,
+          "shoulder_ease_cm": -2.59,
+          "classification": "Too tight"
         },
         "M": {
-          "chest_ease_cm": 15.29,
-          "waist_ease_cm": 19.88,
-          "shoulder_ease_cm": 2.32,
-          "classification": "Relaxed fit"
+          "chest_ease_cm": -5.96,
+          "waist_ease_cm": 9.41,
+          "shoulder_ease_cm": 0.41,
+          "classification": "Too tight"
         },
         "L": {
-          "chest_ease_cm": 23.29,
-          "waist_ease_cm": 27.88,
-          "shoulder_ease_cm": 5.32,
-          "classification": "Too loose"
+          "chest_ease_cm": 2.04,
+          "waist_ease_cm": 17.41,
+          "shoulder_ease_cm": 3.41,
+          "classification": "Close fit"
         }
       }
     },
@@ -83,21 +83,21 @@
       "gender": "feminine",
       "sizes": {
         "S": {
-          "chest_ease_cm": 12.09,
-          "waist_ease_cm": 27.02,
-          "shoulder_ease_cm": 5.87,
-          "classification": "Relaxed fit"
+          "chest_ease_cm": 9.8,
+          "waist_ease_cm": 24.14,
+          "shoulder_ease_cm": 5.7,
+          "classification": "Regular fit"
         },
         "M": {
-          "chest_ease_cm": 20.09,
-          "waist_ease_cm": 35.02,
-          "shoulder_ease_cm": 8.87,
-          "classification": "Too loose"
+          "chest_ease_cm": 17.8,
+          "waist_ease_cm": 32.14,
+          "shoulder_ease_cm": 8.7,
+          "classification": "Relaxed fit"
         },
         "L": {
-          "chest_ease_cm": 28.09,
-          "waist_ease_cm": 43.02,
-          "shoulder_ease_cm": 11.87,
+          "chest_ease_cm": 25.8,
+          "waist_ease_cm": 40.14,
+          "shoulder_ease_cm": 11.7,
           "classification": "Too loose"
         }
       }
@@ -107,22 +107,22 @@
       "gender": "neutral",
       "sizes": {
         "S": {
-          "chest_ease_cm": 7.97,
-          "waist_ease_cm": 20.03,
-          "shoulder_ease_cm": 2.22,
-          "classification": "Regular fit"
+          "chest_ease_cm": -1.06,
+          "waist_ease_cm": 12.6,
+          "shoulder_ease_cm": 1.43,
+          "classification": "Too tight"
         },
         "M": {
-          "chest_ease_cm": 15.97,
-          "waist_ease_cm": 28.03,
-          "shoulder_ease_cm": 5.22,
-          "classification": "Relaxed fit"
+          "chest_ease_cm": 6.94,
+          "waist_ease_cm": 20.6,
+          "shoulder_ease_cm": 4.43,
+          "classification": "Regular fit"
         },
         "L": {
-          "chest_ease_cm": 23.97,
-          "waist_ease_cm": 36.03,
-          "shoulder_ease_cm": 8.22,
-          "classification": "Too loose"
+          "chest_ease_cm": 14.94,
+          "waist_ease_cm": 28.6,
+          "shoulder_ease_cm": 7.43,
+          "classification": "Relaxed fit"
         }
       }
     }

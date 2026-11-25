@@ -105,14 +105,19 @@ class AvatarOrchestrationService:
         # 2. Map semantic controls to regional scales
         regional_scales = map_controls_to_regional_scales(controls_dict)
 
-        # 3. Construct AvatarShapeSpec
+        # 3. Construct AvatarShapeSpec (forward any user-supplied target chest/waist measurements)
+        target_meas: Dict[str, float] = {}
+        for m in (latest_rev.measurements or []):
+            if m.lifecycle_status == "active" and m.acquisition_method in ("user_input", "user_reported", "manual"):
+                target_meas[m.measurement_code] = float(m.value_cm)
+
         gender_enum = PresentationGender(profile.presentation_gender)
         target_stature = float(profile.stature_cm)
         shape_spec = AvatarShapeSpec(
             spec_version="1.0.0",
             presentation=gender_enum,
             target_stature_cm=target_stature,
-            target_measurements={},
+            target_measurements=target_meas,
             regional_scales=regional_scales,
             semantic_controls=controls_dict,
         )
@@ -161,6 +166,7 @@ class AvatarOrchestrationService:
                 "is_watertight": validation_report.is_watertight,
                 "rigged": rigged,
                 "bone_count": 104 if rigged else 0,
+                "calibration": mesh.metadata.get("calibration"),
             },
         )
 

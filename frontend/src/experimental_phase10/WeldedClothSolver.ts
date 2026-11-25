@@ -753,8 +753,11 @@ export class WeldedClothSolver {
         this.pos[ix + 2] = nz;
       }
 
-      // 2. Solve XPBD constraints with Lagrange multipliers
+      // 2. Solve XPBD constraints with Lagrange multipliers (2nd pass on final substep BEFORE final collision)
       solveConstraintsPass();
+      if (s === substeps - 1) {
+        solveConstraintsPass();
+      }
 
       // 3. Hybrid anatomical collision (capsules + swept CCD every substep; spatial-hash mesh on substeps 0 & 3)
       const colStats = this.collider.resolveCollisions(
@@ -763,17 +766,13 @@ export class WeldedClothSolver {
         this.particleCount,
         thicknessM,
         s === 0 || s === substeps - 1,
-        this.prevPos
+        this.prevPos,
+        s === substeps - 1 ? 0.96 : 0.70
       );
       stepColMs += colStats.collisionTimeMs;
       stepCapCorr += colStats.capsuleCorrections;
       stepMeshCorr += colStats.meshCorrections;
       stepTunnel += colStats.tunnelingIncidents;
-
-      // 4. Post-collision structural smoothing pass on final substep to eliminate spike artifacts
-      if (s === substeps - 1) {
-        solveConstraintsPass();
-      }
     }
 
     this.lastCollisionMs = stepColMs;

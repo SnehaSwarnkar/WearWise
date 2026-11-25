@@ -137,6 +137,17 @@ def main():
             )
             db.commit()
 
+            prof_srv.record_measurements(
+                profile_id=p.id,
+                requesting_user_id=owner_id,
+                expected_revision=p.current_revision,
+                measurements=[
+                    {"measurement_code": "chest_circumference", "value_cm": spec["target_chest_cm"], "acquisition_method": "user_input"},
+                    {"measurement_code": "waist_planar_circumference", "value_cm": spec["target_waist_cm"], "acquisition_method": "user_input"},
+                ],
+            )
+            db.commit()
+
             gen = av_srv.generate_avatar_for_profile(
                 profile_id=p.id,
                 requesting_user_id=owner_id,

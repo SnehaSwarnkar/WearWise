@@ -483,37 +483,83 @@ class AnnyAdapter:
             apply_local("l-lowerleg-scale-horiz-incr", cl.scale_x * 0.5)
             apply_local("r-lowerleg-scale-horiz-incr", cl.scale_x * 0.5)
 
-        # 5. Forward Pass (PyTorch CPU, no gradients)
+        # 5. Forward Pass (+ Closed-Loop Measurement Calibration when target_measurements provided)
         model = self.get_model()
-        with torch.no_grad():
-            out = model(
-                pose_parameters=self._pose_params,
-                phenotype_kwargs=phenotype_dict,
-                local_changes_kwargs=local_kwargs,
-            )
+        faces = self._faces.copy() if self._faces is not None else np.zeros((0, 3), dtype=np.int32)
+        target_m_dict = shape_spec.target_measurements or {}
+        t_chest = target_m_dict.get("chest_circumference")
+        t_waist = target_m_dict.get("waist_planar_circumference") or target_m_dict.get("waist_circumference")
 
-        verts_tensor = out.get("vertices", out.get("rest_vertices"))
-        if verts_tensor is None:
-            raise MeshDeformationError("Anny model output missing vertex tensors.")
+        def run_forward(pheno: Dict[str, float], loc: Dict[str, float]):
+            with torch.no_grad():
+                out_t = model(
+                    pose_parameters=self._pose_params,
+                    phenotype_kwargs=pheno,
+                    local_changes_kwargs=loc,
+                )
+            vt = out_t.get("vertices", out_t.get("rest_vertices"))
+            if vt is None:
+                raise MeshDeformationError("Anny model output missing vertex tensors.")
+            vnp = vt[0].detach().cpu().numpy().astype(np.float32) if vt.dim() == 3 else vt.detach().cpu().numpy().astype(np.float32)
+            zs = float(vnp[:, 2].max() - vnp[:, 2].min())
+            sf = 1.0
+            if zs > 0.01:
+                sf = (stature_cm / 100.0) / zs
+                vnp = (vnp * sf).astype(np.float32)
+            return vnp, sf, out_t.get("bone_poses")
 
-        # Squeeze batch dimension if present
-        verts_np = (
-            verts_tensor[0].detach().cpu().numpy().astype(np.float32)
-            if verts_tensor.dim() == 3
-            else verts_tensor.detach().cpu().numpy().astype(np.float32)
-        )
+        calibration_info: Dict[str, Any] = {"calibrated": False, "iterations": 0}
+        if t_chest is not None or t_waist is not None:
+            from app.anthropometry.engine import AnthropometryEngine
+            anth_eng = AnthropometryEngine()
+            # Initialize weight/muscle/bust/waist from target if available
+            w_cur = float(np.clip(0.5 + (((t_chest or 92.0) - 90.0) / 55.0), 0.15, 1.0))
+            phenotype_dict["weight"] = w_cur
+            phenotype_dict["muscle"] = float(np.clip(0.45 + (((t_chest or 92.0) - 90.0) / 80.0), 0.25, 0.85))
+            bust_cur = float(local_kwargs.get("measure-bust-circ-incr", 0.0))
+            waist_cur = float(local_kwargs.get("measure-waist-circ-incr", 0.0))
 
-        # 6. Post-inference Exact Stature Alignment (Isotropic Scaling)
-        # Anny height phenotype provides non-linear biomechanical scaling;
-        # isotropic scaling guarantees exact millimeter matching to target_stature_cm.
-        z_span = float(verts_np[:, 2].max() - verts_np[:, 2].min())
-        target_m = stature_cm / 100.0
-        scale_factor = 1.0
-        if z_span > 0.01:
-            scale_factor = target_m / z_span
-            verts_np = (verts_np * scale_factor).astype(np.float32)
+            for it in range(1, 6):
+                local_kwargs["measure-bust-circ-incr"] = float(np.clip(bust_cur, -1.0, 1.0))
+                local_kwargs["torso-scale-horiz-incr"] = float(np.clip(bust_cur * 0.35, -0.5, 0.5))
+                local_kwargs["torso-scale-depth-incr"] = float(np.clip(bust_cur * 0.35, -0.5, 0.5))
+                local_kwargs["measure-waist-circ-incr"] = float(np.clip(waist_cur, -1.0, 1.0))
 
-        bone_poses_tensor = out.get("bone_poses")
+                verts_np, scale_factor, bone_poses_tensor = run_forward(phenotype_dict, local_kwargs)
+                tm_c = trimesh.Trimesh(vertices=verts_np, faces=faces, process=False)
+                md_c = MeshData(vertices=verts_np, faces=faces, normals=np.asarray(tm_c.vertex_normals, dtype=np.float32), metadata={})
+                res_c = anth_eng.extract_all(md_c, self.get_landmark_provider(md_c), "calib", ("chest_circumference", "waist_planar_circumference"))
+                m_chest = float(res_c.records["chest_circumference"].measurement.value_cm) if res_c.records["chest_circumference"].measurement else None
+                m_waist = float(res_c.records["waist_planar_circumference"].measurement.value_cm) if res_c.records["waist_planar_circumference"].measurement else None
+
+                err_c = (float(t_chest) - m_chest) if (t_chest is not None and m_chest is not None) else 0.0
+                err_w = (float(t_waist) - m_waist) if (t_waist is not None and m_waist is not None) else 0.0
+                tol_c = max(1.2, 0.015 * float(t_chest)) if t_chest is not None else 999.0
+                tol_w = max(1.2, 0.015 * float(t_waist)) if t_waist is not None else 999.0
+
+                calibration_info = {
+                    "calibrated": True,
+                    "iterations": it,
+                    "target_chest_cm": t_chest,
+                    "measured_chest_cm": m_chest,
+                    "chest_error_cm": round(-err_c, 2) if m_chest is not None else None,
+                    "target_waist_cm": t_waist,
+                    "measured_waist_cm": m_waist,
+                    "waist_error_cm": round(-err_w, 2) if m_waist is not None else None,
+                    "converged": abs(err_c) <= tol_c and abs(err_w) <= tol_w,
+                }
+                if calibration_info["converged"]:
+                    break
+
+                if t_chest is not None and m_chest is not None:
+                    bust_cur = float(np.clip(bust_cur + err_c * 0.045, -1.0, 1.0))
+                    w_cur = float(np.clip(w_cur + err_c * 0.012, 0.05, 1.0))
+                    phenotype_dict["weight"] = w_cur
+                if t_waist is not None and m_waist is not None:
+                    waist_cur = float(np.clip(waist_cur + err_w * 0.065, -1.0, 1.0))
+        else:
+            verts_np, scale_factor, bone_poses_tensor = run_forward(phenotype_dict, local_kwargs)
+
         if bone_poses_tensor is not None:
             bp_np = bone_poses_tensor[0].detach().cpu().numpy().astype(np.float64) if bone_poses_tensor.dim() == 4 else bone_poses_tensor.detach().cpu().numpy().astype(np.float64)
             self._last_bone_poses_zup = bp_np
@@ -527,7 +573,6 @@ class AnnyAdapter:
             raise MeshDeformationError("Forward pass produced non-finite or NaN vertex coordinates.")
 
         # Compute vertex normals
-        faces = self._faces.copy() if self._faces is not None else np.zeros((0, 3), dtype=np.int32)
         tm = trimesh.Trimesh(vertices=verts_np, faces=faces, process=False)
         normals = np.asarray(tm.vertex_normals, dtype=np.float32)
 
@@ -543,6 +588,7 @@ class AnnyAdapter:
             "vertex_count": int(verts_np.shape[0]),
             "face_count": int(faces.shape[0]),
             "clamped_parameters": clamped_params,
+            "calibration": calibration_info,
             "inference_time_ms": infer_time_ms,
         }
 
