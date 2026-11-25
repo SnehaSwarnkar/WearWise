@@ -90,9 +90,12 @@ class PersonImageService:
         except Exception:
             pass
 
-        # 5. Strip EXIF and convert to standard RGB
+        # 5. Strip EXIF and personal device metadata by copying raw pixels into a fresh RGB image
         if image.mode != "RGB":
             image = image.convert("RGB")
+        clean_image = Image.new("RGB", image.size)
+        clean_image.paste(image)
+        image = clean_image
 
         # 6. Avatar / Mannequin heuristic rejection
         # Synthetic Anny avatar renderings have very uniform gray backgrounds (e.g. #0a0e17)
@@ -101,11 +104,10 @@ class PersonImageService:
         if colors is not None and len(colors) < 16:
             raise ValidationError(
                 "Uploaded image appears to be a synthetic avatar or flat graphic. "
-                "Mode B AI Photo VTON requires a real-person photograph. "
-                "For 3D avatar try-on, please use Mode A."
+                "Photo Try-On requires a real-person photograph."
             )
 
-        # 7. Compute SHA-256 content hash of cleaned image
+        # 7. Compute SHA-256 content hash of EXIF-free cleaned image
         output_buffer = io.BytesIO()
         image.save(output_buffer, format="JPEG", quality=92, optimize=True)
         cleaned_bytes = output_buffer.getvalue()

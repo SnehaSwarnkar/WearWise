@@ -20,3 +20,13 @@ export function fetchProduct(id) {
 export function fetchProductBySku(sku) {
   return api.get(`/api/products/sku/${encodeURIComponent(sku)}`);
 }
+
+export function fetchProductReviews(sku) {
+  return api.get(`/api/products/sku/${encodeURIComponent(sku)}/reviews`);
+}
+
+export function submitProductReview(sku, payload) {
+  const token = localStorage.getItem("ww-token");
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  return api.post(`/api/products/sku/${encodeURIComponent(sku)}/reviews`, payload, headers);
+}

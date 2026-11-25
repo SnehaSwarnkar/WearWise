@@ -61,6 +61,11 @@ class MongoVTONRepository:
         mongo.upsert_document(self.jobs_col, {"id": job_id}, updates)
         return mongo.find_document(self.jobs_col, {"id": job_id})
 
+    def update_job_fields(self, job_id: str, fields: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        updates = {**fields, "updated_at": datetime.now(timezone.utc).isoformat()}
+        mongo.upsert_document(self.jobs_col, {"id": job_id}, updates)
+        return mongo.find_document(self.jobs_col, {"id": job_id})
+
     def get_job(self, job_id: str) -> Optional[Dict[str, Any]]:
         return mongo.find_document(self.jobs_col, {"id": job_id})
 

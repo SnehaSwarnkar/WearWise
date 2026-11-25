@@ -22,6 +22,8 @@ import {
   fetchPrototypePreviewMeta,
   fetchGarmentRevisions,
   rollbackGarment,
+  updateTryOnMode,
+  prepareImageTryOn,
 } from '../api/merchantGarments';
 import './MerchantGarmentStudio.css';
 import {
@@ -70,6 +72,7 @@ export default function MerchantGarmentStudio() {
     color_variant: 'Coral Pink / White Trim',
     price: 2999,
     available_sizes: ['S', 'M', 'L'],
+    try_on_mode: 'IMAGE_AND_THREE_D',
   });
 
   // Step 2: Dual-Role Viewpoint Images
@@ -196,6 +199,7 @@ export default function MerchantGarmentStudio() {
       color_variant: g.color_variant || '',
       price: g.price || 2999,
       available_sizes: g.available_sizes || ['S', 'M', 'L'],
+      try_on_mode: g.try_on_mode || 'IMAGE_AND_THREE_D',
     });
     if (g.images) setUploadedImages(g.images);
     if (g.images_meta) setImagesMeta(g.images_meta);
@@ -274,6 +278,7 @@ export default function MerchantGarmentStudio() {
       color_variant: 'Coral Pink / White Trim',
       price: 2999,
       available_sizes: ['S', 'M', 'L'],
+      try_on_mode: 'IMAGE_AND_THREE_D',
     });
     setUploadedImages({
       front: null,
@@ -468,6 +473,55 @@ export default function MerchantGarmentStudio() {
       showFeedback(err.message, true);
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleSelectTryOnMode = async (mode) => {
+    setIdentity((prev) => ({ ...prev, try_on_mode: mode }));
+    if (!garmentId) return;
+    setLoading(true);
+    try {
+      const updated = await updateTryOnMode(garmentId, mode);
+      applyGarmentDoc(updated);
+      const labelMap = {
+        IMAGE_ONLY: 'Image Try-On only',
+        THREE_D_ONLY: '3D Try-On only',
+        IMAGE_AND_THREE_D: 'Both Image & 3D Try-On',
+      };
+      showFeedback(`Updated virtual try-on setting to ${labelMap[mode] || mode}.`);
+    } catch (err) {
+      showFeedback(err.message, true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePrepareImageTryOn = async () => {
+    if (!garmentId) {
+      showFeedback('Save product details first before preparing your listing.', true);
+      return;
+    }
+    setLoading(true);
+    try {
+      const resp = await prepareImageTryOn(garmentId);
+      setGarmentStatus(resp.status);
+      setQaReport(resp.qa_report);
+      setDownstreamStale(false);
+      setGarmentData((prev) => ({
+        ...(prev || {}),
+        id: garmentId,
+        revision: resp.revision,
+        active_revision: resp.revision,
+        status: resp.status,
+        downstream_stale: false,
+        qa_report: resp.qa_report,
+      }));
+      refreshRevisions(garmentId);
+      showFeedback('Front product photos verified for Image Try-On. Review and publish below.');
+    } catch (err) {
+      showFeedback(err.message, true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -684,11 +738,14 @@ export default function MerchantGarmentStudio() {
                   value={identity.category}
                   onChange={(e) => setIdentity({ ...identity, category: e.target.value })}
                 >
-                  <option value="T-Shirt">T-Shirt / Tops</option>
-                  <option value="Hoodie">Hoodie / Sweatshirt</option>
-                  <option value="Polo">Polo Shirt</option>
-                  <option value="Dress">Dress / One-Piece</option>
-                  <option value="Jacket">Jacket / Outerwear</option>
+                  <option value="Tops">T-Shirt / Tops</option>
+                  <option value="Shirts">Shirts</option>
+                  <option value="Trousers">Trousers</option>
+                  <option value="Jeans">Jeans</option>
+                  <option value="Skirts">Skirts</option>
+                  <option value="Dresses">Dresses</option>
+                  <option value="Jackets">Jackets</option>
+                  <option value="T-Shirt">T-Shirt (Legacy)</option>
                 </select>
               </div>
 
@@ -757,6 +814,69 @@ export default function MerchantGarmentStudio() {
                 value={identity.description}
                 onChange={(e) => setIdentity({ ...identity, description: e.target.value })}
               />
+            </div>
+
+            {/* Dual-Mode Virtual Try-On Options */}
+            <div
+              data-testid="seller-tryon-options"
+              style={{
+                marginTop: '14px',
+                marginBottom: '16px',
+                padding: '16px',
+                borderRadius: '12px',
+                border: '2px solid #151515',
+                background: '#FFF8F1',
+              }}
+            >
+              <div style={{ fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', marginBottom: '6px' }}>
+                Choose Virtual Try-On Options
+              </div>
+              <p style={{ fontSize: '12.5px', color: '#475569', margin: '0 0 12px' }}>
+                Decide how shoppers can try on this piece. Image Try-On only listings require garment photos without forcing 3D modelling.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '10px' }}>
+                {[
+                  {
+                    id: 'IMAGE_ONLY',
+                    title: 'Image Try-On only',
+                    desc: 'Upload product photos and publish without building a 3D model.',
+                  },
+                  {
+                    id: 'THREE_D_ONLY',
+                    title: '3D Try-On only',
+                    desc: 'Create and verify S/M/L 3D fit models; photo try-on disabled.',
+                  },
+                  {
+                    id: 'IMAGE_AND_THREE_D',
+                    title: 'Both Image & 3D Try-On',
+                    desc: 'Offer shoppers both photo try-on and interactive 3D fitting.',
+                  },
+                ].map((opt) => {
+                  const selected = (identity.try_on_mode || 'IMAGE_AND_THREE_D') === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      data-testid={`seller-mode-${opt.id}`}
+                      onClick={() => handleSelectTryOnMode(opt.id)}
+                      style={{
+                        textAlign: 'left',
+                        padding: '12px',
+                        borderRadius: '10px',
+                        border: selected ? '2.5px solid #FF3D9A' : '2px solid #151515',
+                        background: selected ? '#fff' : '#f8fafc',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <div style={{ fontWeight: 900, fontSize: '13px', marginBottom: '4px' }}>
+                        {selected ? '✓ ' : ''}
+                        {opt.title}
+                      </div>
+                      <div style={{ fontSize: '11.5px', color: '#475569', lineHeight: 1.4 }}>{opt.desc}</div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="actions-row">
@@ -875,9 +995,25 @@ export default function MerchantGarmentStudio() {
               <button type="button" className="btn-secondary-merchant" onClick={() => setActiveStep(1)}>
                 <ArrowLeft size={16} /> BACK
               </button>
-              <button type="button" className="btn-primary-merchant" onClick={() => setActiveStep(3)}>
-                CONTINUE TO PATTERN SPECIFICATION <ArrowRight size={16} />
-              </button>
+              {identity.try_on_mode === 'IMAGE_ONLY' ? (
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <button type="button" className="btn-secondary-merchant" onClick={() => setActiveStep(3)}>
+                    Optional: Sizes &amp; Fabric
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="skip-to-publish-image-only-btn"
+                    className="btn-primary-merchant"
+                    onClick={() => setActiveStep(6)}
+                  >
+                    CONTINUE TO REVIEW &amp; PUBLISH <ArrowRight size={16} />
+                  </button>
+                </div>
+              ) : (
+                <button type="button" className="btn-primary-merchant" onClick={() => setActiveStep(3)}>
+                  CONTINUE TO PATTERN SPECIFICATION <ArrowRight size={16} />
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -1412,15 +1548,29 @@ export default function MerchantGarmentStudio() {
 
             {/* Pipeline Trigger & Progress Banner */}
             <div className="generate-trigger-bar">
-              <button
-                type="button"
-                className="btn-generate-hero"
-                onClick={handleGenerate3D}
-                disabled={isGenerating}
-              >
-                {isGenerating ? <Cpu className="animate-spin" size={20} /> : <Sparkles size={20} />}
-                <span>{isGenerating ? 'CREATING YOUR PREVIEW...' : 'CREATE 3D PREVIEW & CHECK SHAPE'}</span>
-              </button>
+              {identity.try_on_mode === 'IMAGE_ONLY' ? (
+                <button
+                  type="button"
+                  data-testid="verify-image-tryon-btn"
+                  className="btn-generate-hero"
+                  onClick={handlePrepareImageTryOn}
+                  disabled={loading}
+                >
+                  <CheckCircle2 size={20} />
+                  <span>{loading ? 'VERIFYING PHOTOS...' : 'VERIFY PHOTOS FOR IMAGE TRY-ON (NO 3D REQUIRED)'}</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  data-testid="create-3d-preview-btn"
+                  className="btn-generate-hero"
+                  onClick={handleGenerate3D}
+                  disabled={isGenerating}
+                >
+                  {isGenerating ? <Cpu className="animate-spin" size={20} /> : <Sparkles size={20} />}
+                  <span>{isGenerating ? 'CREATING YOUR PREVIEW...' : 'CREATE 3D PREVIEW & CHECK SHAPE'}</span>
+                </button>
+              )}
             </div>
 
             {/* 13 Pipeline Stages (if triggered or generated) */}
@@ -1440,8 +1590,39 @@ export default function MerchantGarmentStudio() {
             )}
 
             <div className="preview-stage-layout">
-              {/* Left Column: 3D Studio Canvas with Static Mannequin */}
+              {/* Left Column: 3D Studio Canvas OR Image Try-On Photo Summary */}
               <div>
+                {identity.try_on_mode === 'IMAGE_ONLY' ? (
+                  <div
+                    data-testid="seller-image-only-preview"
+                    style={{
+                      padding: '24px',
+                      borderRadius: '14px',
+                      border: '2px solid #151515',
+                      background: '#FFF8F1',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <h3 style={{ margin: '0 0 8px', fontSize: '16px', fontWeight: 900 }}>
+                      Image Try-On Listing Ready (No 3D Model Required)
+                    </h3>
+                    <p style={{ fontSize: '13px', color: '#475569', margin: '0 0 16px' }}>
+                      Shoppers will see your product photos and use Image Try-On on the product page.
+                    </p>
+                    {uploadedImages.front ? (
+                      <img
+                        src={uploadedImages.front}
+                        alt={identity.name || 'Front garment photo'}
+                        style={{ maxWidth: '100%', maxHeight: '320px', objectFit: 'contain', borderRadius: '10px', border: '1.5px solid #151515', background: '#fff' }}
+                      />
+                    ) : (
+                      <div style={{ padding: '18px', borderRadius: '8px', border: '1.5px dashed #dc2626', color: '#991b1b', fontWeight: 700, fontSize: '13px' }}>
+                        Upload a front garment photo in Step 2 before publishing.
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <>
                 {downstreamStale && (
                   <div
                     data-testid="downstream-stale-banner"
@@ -1528,6 +1709,8 @@ export default function MerchantGarmentStudio() {
                     </div>
                   </div>
                 </div>
+                  </>
+                )}
               </div>
 
               {/* Right Column: Controls, QA Report, Approval & Publication */}
@@ -1682,10 +1865,10 @@ export default function MerchantGarmentStudio() {
                   <button
                     type="button"
                     className="btn-secondary-merchant"
-                    onClick={() => navigate(identity.sku && identity.sku !== 'TSH-WW-CREW-001' ? `/try-on?sku=${encodeURIComponent(identity.sku)}&size=${previewSize}` : '/try-on')}
+                    onClick={() => navigate(identity.sku ? `/product/${encodeURIComponent(identity.sku)}` : '/explore')}
                     style={{ justifyContent: 'center', padding: '12px' }}
                   >
-                    OPEN IN SHOPPER TRY-ON STUDIO →
+                    OPEN PRODUCT LISTING AS SHOPPER →
                   </button>
                 </div>
               </div>

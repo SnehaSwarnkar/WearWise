@@ -36,6 +36,8 @@ import { HonestFitPage } from './pages/HonestFit';
 import MerchantGarmentStudio from './pages/MerchantGarmentStudio';
 import Phase10SimPage from './experimental_phase10/Phase10SimPage';
 import ExperimentalTryOnPage from './experimental_phase10/ExperimentalTryOnPage';
+import ProductDetailPage from './pages/ProductDetailPage';
+import ImageTryOnPage from './pages/ImageTryOnPage';
 
 /** Redirect unauthenticated commerce shoppers to /login */
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -50,6 +52,8 @@ export const App: React.FC = () => {
       {/* ── Public Storefront ── */}
       <Route path="/" element={<Home />} />
       <Route path="/explore" element={<Explore />} />
+      <Route path="/product/:sku" element={<ProductDetailPage />} />
+      <Route path="/image-try-on" element={<ImageTryOnPage />} />
       <Route path="/my-style" element={<MyStyle />} />
       <Route path="/try-on" element={<TryOn />} />
       <Route path="/style-analysis" element={<StyleAnalysis />} />

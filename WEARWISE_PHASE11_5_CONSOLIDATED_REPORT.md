@@ -31,7 +31,7 @@
 - **Removed from Shopper UI:** `Developer Diagnostics` panel, `FPS`, `web_worker`, `SETTLING`/`RUNNING`, `Welded Particles`, `SHA-256`, `HTTP 409`, and raw error details.
 - **New Shopper Experience:**
   - Displays **Your Recommended Size** (`L` for Athletic `100 cm` chest; `S` for Petite `86 cm` chest), **Expected Fit** (`Snug fit`, `Regular fit`, `Relaxed fit`, `Too tight`, `Too loose`, or `Recommendation unavailable`), **Why this size?**, and **Compare Sizes** buttons.
-  - Verified clean in [shopper_tryon_desktop.png](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/artifacts/phase11/phase11_5/shopper_tryon_desktop.png) and [shopper_tryon_mobile.png](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/artifacts/phase11/phase11_5/shopper_tryon_mobile.png).
+  - Historical Phase 11.5 desktop & mobile screenshots captured in `run_phase11_5_full_e2e.py` (superseded by Phase 12/12.1 evidence in `artifacts/phase12/`).
 
 ---
 
@@ -42,13 +42,13 @@
   - Stages: `1. Add product details`, `2. Upload product photos`, `3. Choose garment style`, `4. Add size measurements`, `5. Choose fabric`, `6. Preview & publish`.
   - Status summary banner (`seller-status-summary`): `Not started`, `In progress`, `Needs attention`, `Ready to review`, `Published` with one clear next step.
   - Replaced jargon (`GENERATE SIZE-GRADED 3D GARMENTS & RUN QA` → `CREATE 3D PREVIEW & CHECK SHAPE`; `Stale Downstream Output` → `This preview is outdated...`).
-  - Verified in [seller_studio_simplified.png](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/artifacts/phase11/phase11_5/seller_studio_simplified.png).
+  - Historical Seller Studio screenshot verified during Phase 11.5 (superseded by Phase 12.1 `artifacts/phase12/07_seller_studio_options_desktop.png`).
 
 ---
 
 ## D. Avatar Calibration & Updated 5×3 Fit Matrix
 
-Executed via [run_phase11_0_and_11_1.py](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/artifacts/phase11/run_phase11_0_and_11_1.py) (`avatar_calibration_results.json` & `body_shape_fit_matrix.json`):
+Executed via Phase 11.0/11.1 closed-loop calibration script (`avatar_calibration_results` & `body_shape_fit_matrix`):
 
 | Test Profile | Stature | Target → Extracted Chest (Err) | Target → Extracted Waist (Err) | S Fit | M Fit | L Fit |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -64,12 +64,12 @@ Executed via [run_phase11_0_and_11_1.py](file:///c:/Users/Lenovo/Documents/Major
 
 ## E. Commerce Integration Evidence
 
-Executed in [run_phase11_5_full_e2e.py](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/artifacts/phase11/run_phase11_5_full_e2e.py) ([phase11_5_e2e_results.json](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/artifacts/phase11/phase11_5/phase11_5_e2e_results.json)):
+Executed in Phase 11.5 historical verification (`phase11_5_e2e_results`):
 - **Canonical Session:** `ww-session-id` = `sess_oplvejb57` shared across `/experimental-try-on` → `/cart` → `/checkout` → `/order-confirmation`.
 - **Verified Steps:**
   1. Added `TSH-WW-PHASE11-ACCEPTANCE-001` Size `S` from `/experimental-try-on` (`addToCart`).
-  2. Opened `/cart`: item appeared (`cart_has_item: true`), persisted across full page reload (`cart_persisted_after_reload: true`), quantity incremented to `2` (`₹5,998`, [cart_persisted_qty2.png](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/artifacts/phase11/phase11_5/cart_persisted_qty2.png)).
-  3. Completed demo checkout on `/checkout` (`demo_order_placed: true`, [checkout_confirmation.png](file:///c:/Users/Lenovo/Documents/Major%20Project/WearWise/artifacts/phase11/phase11_5/checkout_confirmation.png)).
+  2. Opened `/cart`: item appeared (`cart_has_item: true`), persisted across full page reload (`cart_persisted_after_reload: true`), quantity incremented to `2` (`₹5,998`).
+  3. Completed demo checkout on `/checkout` (`demo_order_placed: true`).
   4. Note: Navigating to `/orders` redirects unauthenticated guests to `/login` (`<PrivateRoute>`).
 
 ---

@@ -243,3 +243,27 @@ export async function fetchShopperGarmentAsset(garmentId, size = 'M') {
   if (!res.ok) throw new Error('Garment asset not published or unavailable');
   return res.json();
 }
+
+export async function updateTryOnMode(garmentId, tryOnMode) {
+  const res = await fetch(`${BASE_URL}/${garmentId}/try-on-mode`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ try_on_mode: tryOnMode }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to update virtual try-on mode');
+  }
+  return res.json();
+}
+
+export async function prepareImageTryOn(garmentId) {
+  const res = await fetch(`${BASE_URL}/${garmentId}/prepare-image-tryon`, {
+    method: 'POST',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to verify Image Try-On listing readiness');
+  }
+  return res.json();
+}

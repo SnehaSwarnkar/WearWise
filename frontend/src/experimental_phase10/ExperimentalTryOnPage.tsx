@@ -5,6 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import Header from '../pages/Header';
 import { addToCart } from '../api/cart';
+import { fetchProductBySku } from '../api/products';
 import { ARTICULATED_POSES } from './ArticulatedPoseLibrary';
 import { WorkerClothClient } from './WorkerClothClient';
 
@@ -139,10 +140,12 @@ export default function ExperimentalTryOnPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const sku = searchParams.get('sku') || 'TSH-WW-PHASE11-ACCEPTANCE-001';
   const requestedRev = searchParams.get('revision');
+  const selectedColor = searchParams.get('color') || 'Coral Pink';
   const [selectedSize, setSelectedSize] = useState<string>(searchParams.get('size') || 'M');
   const [selectedAvatarId, setSelectedAvatarId] = useState<string>(STAGING_AVATAR_PROFILES[0].id);
 
   const [garmentMeta, setGarmentMeta] = useState<ResolvedGarmentAsset | null>(null);
+  const [catalogProduct, setCatalogProduct] = useState<any>(null);
   const [loadState, setLoadState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -172,6 +175,18 @@ export default function ExperimentalTryOnPage() {
     setCartMsg(null);
 
     try {
+      const prod = await fetchProductBySku(sku).catch(() => null);
+      setCatalogProduct(prod);
+      if (prod?.tryOnCapabilities && prod.tryOnCapabilities.threeDTryOnEnabled === false) {
+        setGarmentMeta(null);
+        setLoadState('error');
+        setErrorMsg(
+          prod.tryOnCapabilities.threeDDisabledReason ||
+            'Interactive 3D Try-On is disabled by the seller for this item.'
+        );
+        return;
+      }
+
       const revQuery = requestedRev ? `&revision=${encodeURIComponent(requestedRev)}` : '';
       const metaUrl = `${BODY_ENGINE_BASE}/api/v1/merchant/garments/${encodeURIComponent(sku)}/shopper-asset?size=${encodeURIComponent(selectedSize)}${revQuery}`;
       const res = await fetch(metaUrl, { cache: 'no-store' });
@@ -229,9 +244,10 @@ export default function ExperimentalTryOnPage() {
     clientRef.current = client;
 
     const loader = new GLTFLoader();
-    const garmentAssetFullUrl = garmentMeta.asset_url.startsWith('http')
-      ? garmentMeta.asset_url
-      : `${BODY_ENGINE_BASE}${garmentMeta.asset_url}`;
+    const garmentAssetFullUrl =
+      garmentMeta.asset_url.startsWith('http') || garmentMeta.asset_url.startsWith('/garments/')
+        ? garmentMeta.asset_url
+        : `${BODY_ENGINE_BASE}${garmentMeta.asset_url}`;
 
     let disposed = false;
     Promise.all([
@@ -352,16 +368,16 @@ export default function ExperimentalTryOnPage() {
     setCartMsg(null);
     try {
       await addToCart({
-        id: 1,
+        id: catalogProduct?.id || 1,
         sku: garmentMeta.sku,
         published_revision: garmentMeta.revision,
         name: garmentMeta.name,
-        price: 2999,
+        price: catalogProduct?.price || 2999,
         size: selectedSize,
         quantity: 1,
-        image: '/garments/reference_front.jpg',
-        brand: 'WEARWISE EDIT',
-        color: 'Coral Pink',
+        image: catalogProduct?.image || undefined,
+        brand: catalogProduct?.seller_name || catalogProduct?.brand || 'WEARWISE EDIT',
+        color: selectedColor,
       });
       setCartMsg(`Added ${garmentMeta.name} (Size ${selectedSize}) to your bag.`);
     } catch {
@@ -419,11 +435,16 @@ export default function ExperimentalTryOnPage() {
               Virtual Fitting Room
             </span>
             <h1 style={{ fontSize: '28px', fontWeight: 900, margin: '4px 0' }}>
-              {garmentMeta?.name || 'Boxy Crew Tee'}
+              {catalogProduct?.name || garmentMeta?.name || 'Boxy Crew Tee'}
             </h1>
             <p style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: '#151515' }}>
-              ₹2,999 · Size {selectedSize} · {garmentMeta?.fabric_profile?.name || 'Cotton Waffle Knit (240 GSM)'}
+              ₹{Number(catalogProduct?.price || 2999).toLocaleString('en-IN')} · Size {selectedSize} · {garmentMeta?.fabric_profile?.name || 'Cotton Waffle Knit (240 GSM)'}
             </p>
+            <div style={{ marginTop: '6px' }}>
+              <Link to={`/product/${encodeURIComponent(sku)}`} style={{ fontSize: '12px', fontWeight: 800, color: '#151515', textDecoration: 'underline' }}>
+                ← Back to Product Details
+              </Link>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
             <Link

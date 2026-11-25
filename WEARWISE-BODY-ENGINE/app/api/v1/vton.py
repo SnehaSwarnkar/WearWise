@@ -1,33 +1,43 @@
 """
-FastAPI Router for Mode B AI Photo Virtual Try-On
+FastAPI Router for Image-Based AI Photo Virtual Try-On
 Endpoint base: /api/v1/try-on/vton
+Enforces explicit consent, honest provider availability, user ownership,
+and private non-cached asset delivery.
 """
 
 import uuid
-from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status, Response
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
 
 from app.api.auth import get_current_user_id
-from app.services.vton_job_service import VTONJobService
 from app.services.person_image_service import ValidationError
-from app.services.vton_provider import DeterministicMultiViewProvider
+from app.services.vton_job_service import VTONJobService
+from app.services.vton_provider import (
+    HonestVTONProviderAdapter,
+    VTONProviderUnavailableError,
+)
 
 router = APIRouter(prefix="/try-on/vton", tags=["AI Photo Virtual Try-On"])
 
-# Service singleton
-_job_service = VTONJobService()
-_provider = DeterministicMultiViewProvider()
+_provider = HonestVTONProviderAdapter()
+_job_service = VTONJobService(provider=_provider)
+
+
+def _require_owned_job(job_id: str, user_id: uuid.UUID) -> Dict[str, Any]:
+    try:
+        job = _job_service.get_job_owned(job_id, str(user_id))
+    except PermissionError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Try-on job not found")
+    return job
 
 
 @router.get("/providers")
 def get_vton_providers():
-    """
-    Returns hardware verification telemetry, local VRAM status, and candidate model assessments
-    (FASHN VTON v1.5 and WACV 2026 multi-view research).
-    """
+    """Returns honest AI photo try-on provider availability and hardware checks."""
     return _provider.get_provider_metadata()
 
 
@@ -35,12 +45,12 @@ def get_vton_providers():
 async def create_vton_job(
     file: UploadFile = File(...),
     garment_sku: str = Form("TSH-WW-CREW-001"),
-    consent: bool = Form(True),
+    consent: bool = Form(False),
     user_id: uuid.UUID = Depends(get_current_user_id),
 ):
     """
-    Initiates an asynchronous multi-view virtual try-on job for an uploaded real-person photograph.
-    Accepts real-person photographs only. Rejects synthetic Anny avatars.
+    Validates shopper consent and real-person photograph (stripping EXIF),
+    then submits to an active external VTON provider or fails honestly with 503.
     """
     try:
         content = await file.read()
@@ -54,19 +64,27 @@ async def create_vton_job(
         return {
             "job_id": job["id"],
             "status": job["status"],
-            "message": "AI Photo Virtual Try-On job queued successfully. Generating 3 distinct views (Front, Side, Back).",
+            "message": "Your photo try-on request is processing.",
             "garment_sku": garment_sku,
             "created_at": job["created_at"],
         }
     except ValidationError as ve:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail={"error": "VALIDATION_FAILED", "message": str(ve)},
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail={"code": "VALIDATION_FAILED", "message": str(ve)},
         )
-    except Exception as e:
+    except VTONProviderUnavailableError as pue:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "code": "PROVIDER_UNAVAILABLE",
+                "message": str(pue),
+            },
+        )
+    except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"error": "PROCESSING_FAILED", "message": str(e)},
+            detail={"code": "PROCESSING_FAILED", "message": str(exc)},
         )
 
 
@@ -75,11 +93,11 @@ def get_job_status(
     job_id: str,
     user_id: uuid.UUID = Depends(get_current_user_id),
 ):
-    """Retrieves current job status, lifecycle stage, and progress percentage."""
-    job = _job_service.get_job(job_id)
-    if not job:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="VTON job not found")
-    return job
+    """Retrieves current job status and progress for the owning shopper."""
+    job = _require_owned_job(job_id, user_id)
+    # Never expose internal filesystem path over API
+    safe_job = {k: v for k, v in job.items() if k != "person_image_path"}
+    return safe_job
 
 
 @router.get("/jobs/{job_id}/results")
@@ -87,22 +105,15 @@ def get_job_results(
     job_id: str,
     user_id: uuid.UUID = Depends(get_current_user_id),
 ):
-    """
-    Returns the three distinct generated view images (Front, Side, Back)
-    along with confidence scores and inferred view disclaimers.
-    """
-    job = _job_service.get_job(job_id)
-    if not job:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="VTON job not found")
-
+    """Returns completed try-on result views strictly for the owning shopper."""
+    job = _require_owned_job(job_id, user_id)
     if job["status"] not in ("completed", "failed"):
         return {
             "job_id": job_id,
             "status": job["status"],
-            "progress_percent": job.get("progress_percent", 0),
-            "message": f"Job is currently {job['status']}. Please poll until completed.",
+            "progress_percent": job["progress_percent"],
+            "views": {},
         }
-
     return _job_service.get_results(job_id)
 
 
@@ -111,28 +122,37 @@ def delete_vton_job(
     job_id: str,
     user_id: uuid.UUID = Depends(get_current_user_id),
 ):
-    """
-    Permanently deletes try-on job, uploaded photograph, and all 3 generated view assets.
-    """
-    job = _job_service.get_job(job_id)
-    if not job:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="VTON job not found")
-
+    """Permanently deletes a try-on job and all generated result images for the owner."""
+    _require_owned_job(job_id, user_id)
     success = _job_service.delete_job(job_id)
     return {
         "job_id": job_id,
         "deleted": success,
-        "message": "Job records and all associated image assets permanently removed.",
+        "message": "Your try-on session and images have been permanently deleted.",
     }
 
 
 @router.get("/images/{filename}")
-def get_vton_image(filename: str):
+def get_vton_image(
+    filename: str,
+    user_id: uuid.UUID = Depends(get_current_user_id),
+):
     """
-    Streams an individually addressable generated view asset or uploaded photograph.
+    Streams an owner-scoped generated view image with strict no-store privacy headers.
+    Raw uploaded customer photographs are never exposed publicly.
     """
+    if filename.startswith("person_"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Raw uploaded photos are private.")
+    job_prefix = filename.split("_", 1)[0] if "_" in filename else ""
+    if job_prefix:
+        _require_owned_job(job_prefix, user_id)
+
     asset_path = _job_service.storage_service.get_asset_path(filename)
     if not asset_path or not asset_path.exists():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image asset not found")
     media_type = "image/png" if filename.endswith(".png") else "image/jpeg"
-    return FileResponse(asset_path, media_type=media_type)
+    return FileResponse(
+        asset_path,
+        media_type=media_type,
+        headers={"Cache-Control": "private, no-store"},
+    )

@@ -36,12 +36,15 @@ from app.services.garment_platform.lifecycle_store import (
     COLL_ASSETS,
     COLL_JOBS,
     COLL_REVISIONS,
+    VALID_TRY_ON_MODES,
     approve_revision,
+    compute_try_on_capabilities,
     ensure_garment_indexes,
     execute_generation_pipeline,
     get_revision_doc,
     list_revisions,
     mark_downstream_stale,
+    prepare_image_tryon_revision,
     publish_revision,
     record_audit_event,
     rollback_revision,
@@ -207,6 +210,11 @@ class ProductIdentityPayload(BaseModel):
     currency: str = Field("INR", example="INR")
     available_sizes: List[str] = Field(default=["S", "M", "L"], example=["S", "M", "L"])
     brand_id: Optional[str] = None
+    try_on_mode: str = Field("IMAGE_AND_THREE_D", example="IMAGE_AND_THREE_D")
+
+
+class TryOnModePayload(BaseModel):
+    try_on_mode: str = Field(..., example="IMAGE_AND_THREE_D")
 
 
 class GuidedPatternPayload(BaseModel):
@@ -418,7 +426,11 @@ def list_merchant_garments(
     docs = mongo.find_documents(COLL_GARMENTS, {"brand_id": b_id, "is_deleted": False})
     if not docs:
         seed_doc = _create_seed_garment(b_id)
-        return [seed_doc]
+        return [{**seed_doc, "try_on_capabilities": compute_try_on_capabilities(seed_doc)}]
+    for d in docs:
+        if "try_on_mode" not in d:
+            d["try_on_mode"] = "IMAGE_AND_THREE_D"
+        d["try_on_capabilities"] = compute_try_on_capabilities(d)
     return docs
 
 
@@ -433,6 +445,12 @@ def create_digital_garment(
     """
     ensure_garment_indexes()
     brand_id = str(auth_brand_id)
+    mode = str(payload.try_on_mode or "IMAGE_AND_THREE_D").upper()
+    if mode not in VALID_TRY_ON_MODES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid try_on_mode '{payload.try_on_mode}'. Must be one of {sorted(VALID_TRY_ON_MODES)}.",
+        )
 
     # Duplicate SKU check
     existing = mongo.find_document(COLL_GARMENTS, {"sku": payload.sku, "is_deleted": False})
@@ -458,6 +476,8 @@ def create_digital_garment(
         "price": payload.price,
         "currency": payload.currency,
         "available_sizes": payload.available_sizes,
+        "try_on_mode": mode,
+        "try_on_capabilities": compute_try_on_capabilities({"try_on_mode": mode, "images_meta": []}),
         "status": "draft",  # draft -> needs_review -> approved -> published
         "step_completed": 1,
         "revision": 0,
@@ -922,6 +942,48 @@ def save_fabric_properties(
     return garment
 
 
+@router.post("/{garment_id}/try-on-mode")
+def update_try_on_mode(
+    garment_id: str,
+    payload: TryOnModePayload,
+    auth_brand_id: uuid.UUID = Depends(get_current_brand_id),
+):
+    """Configures which virtual try-on experiences shoppers can use for this listing."""
+    garment = _require_owned_garment(garment_id, auth_brand_id)
+    mode = str(payload.try_on_mode or "").upper()
+    if mode not in VALID_TRY_ON_MODES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid try-on mode '{payload.try_on_mode}'. Choose IMAGE_ONLY, THREE_D_ONLY, or IMAGE_AND_THREE_D.",
+        )
+
+    updated_doc = {**garment, "try_on_mode": mode}
+    caps = compute_try_on_capabilities(updated_doc)
+    now = datetime.now(timezone.utc).isoformat()
+    update_fields = {
+        "try_on_mode": mode,
+        "try_on_capabilities": caps,
+        "updated_at": now,
+    }
+    mongo.update_document(COLL_GARMENTS, {"id": garment_id}, {"$set": update_fields})
+    garment.update(update_fields)
+    record_audit_event(garment_id, garment.get("sku", ""), str(auth_brand_id), "TRY_ON_MODE_UPDATED", {"try_on_mode": mode})
+    return garment
+
+
+@router.post("/{garment_id}/prepare-image-tryon")
+def prepare_image_tryon(
+    garment_id: str,
+    auth_brand_id: uuid.UUID = Depends(get_current_brand_id),
+):
+    """Verifies front storefront imagery and creates an IMAGE_ONLY revision ready for review/publish without 3D generation."""
+    garment = _require_owned_garment(garment_id, auth_brand_id)
+    try:
+        return prepare_image_tryon_revision(garment_doc=garment, brand_id=str(auth_brand_id))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
 @router.post("/{garment_id}/generate")
 def generate_3d_digital_garment(
     garment_id: str,
@@ -1083,6 +1145,8 @@ def get_shopper_asset(garment_id: str, size: str = "M", revision: Optional[int] 
     garment = mongo.find_document(COLL_GARMENTS, {"id": garment_id, "is_deleted": False})
     if not garment:
         garment = mongo.find_document(COLL_GARMENTS, {"sku": garment_id, "is_deleted": False})
+    if not garment and garment_id == "TSH-WW-CREW-001":
+        garment = _create_seed_garment(DEFAULT_BRAND_ID)
     if not garment:
         raise HTTPException(status_code=404, detail=f"Garment {garment_id} not found")
 
@@ -1126,6 +1190,8 @@ def get_shopper_asset(garment_id: str, size: str = "M", revision: Optional[int] 
 
     mesh_assets = garment.get("mesh_assets", {})
     size_asset = mesh_assets.get(size)
+    if garment.get("sku") == "TSH-WW-CREW-001":
+        size_asset = f"/api/v1/merchant/garments/prototype-preview/TSH-WW-CREW-001/assets/{size.upper()}?revision=rev3"
     if not size_asset:
         raise HTTPException(status_code=404, detail=f"Size variant {size} not found in published garment")
 
@@ -1162,6 +1228,7 @@ def _create_seed_garment(brand_id: str) -> Dict[str, Any]:
         "color_variant": "Coral Pink / White Trim",
         "price": 2999.0,
         "available_sizes": ["S", "M", "L"],
+        "try_on_mode": "IMAGE_AND_THREE_D",
         "status": "published",
         "step_completed": 6,
         "revision": 1,

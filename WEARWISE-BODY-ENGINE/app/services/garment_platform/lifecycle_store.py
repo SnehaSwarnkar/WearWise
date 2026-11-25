@@ -13,6 +13,7 @@ import json
 import logging
 import os
 import shutil
+import threading
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -41,11 +42,70 @@ COLL_PUBLICATIONS = "garment_publications"
 COLL_AUDIT_EVENTS = "garment_audit_events"
 COLL_COMMERCE_PUBLICATIONS = "catalog_publications"
 
+VALID_TRY_ON_MODES = {"IMAGE_ONLY", "THREE_D_ONLY", "IMAGE_AND_THREE_D"}
+
+
+def has_storefront_front_photo(garment_doc: Dict[str, Any]) -> bool:
+    for im in garment_doc.get("images_meta", []):
+        roles = im.get("roles") or [im.get("role")]
+        if im.get("viewpoint") == "front" and any(r in ("storefront_gallery", "both") for r in roles):
+            return True
+    return False
+
+
+def has_any_storefront_photo(garment_doc: Dict[str, Any]) -> bool:
+    for im in garment_doc.get("images_meta", []):
+        roles = im.get("roles") or [im.get("role")]
+        if any(r in ("storefront_gallery", "both") for r in roles):
+            return True
+    return False
+
+
+def compute_try_on_capabilities(
+    garment_doc: Dict[str, Any],
+    size_variants: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    raw_mode = str(garment_doc.get("try_on_mode") or "IMAGE_AND_THREE_D").upper()
+    mode = raw_mode if raw_mode in VALID_TRY_ON_MODES else "IMAGE_AND_THREE_D"
+    sv = size_variants if size_variants is not None else (garment_doc.get("size_variants") or garment_doc.get("mesh_assets") or {})
+    has_3d = bool(sv) and any(
+        isinstance(v, dict) and bool(v.get("asset_url")) or isinstance(v, str)
+        for k, v in sv.items()
+        if k in ("S", "M", "L", "XS", "XL")
+    )
+    has_photos = has_any_storefront_photo(garment_doc)
+    image_req = mode in ("IMAGE_ONLY", "IMAGE_AND_THREE_D")
+    three_d_req = mode in ("THREE_D_ONLY", "IMAGE_AND_THREE_D")
+    return {
+        "mode": mode,
+        "imageTryOnEnabled": image_req and has_photos,
+        "threeDTryOnEnabled": three_d_req and has_3d,
+        "imageTryOnReady": image_req and has_photos,
+        "threeDTryOnReady": three_d_req and has_3d,
+        "imageDisabledReason": (
+            None
+            if not image_req
+            else (None if has_photos else "Upload a front storefront photo before enabling Image Try-On.")
+        )
+        if image_req
+        else "The seller configured this item exclusively for Interactive 3D Try-On.",
+        "threeDDisabledReason": (
+            None
+            if three_d_req and has_3d
+            else (
+                "The seller has not enabled Interactive 3D Try-On for this item."
+                if not three_d_req
+                else "3D garment model assets have not been generated and approved yet."
+            )
+        ),
+    }
+
 BODY_ENGINE_ROOT = Path(__file__).resolve().parents[3]
 PRIVATE_STORAGE_ROOT = BODY_ENGINE_ROOT / "artifacts" / "merchant_private"
 PUBLISHED_CATALOG_ROOT = BODY_ENGINE_ROOT / "artifacts" / "published_catalog"
 
 _indexes_initialized = False
+_publish_lock = threading.Lock()
 
 
 def ensure_garment_indexes() -> None:
@@ -495,6 +555,92 @@ def execute_generation_pipeline(
         raise
 
 
+def prepare_image_tryon_revision(
+    garment_doc: Dict[str, Any],
+    brand_id: str,
+) -> Dict[str, Any]:
+    """
+    Prepares an immutable revision for sellers who selected IMAGE_ONLY try-on
+    so they can verify photos & listing details and publish without forced 3D mesh generation.
+    """
+    ensure_garment_indexes()
+    mode = str(garment_doc.get("try_on_mode") or "IMAGE_ONLY").upper()
+    if mode != "IMAGE_ONLY":
+        raise ValueError("Image-only preparation is only valid when try-on mode is IMAGE_ONLY. Run 3D generation instead.")
+    if not has_storefront_front_photo(garment_doc):
+        raise ValueError("Upload a front storefront garment photograph before verifying Image Try-On readiness.")
+
+    garment_id = garment_doc["id"]
+    sku = garment_doc.get("sku", "")
+    next_rev = _next_revision_number(garment_doc)
+    now = datetime.now(timezone.utc).isoformat()
+    input_hash = compute_generation_input_hash(garment_doc)
+    qa_id = f"qa-img-{garment_id[:8]}-r{next_rev}"
+    qa_report = {
+        "qa_id": qa_id,
+        "garment_id": garment_id,
+        "sku": sku,
+        "revision": next_rev,
+        "overall_status": "PASSED",
+        "confidence_level": "IMAGE_VTON_READY",
+        "mode": "IMAGE_ONLY",
+        "summary": "Front garment photo and storefront details verified for Image Try-On.",
+        "validation_source": f"WearWise Image VTON Readiness Check (rev{next_rev})",
+        "asset_sha256_map": {},
+        "stale": False,
+    }
+    revision_doc = {
+        "garment_id": garment_id,
+        "sku": sku,
+        "brand_id": brand_id,
+        "revision": next_rev,
+        "parent_revision": garment_doc.get("revision") if next_rev > 1 else None,
+        "job_id": None,
+        "input_hash": input_hash,
+        "generator_version": "ImageOnlyVerification-v1",
+        "generation_mode": "IMAGE_ONLY",
+        "status": "AWAITING_APPROVAL",
+        "immutable": True,
+        "source_images": garment_doc.get("images_meta", []),
+        "measurements": garment_doc.get("measurements", {}),
+        "material_profile": garment_doc.get("fabric_properties", {}),
+        "mesh_assets": {},
+        "size_variants": {},
+        "asset_checksums": {},
+        "qa_id": qa_id,
+        "qa_report": qa_report,
+        "pipeline_stages": [
+            {"stage": 1, "name": "Storefront photo validation", "status": "completed", "details": "Front garment photo verified"},
+            {"stage": 2, "name": "Image Try-On capability readiness", "status": "completed", "details": "Ready for review and publication"},
+        ],
+        "created_by": brand_id,
+        "created_at": now,
+    }
+    mongo.upsert_document(COLL_REVISIONS, {"garment_id": garment_id, "revision": next_rev}, revision_doc)
+    update_garment = {
+        "revision": next_rev,
+        "active_revision": next_rev,
+        "qa_report": qa_report,
+        "status": "needs_review",
+        "downstream_stale": False,
+        "stale_reason": None,
+        "draft_dirty": False,
+        "step_completed": max(garment_doc.get("step_completed", 2), 6),
+        "updated_at": now,
+    }
+    mongo.update_document(COLL_GARMENTS, {"id": garment_id}, {"$set": update_garment})
+    garment_doc.update(update_garment)
+    record_audit_event(garment_id, sku, brand_id, "IMAGE_TRYON_VERIFIED", {"revision": next_rev})
+    return {
+        "garment_id": garment_id,
+        "revision": next_rev,
+        "status": "needs_review",
+        "revision_status": "AWAITING_APPROVAL",
+        "qa_report": qa_report,
+        "message": f"Verified Image Try-On listing rev{next_rev}. Ready for approval & publishing.",
+    }
+
+
 def approve_revision(
     garment_doc: Dict[str, Any],
     brand_id: str,
@@ -513,25 +659,31 @@ def approve_revision(
     if rev_doc.get("status") not in ("AWAITING_APPROVAL", "QA_PASSED"):
         raise ValueError(f"Revision rev{rev} is in status '{rev_doc.get('status')}' and cannot be approved.")
 
+    try_on_mode = str(garment_doc.get("try_on_mode") or "IMAGE_AND_THREE_D").upper()
+    if try_on_mode in ("IMAGE_ONLY", "IMAGE_AND_THREE_D") and not has_any_storefront_photo(garment_doc):
+        raise ValueError(f"Cannot approve rev{rev}: Image Try-On requires at least one storefront garment photo.")
+
     qa_report = rev_doc.get("qa_report") or {}
     if qa_report.get("overall_status") not in ("PASSED", "WARNING"):
         raise ValueError(f"Cannot approve rev{rev}: QA status is '{qa_report.get('overall_status', 'MISSING')}'.")
 
-    # Verify all required size assets exist on disk and match recorded SHA-256 + QA report hashes
-    available_sizes = garment_doc.get("available_sizes", ["S", "M", "L"])
-    qa_hashes = qa_report.get("asset_sha256_map", {})
-    for sz in available_sizes:
-        ast = mongo.find_document(COLL_ASSETS, {"garment_id": garment_id, "revision": rev, "size": sz})
-        if not ast:
-            raise ValueError(f"Missing size asset '{sz}' for revision rev{rev}.")
-        sp = ast.get("storage_path", "")
-        disk_sha = GarmentAssetManager.compute_sha256(sp)
-        if not disk_sha:
-            raise ValueError(f"Asset file missing on disk for size '{sz}' rev{rev}.")
-        if disk_sha != ast.get("sha256"):
-            raise ValueError(f"Checksum mismatch on disk for size '{sz}' rev{rev}.")
-        if qa_hashes and qa_hashes.get(sz) != disk_sha:
-            raise ValueError(f"QA report hash mismatch for size '{sz}' rev{rev}.")
+    is_image_only_rev = try_on_mode == "IMAGE_ONLY" and rev_doc.get("generation_mode") == "IMAGE_ONLY"
+    if not is_image_only_rev:
+        # Verify all required size 3D assets exist on disk and match recorded SHA-256 + QA report hashes
+        available_sizes = garment_doc.get("available_sizes", ["S", "M", "L"])
+        qa_hashes = qa_report.get("asset_sha256_map", {})
+        for sz in available_sizes:
+            ast = mongo.find_document(COLL_ASSETS, {"garment_id": garment_id, "revision": rev, "size": sz})
+            if not ast:
+                raise ValueError(f"Missing 3D size asset '{sz}' for revision rev{rev}. Run 3D model generation first.")
+            sp = ast.get("storage_path", "")
+            disk_sha = GarmentAssetManager.compute_sha256(sp)
+            if not disk_sha:
+                raise ValueError(f"3D asset file missing on disk for size '{sz}' rev{rev}.")
+            if disk_sha != ast.get("sha256"):
+                raise ValueError(f"Checksum mismatch on disk for size '{sz}' rev{rev}.")
+            if qa_hashes and qa_hashes.get(sz) != disk_sha:
+                raise ValueError(f"QA report hash mismatch for size '{sz}' rev{rev}.")
 
     now = datetime.now(timezone.utc).isoformat()
     approval_id = f"apr-{garment_id[:8]}-r{rev}-{uuid.uuid4().hex[:6]}"
@@ -593,25 +745,28 @@ def _copy_approved_assets_to_published(
     glb_paths: Dict[str, str] = {}
     published_size_variants: Dict[str, Any] = {}
     qa_report = rev_doc.get("qa_report") or {}
+    try_on_mode = str(garment_doc.get("try_on_mode") or "IMAGE_AND_THREE_D").upper()
+    is_image_only_rev = try_on_mode == "IMAGE_ONLY" and rev_doc.get("generation_mode") == "IMAGE_ONLY"
 
-    for sz in available_sizes:
-        ast = mongo.find_document(COLL_ASSETS, {"garment_id": garment_doc["id"], "revision": rev, "size": sz})
-        if not ast or not os.path.exists(ast["storage_path"]):
-            raise ValueError(f"Cannot publish rev{rev}: missing private asset for size {sz}.")
-        dst_glb = str(pub_dir / f"{sku}_{sz}_rev{rev}.glb")
-        if not os.path.exists(dst_glb):
-            shutil.copy2(ast["storage_path"], dst_glb)
-        sha256 = GarmentAssetManager.compute_sha256(dst_glb)
-        if sha256 != ast.get("sha256"):
-            raise ValueError(f"Published copy checksum mismatch for {sku} size {sz} rev{rev}.")
-        glb_paths[sz] = dst_glb
-        published_size_variants[sz] = {
-            "glb_file": f"{sku}_{sz}_rev{rev}.glb",
-            "asset_url": f"/api/products/sku/{sku}/revisions/{rev}/assets/{sz}",
-            "sha256": sha256,
-            "size_bytes": os.path.getsize(dst_glb),
-            "overall_prototype_qa": qa_report.get("overall_status", "PASSED"),
-        }
+    if not is_image_only_rev:
+        for sz in available_sizes:
+            ast = mongo.find_document(COLL_ASSETS, {"garment_id": garment_doc["id"], "revision": rev, "size": sz})
+            if not ast or not os.path.exists(ast["storage_path"]):
+                raise ValueError(f"Cannot publish rev{rev}: missing 3D asset for size {sz}.")
+            dst_glb = str(pub_dir / f"{sku}_{sz}_rev{rev}.glb")
+            if not os.path.exists(dst_glb):
+                shutil.copy2(ast["storage_path"], dst_glb)
+            sha256 = GarmentAssetManager.compute_sha256(dst_glb)
+            if sha256 != ast.get("sha256"):
+                raise ValueError(f"Published copy checksum mismatch for {sku} size {sz} rev{rev}.")
+            glb_paths[sz] = dst_glb
+            published_size_variants[sz] = {
+                "glb_file": f"{sku}_{sz}_rev{rev}.glb",
+                "asset_url": f"/api/products/sku/{sku}/revisions/{rev}/assets/{sz}",
+                "sha256": sha256,
+                "size_bytes": os.path.getsize(dst_glb),
+                "overall_prototype_qa": qa_report.get("overall_status", "PASSED"),
+            }
 
     # Copy ONLY storefront-safe images (never technical_reference-only images)
     storefront_images: List[Dict[str, Any]] = []
@@ -647,6 +802,21 @@ def publish_revision(
     publisher_id: str,
     target_revision: Optional[int] = None,
 ) -> Dict[str, Any]:
+    with _publish_lock:
+        return _publish_revision_locked(
+            garment_doc=garment_doc,
+            brand_id=brand_id,
+            publisher_id=publisher_id,
+            target_revision=target_revision,
+        )
+
+
+def _publish_revision_locked(
+    garment_doc: Dict[str, Any],
+    brand_id: str,
+    publisher_id: str,
+    target_revision: Optional[int] = None,
+) -> Dict[str, Any]:
     ensure_garment_indexes()
     garment_id = garment_doc["id"]
     sku = garment_doc.get("sku", "TSH-WW-CREW-001")
@@ -657,7 +827,15 @@ def publish_revision(
     if rev_doc.get("status") not in ("APPROVED", "PUBLISHED"):
         raise ValueError(f"Revision rev{rev} is in status '{rev_doc.get('status')}'. Explicit approval is required before publishing.")
 
+    try_on_mode = str(garment_doc.get("try_on_mode") or "IMAGE_AND_THREE_D").upper()
+    if try_on_mode in ("IMAGE_ONLY", "IMAGE_AND_THREE_D") and not has_any_storefront_photo(garment_doc):
+        raise ValueError(f"Cannot publish {sku} as '{try_on_mode}' without a storefront garment photograph.")
+
     copied = _copy_approved_assets_to_published(garment_doc, rev_doc, rev)
+    if try_on_mode in ("THREE_D_ONLY", "IMAGE_AND_THREE_D") and not copied["size_variants"]:
+        raise ValueError(f"Cannot publish {sku} as '{try_on_mode}' without approved S/M/L 3D assets.")
+
+    caps = compute_try_on_capabilities(garment_doc, size_variants=copied["size_variants"])
     now = datetime.now(timezone.utc).isoformat()
     published_ver = f"v{rev}.0"
 
@@ -725,6 +903,9 @@ def publish_revision(
                     "measurement_chart": rev_doc.get("measurements", {}),
                     "material_profile": rev_doc.get("material_profile", {}),
                     "storefront_images": copied["storefront_images"],
+                    "try_on_mode": try_on_mode,
+                    "try_on_capabilities": caps,
+                    "seller_name": garment_doc.get("seller_name", "WearWise Studio Merchant"),
                     "qa_summary": {
                         "qa_id": rev_doc.get("qa_id"),
                         "overall_status": rev_doc.get("qa_report", {}).get("overall_status"),
@@ -759,11 +940,13 @@ def publish_revision(
             "published_version": published_ver,
             "published_at": now,
             "published_by": publisher_id,
+            "try_on_mode": try_on_mode,
+            "try_on_capabilities": caps,
             "manifest": manifest,
             "updated_at": now,
         },
     )
-    record_audit_event(garment_id, sku, brand_id, "REVISION_PUBLISHED", {"revision": rev, "publication_id": pub_id})
+    record_audit_event(garment_id, sku, brand_id, "REVISION_PUBLISHED", {"revision": rev, "publication_id": pub_id, "try_on_mode": try_on_mode})
     return {
         "garment_id": garment_id,
         "sku": sku,
@@ -773,6 +956,8 @@ def publish_revision(
         "published_at": now,
         "published_by": publisher_id,
         "publication_id": pub_id,
+        "try_on_mode": try_on_mode,
+        "try_on_capabilities": caps,
         "manifest": manifest,
         "size_variants": copied["size_variants"],
         "message": f"Published {sku} rev{rev} ({published_ver}) to active catalog.",

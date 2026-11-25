@@ -11,3 +11,6 @@ scipy>=1.14.0
 trimesh>=4.5.0
 alembic>=1.14.0
 sqlalchemy>=2.0.0
+Pillow>=10.0.0
+pygltflib>=1.16.0
+torch>=2.2.0
