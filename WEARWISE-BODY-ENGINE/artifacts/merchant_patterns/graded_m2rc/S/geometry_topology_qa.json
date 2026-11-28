@@ -1,0 +1,85 @@
+{
+  "passed": true,
+  "errors": [],
+  "component_count": 7,
+  "component_names": [
+    "PANEL-FRONT-TORSO",
+    "PANEL-BACK-TORSO",
+    "PANEL-SLEEVE-L",
+    "PANEL-SLEEVE-R",
+    "PANEL-COLLAR-RIB",
+    "PANEL-HEM-BAND",
+    "PANEL-POCKET-CHEST"
+  ],
+  "garment_vertex_count": 3384,
+  "garment_face_count": 6096,
+  "welded_shell_vertices": 3002,
+  "welded_shell_edges": 8860,
+  "welded_shell_faces": 5856,
+  "euler_characteristic": -2,
+  "is_non_watertight": true,
+  "is_winding_consistent": true,
+  "degenerate_faces_count": 0,
+  "non_manifold_edges_count": 0,
+  "non_manifold_vertices_count": 0,
+  "shell_connected_components": 1,
+  "boundary_edges_count": 152,
+  "boundary_loops_count": 4,
+  "boundary_loops": [
+    {
+      "vertex_count": 28,
+      "closed": true,
+      "perimeter_cm": 38.92,
+      "centroid_m": [
+        0.2864,
+        1.0671,
+        -0.0627
+      ],
+      "classified_role": "Left Sleeve Cuff Opening"
+    },
+    {
+      "vertex_count": 28,
+      "closed": true,
+      "perimeter_cm": 38.92,
+      "centroid_m": [
+        -0.2864,
+        1.0671,
+        -0.0627
+      ],
+      "classified_role": "Right Sleeve Cuff Opening"
+    },
+    {
+      "vertex_count": 32,
+      "closed": true,
+      "perimeter_cm": 42.0,
+      "centroid_m": [
+        0.0,
+        1.3527,
+        -0.0802
+      ],
+      "classified_role": "Neckline Opening"
+    },
+    {
+      "vertex_count": 64,
+      "closed": true,
+      "perimeter_cm": 97.95,
+      "centroid_m": [
+        0.0,
+        0.715,
+        -0.0967
+      ],
+      "classified_role": "Bottom Hem Opening"
+    }
+  ],
+  "self_intersecting_triangle_pairs": 0,
+  "bounds_min_m": [
+    -0.3382,
+    0.715,
+    -0.2189
+  ],
+  "bounds_max_m": [
+    0.3382,
+    1.383,
+    0.0576
+  ]
+}

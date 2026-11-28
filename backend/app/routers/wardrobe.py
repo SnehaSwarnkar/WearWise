@@ -9,11 +9,16 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fastapi import APIRouter, File, Form, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
+from app.core.security import reject_seller_portal_access
 from app.schemas.wardrobe import WardrobeItem, WardrobeItemUpdate
 from app import database as db
 
-router = APIRouter(prefix="/api/wardrobe", tags=["Wardrobe"])
+router = APIRouter(
+    prefix="/api/wardrobe",
+    tags=["Wardrobe"],
+    dependencies=[Depends(reject_seller_portal_access)],
+)
 
 UPLOAD_DIR = Path(__file__).parent.parent.parent / "uploads" / "wardrobe"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)

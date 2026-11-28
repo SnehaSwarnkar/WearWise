@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="710.2" height="915.8" viewBox="0 0 710.2 915.8">
+  <rect width="100%" height="100%" fill="#fdfbf7"/>
+  <text x="16" y="22" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0f172a">SIZE S · PANEL-FRONT-TORSO — Front Torso Panel</text>
+  <text x="16" y="38" font-family="sans-serif" font-size="10" fill="#475569">Units: cm | Seam Allowance: 1.0 cm | Algorithmic 2D CAD Spec With Cutline (Verify Before Plotter Cutting)</text>
+  <polygon points="101.25,774.78 96.48,736.22 93.02,706.36 89.98,676.44 87.54,646.47 85.86,616.45 85.00,586.42 85.01,556.39 85.86,526.37 87.46,496.40 89.66,466.47 92.29,436.62 95.60,401.96 120.09,386.42 139.26,373.63 156.32,361.04 170.38,348.77 180.73,337.02 187.05,326.12 189.55,316.12 188.72,306.34 184.38,295.86 176.20,284.44 164.36,272.36 149.51,259.88 132.50,247.14 100.00,224.09 136.57,207.79 157.11,198.62 177.65,189.46 198.20,180.30 218.75,171.14 239.29,161.98 259.83,152.81 295.29,137.00 293.53,170.61 295.78,186.23 300.90,200.50 308.55,212.89 318.31,222.97 329.67,230.39 342.11,234.94 355.09,236.46 368.07,234.94 380.51,230.39 391.87,222.97 401.63,212.89 409.28,200.50 414.40,186.23 416.65,170.61 414.89,137.00 450.36,152.81 470.89,161.98 491.43,171.14 511.98,180.30 532.53,189.46 553.08,198.62 573.61,207.79 610.18,224.09 577.68,247.14 560.67,259.88 545.82,272.36 533.98,284.44 525.80,295.86 521.46,306.34 520.63,316.12 523.13,326.12 529.45,337.02 539.80,348.77 553.86,361.04 570.92,373.63 590.09,386.42 614.58,401.96 617.89,436.62 620.52,466.47 622.72,496.40 624.32,526.37 625.17,556.39 625.18,586.42 624.32,616.45 622.64,646.47 620.20,676.44 617.16,706.36 613.70,736.22 608.93,774.78" fill="none" stroke="#1e293b" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <polygon points="110.09,764.78 140.71,764.78 171.34,764.78 201.97,764.78 232.59,764.78 263.21,764.78 293.84,764.78 324.47,764.78 355.09,764.78 385.71,764.78 416.34,764.78 446.97,764.78 477.59,764.78 508.21,764.78 538.84,764.78 569.47,764.78 600.09,764.78 603.77,735.03 607.22,705.28 610.24,675.53 612.66,645.78 614.33,616.03 615.18,586.28 615.17,556.53 614.33,526.78 612.74,497.03 610.55,467.28 607.93,437.53 605.09,407.78 584.64,394.80 565.17,381.82 547.59,368.84 532.73,355.87 521.29,342.89 513.77,329.91 510.52,316.93 511.63,303.95 517.00,290.97 526.30,277.99 539.02,265.02 554.45,252.04 571.79,239.06 590.09,226.08 569.54,216.92 549.00,207.75 528.46,198.59 507.91,189.43 487.36,180.27 466.82,171.11 446.28,161.94 425.73,152.78 426.69,171.07 424.15,188.66 418.34,204.86 409.57,219.07 398.28,230.73 385.02,239.39 370.40,244.73 355.09,246.53 339.78,244.73 325.16,239.39 311.90,230.73 300.61,219.07 291.84,204.86 286.03,188.66 283.49,171.07 284.45,152.78 263.90,161.94 243.36,171.11 222.82,180.27 202.27,189.43 181.72,198.59 161.18,207.75 140.64,216.92 120.09,226.08 138.39,239.06 155.73,252.04 171.16,265.02 183.88,277.99 193.18,290.97 198.55,303.95 199.66,316.93 196.41,329.91 188.89,342.89 177.45,355.87 162.59,368.84 145.01,381.82 125.54,394.80 105.09,407.78 102.25,437.53 99.63,467.28 97.44,497.03 95.85,526.78 95.01,556.53 95.00,586.28 95.85,616.03 97.52,645.78 99.94,675.53 102.96,705.28 106.41,735.03" fill="#fce7f3" fill-opacity="0.65" stroke="#be185d" stroke-width="2.0"/>
+  <line x1="355.09" y1="684.78" x2="355.09" y2="314.78" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="355.1" y="493.8" font-family="sans-serif" font-size="9" fill="#475569" text-anchor="middle">GRAIN (vertical_warp)</text>
+  <text x="355.1" y="796.8" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">FRONT_BOTTOM_SEAM (49.00cm)</text>
+  <text x="638.2" y="603.8" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">FRONT_SIDE_L (35.81cm)</text>
+  <text x="537.5" y="299.7" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">FRONT_ARMHOLE_L (26.03cm)</text>
+  <text x="525.8" y="162.9" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">FRONT_SHOULDER_L (18.00cm)</text>
+  <text x="355.1" y="214.5" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">FRONT_NECKLINE (26.61cm)</text>
+  <text x="184.4" y="162.9" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">FRONT_SHOULDER_R (18.00cm)</text>
+  <text x="172.7" y="299.7" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">FRONT_ARMHOLE_R (26.03cm)</text>
+  <text x="72.0" y="603.8" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">FRONT_SIDE_R (35.81cm)</text>
+  <circle cx="355.09" cy="764.78" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <circle cx="355.09" cy="246.48" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <circle cx="605.09" cy="407.78" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <circle cx="105.09" cy="407.78" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <polyline points="396.79,256.78 396.79,376.78 406.79,386.78 496.79,386.78 506.79,376.78 506.79,256.78" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="4,3"/>
+  <line x1="16" y1="883.8" x2="38" y2="883.8" stroke="#be185d" stroke-width="2.0"/>
+  <text x="44" y="886.8" font-family="sans-serif" font-size="9.5" fill="#0f172a">Stitch Line</text>
+  <line x1="115" y1="883.8" x2="137" y2="883.8" stroke="#1e293b" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <text x="143" y="886.8" font-family="sans-serif" font-size="9.5" fill="#0f172a">Cut Line (+1.0 cm SA)</text>
+  <line x1="262" y1="883.8" x2="284" y2="883.8" stroke="#0284c7" stroke-width="2.6"/>
+  <text x="290" y="886.8" font-family="sans-serif" font-size="9.5" fill="#0f172a">Open Boundary</text>
+  <circle cx="22" cy="898.8" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <text x="32" y="901.8" font-family="sans-serif" font-size="9.5" fill="#0f172a">Notch</text>
+  <line x1="82" y1="898.8" x2="104" y2="898.8" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="110" y="901.8" font-family="sans-serif" font-size="9.5" fill="#0f172a">Grainline</text>
+  <line x1="172" y1="898.8" x2="194" y2="898.8" stroke="#2563eb" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="200" y="901.8" font-family="sans-serif" font-size="9.5" fill="#0f172a">Topstitch Attachment</text>
+</svg>

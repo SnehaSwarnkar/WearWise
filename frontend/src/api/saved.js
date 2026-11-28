@@ -27,10 +27,13 @@ export function addToWishlist(product) {
   return api.post("/api/saved/wishlist", {
     session_id: getSessionId(),
     product_id: product.id,
+    sku: product.sku || null,
     name: product.name,
     price: product.price,
     image: product.image || null,
-    brand: product.brand || null,
+    brand: product.brand || product.seller_name || null,
+    category: product.category || null,
+    try_on_mode: product.try_on_mode || null,
   });
 }
 

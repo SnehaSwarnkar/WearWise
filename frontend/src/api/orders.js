@@ -1,39 +1,32 @@
-import { api, getSessionId } from "./client";
-import { getToken } from "./auth";
-
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import { api, getCsrfToken, getSessionId, getStoreApiBase } from "./client";
 
 // ── Place order ───────────────────────────────────────────────────────────────
 
-export function placeOrder(customer, paymentMethod) {
+export function placeOrder(customer, paymentMethod, idempotencyKey = null) {
   return api.post("/api/orders/place", {
     session_id: getSessionId(),
     customer,
     paymentMethod,
+    idempotency_key: idempotencyKey,
   });
 }
 
-// ── My orders (authenticated) ─────────────────────────────────────────────────
+// ── My orders (authenticated shopper) ─────────────────────────────────────────
 
 export async function getMyOrders() {
-  const token = getToken();
-  if (!token) throw new Error("Not authenticated");
-  const res = await fetch(`${BASE_URL}/api/orders/my`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || "Failed to load orders");
-  }
-  return res.json();
+  return api.get("/api/orders/my");
 }
 
-// ── Order detail (authenticated) ──────────────────────────────────────────────
+// ── Order detail (authenticated shopper or matching session) ──────────────────
 
 export async function getOrderDetail(orderId) {
-  const token = getToken();
-  const headers = token ? { Authorization: `Bearer ${token}` } : {};
-  const res = await fetch(`${BASE_URL}/api/orders/detail/${orderId}`, { headers });
+  const res = await fetch(`${getStoreApiBase()}/api/orders/detail/${orderId}`, {
+    credentials: "include",
+    headers: {
+      "X-Session-Id": getSessionId(),
+      ...(getCsrfToken() ? { "X-CSRF-Token": getCsrfToken() } : {}),
+    },
+  });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || "Order not found");

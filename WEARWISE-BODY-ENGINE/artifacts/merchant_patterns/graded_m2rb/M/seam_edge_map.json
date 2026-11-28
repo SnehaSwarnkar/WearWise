@@ -1,0 +1,641 @@
+{
+  "sku": "TSH-WW-CREW-001",
+  "size_label": "M",
+  "ordinary_seam_count": 16,
+  "ordinary_seams": [
+    {
+      "seam_id": "SEAM-SH-L",
+      "name": "Left Shoulder Seam",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "flat_joined",
+      "source_panel_id": "PANEL-FRONT-TORSO",
+      "source_edge_id": "FRONT_SHOULDER_L",
+      "dest_panel_id": "PANEL-BACK-TORSO",
+      "dest_edge_id": "BACK_SHOULDER_L",
+      "expected_edge_length_cm": 19.33,
+      "actual_2d_source_length_cm": 19.33,
+      "actual_2d_dest_length_cm": 19.33,
+      "actual_3d_source_length_cm": 19.33,
+      "actual_3d_dest_length_cm": 19.33,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "neck_hps_l",
+        "drop_shoulder_l"
+      ]
+    },
+    {
+      "seam_id": "SEAM-SH-R",
+      "name": "Right Shoulder Seam",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "flat_joined",
+      "source_panel_id": "PANEL-FRONT-TORSO",
+      "source_edge_id": "FRONT_SHOULDER_R",
+      "dest_panel_id": "PANEL-BACK-TORSO",
+      "dest_edge_id": "BACK_SHOULDER_R",
+      "expected_edge_length_cm": 19.33,
+      "actual_2d_source_length_cm": 19.33,
+      "actual_2d_dest_length_cm": 19.33,
+      "actual_3d_source_length_cm": 19.33,
+      "actual_3d_dest_length_cm": 19.33,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "neck_hps_r",
+        "drop_shoulder_r"
+      ]
+    },
+    {
+      "seam_id": "SEAM-SIDE-L",
+      "name": "Left Torso Side Seam",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "closed_edge",
+      "source_panel_id": "PANEL-FRONT-TORSO",
+      "source_edge_id": "FRONT_SIDE_L",
+      "dest_panel_id": "PANEL-BACK-TORSO",
+      "dest_edge_id": "BACK_SIDE_L",
+      "expected_edge_length_cm": 37.47,
+      "actual_2d_source_length_cm": 37.47,
+      "actual_2d_dest_length_cm": 37.47,
+      "actual_3d_source_length_cm": 37.47,
+      "actual_3d_dest_length_cm": 37.47,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "underarm_l",
+        "hem_seam_l"
+      ]
+    },
+    {
+      "seam_id": "SEAM-SIDE-R",
+      "name": "Right Torso Side Seam",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "closed_edge",
+      "source_panel_id": "PANEL-FRONT-TORSO",
+      "source_edge_id": "FRONT_SIDE_R",
+      "dest_panel_id": "PANEL-BACK-TORSO",
+      "dest_edge_id": "BACK_SIDE_R",
+      "expected_edge_length_cm": 37.47,
+      "actual_2d_source_length_cm": 37.47,
+      "actual_2d_dest_length_cm": 37.47,
+      "actual_3d_source_length_cm": 37.47,
+      "actual_3d_dest_length_cm": 37.47,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "underarm_r",
+        "hem_seam_r"
+      ]
+    },
+    {
+      "seam_id": "SEAM-ARMHOLE-L-FRONT",
+      "name": "Left Armhole Front Inset Seam",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "curved_inset",
+      "source_panel_id": "PANEL-FRONT-TORSO",
+      "source_edge_id": "FRONT_ARMHOLE_L",
+      "dest_panel_id": "PANEL-SLEEVE-L",
+      "dest_edge_id": "SLEEVE_CAP_FRONT",
+      "expected_edge_length_cm": 26.52,
+      "actual_2d_source_length_cm": 26.52,
+      "actual_2d_dest_length_cm": 26.52,
+      "actual_3d_source_length_cm": 26.52,
+      "actual_3d_dest_length_cm": 26.52,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "underarm_l",
+        "shoulder_apex_l"
+      ]
+    },
+    {
+      "seam_id": "SEAM-ARMHOLE-L-BACK",
+      "name": "Left Armhole Back Inset Seam",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "curved_inset",
+      "source_panel_id": "PANEL-BACK-TORSO",
+      "source_edge_id": "BACK_ARMHOLE_L",
+      "dest_panel_id": "PANEL-SLEEVE-L",
+      "dest_edge_id": "SLEEVE_CAP_BACK",
+      "expected_edge_length_cm": 26.52,
+      "actual_2d_source_length_cm": 26.52,
+      "actual_2d_dest_length_cm": 26.52,
+      "actual_3d_source_length_cm": 26.52,
+      "actual_3d_dest_length_cm": 26.52,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "underarm_l",
+        "shoulder_apex_l"
+      ]
+    },
+    {
+      "seam_id": "SEAM-ARMHOLE-R-FRONT",
+      "name": "Right Armhole Front Inset Seam",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "curved_inset",
+      "source_panel_id": "PANEL-FRONT-TORSO",
+      "source_edge_id": "FRONT_ARMHOLE_R",
+      "dest_panel_id": "PANEL-SLEEVE-R",
+      "dest_edge_id": "SLEEVE_CAP_FRONT",
+      "expected_edge_length_cm": 26.52,
+      "actual_2d_source_length_cm": 26.52,
+      "actual_2d_dest_length_cm": 26.52,
+      "actual_3d_source_length_cm": 26.52,
+      "actual_3d_dest_length_cm": 26.52,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "underarm_r",
+        "shoulder_apex_r"
+      ]
+    },
+    {
+      "seam_id": "SEAM-ARMHOLE-R-BACK",
+      "name": "Right Armhole Back Inset Seam",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "curved_inset",
+      "source_panel_id": "PANEL-BACK-TORSO",
+      "source_edge_id": "BACK_ARMHOLE_R",
+      "dest_panel_id": "PANEL-SLEEVE-R",
+      "dest_edge_id": "SLEEVE_CAP_BACK",
+      "expected_edge_length_cm": 26.52,
+      "actual_2d_source_length_cm": 26.52,
+      "actual_2d_dest_length_cm": 26.52,
+      "actual_3d_source_length_cm": 26.52,
+      "actual_3d_dest_length_cm": 26.52,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "underarm_r",
+        "shoulder_apex_r"
+      ]
+    },
+    {
+      "seam_id": "SEAM-UNDERARM-L",
+      "name": "Left Sleeve Underarm Seam",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "tubular_closed",
+      "source_panel_id": "PANEL-SLEEVE-L",
+      "source_edge_id": "SLEEVE_UNDERARM_F",
+      "dest_panel_id": "PANEL-SLEEVE-L",
+      "dest_edge_id": "SLEEVE_UNDERARM_B",
+      "expected_edge_length_cm": 10.36,
+      "actual_2d_source_length_cm": 10.36,
+      "actual_2d_dest_length_cm": 10.36,
+      "actual_3d_source_length_cm": 10.36,
+      "actual_3d_dest_length_cm": 10.36,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "underarm_l",
+        "cuff_underarm_l"
+      ]
+    },
+    {
+      "seam_id": "SEAM-UNDERARM-R",
+      "name": "Right Sleeve Underarm Seam",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "tubular_closed",
+      "source_panel_id": "PANEL-SLEEVE-R",
+      "source_edge_id": "SLEEVE_UNDERARM_F",
+      "dest_panel_id": "PANEL-SLEEVE-R",
+      "dest_edge_id": "SLEEVE_UNDERARM_B",
+      "expected_edge_length_cm": 10.36,
+      "actual_2d_source_length_cm": 10.36,
+      "actual_2d_dest_length_cm": 10.36,
+      "actual_3d_source_length_cm": 10.36,
+      "actual_3d_dest_length_cm": 10.36,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "underarm_r",
+        "cuff_underarm_r"
+      ]
+    },
+    {
+      "seam_id": "SEAM-NECK-RIB-FRONT",
+      "name": "Collar Front Neckband Seam",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "binding_rib",
+      "source_panel_id": "PANEL-FRONT-TORSO",
+      "source_edge_id": "FRONT_NECKLINE",
+      "dest_panel_id": "PANEL-COLLAR-RIB",
+      "dest_edge_id": "COLLAR_NECK_SEAM_FRONT",
+      "expected_edge_length_cm": 27.88,
+      "actual_2d_source_length_cm": 27.88,
+      "actual_2d_dest_length_cm": 27.88,
+      "actual_3d_source_length_cm": 27.88,
+      "actual_3d_dest_length_cm": 27.88,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "center_front_neck",
+        "hps_l",
+        "hps_r"
+      ]
+    },
+    {
+      "seam_id": "SEAM-NECK-RIB-BACK",
+      "name": "Collar Back Neckband Seam",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "binding_rib",
+      "source_panel_id": "PANEL-BACK-TORSO",
+      "source_edge_id": "BACK_NECKLINE",
+      "dest_panel_id": "PANEL-COLLAR-RIB",
+      "dest_edge_id": "COLLAR_NECK_SEAM_BACK",
+      "expected_edge_length_cm": 23.26,
+      "actual_2d_source_length_cm": 23.26,
+      "actual_2d_dest_length_cm": 23.26,
+      "actual_3d_source_length_cm": 23.26,
+      "actual_3d_dest_length_cm": 23.26,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "center_back_neck",
+        "hps_l",
+        "hps_r"
+      ]
+    },
+    {
+      "seam_id": "SEAM-COLLAR-JOIN",
+      "name": "Collar Rib Ring Closure Seam",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "closed_edge",
+      "source_panel_id": "PANEL-COLLAR-RIB",
+      "source_edge_id": "COLLAR_JOIN_START",
+      "dest_panel_id": "PANEL-COLLAR-RIB",
+      "dest_edge_id": "COLLAR_JOIN_END",
+      "expected_edge_length_cm": 4.54,
+      "actual_2d_source_length_cm": 4.54,
+      "actual_2d_dest_length_cm": 4.54,
+      "actual_3d_source_length_cm": 3.1,
+      "actual_3d_dest_length_cm": 3.1,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "collar_join_r"
+      ],
+      "transformation_contract": {
+        "cause": "conical_ring_curvature_development",
+        "explanation": "The 2D pattern drafts the tapered collar band on a straight strip (end slant combines vertical band height 2.80 cm and half circumferential taper 3.57 cm -> 4.54 cm), whereas closing the ring into a 3D conical collar distributes the circumference reduction radially (join radial taper 1.32 cm -> 3D seam meridian 3.10 cm). Cutting edge adds 2 x 0.7 cm seam allowance (5.51 cm).",
+        "measurement_convention": "2D cutting_edge > 2D stitch_slant > 3D ring_meridian; values are NOT artificially forced equal.",
+        "band_height_cm": 2.8,
+        "seam_allowance_cm": 0.7,
+        "cutting_edge_length_cm": 5.51,
+        "expected_2d_stitch_slant_cm": 4.54,
+        "radial_shrink_factor_xz": 0.8212,
+        "radial_taper_at_join_cm": 1.323,
+        "expected_3d_meridian_cm": 3.1,
+        "tolerance_cm": 0.25
+      }
+    },
+    {
+      "seam_id": "SEAM-HEM-BAND-FRONT",
+      "name": "Bottom Hem Band Front Binding",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "binding_hem",
+      "source_panel_id": "PANEL-FRONT-TORSO",
+      "source_edge_id": "FRONT_BOTTOM_SEAM",
+      "dest_panel_id": "PANEL-HEM-BAND",
+      "dest_edge_id": "HEM_BODY_SEAM_FRONT",
+      "expected_edge_length_cm": 53.0,
+      "actual_2d_source_length_cm": 53.0,
+      "actual_2d_dest_length_cm": 53.0,
+      "actual_3d_source_length_cm": 52.97,
+      "actual_3d_dest_length_cm": 52.97,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "side_l_hem",
+        "side_r_hem",
+        "center_front_hem"
+      ]
+    },
+    {
+      "seam_id": "SEAM-HEM-BAND-BACK",
+      "name": "Bottom Hem Band Back Binding",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "binding_hem",
+      "source_panel_id": "PANEL-BACK-TORSO",
+      "source_edge_id": "BACK_BOTTOM_SEAM",
+      "dest_panel_id": "PANEL-HEM-BAND",
+      "dest_edge_id": "HEM_BODY_SEAM_BACK",
+      "expected_edge_length_cm": 53.0,
+      "actual_2d_source_length_cm": 53.0,
+      "actual_2d_dest_length_cm": 53.0,
+      "actual_3d_source_length_cm": 52.97,
+      "actual_3d_dest_length_cm": 52.97,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "side_l_hem",
+        "side_r_hem",
+        "center_back_hem"
+      ]
+    },
+    {
+      "seam_id": "SEAM-HEM-JOIN",
+      "name": "Bottom Hem Band Ring Closure Seam",
+      "record_kind": "ordinary_sewing_seam",
+      "seam_type": "closed_edge",
+      "source_panel_id": "PANEL-HEM-BAND",
+      "source_edge_id": "HEM_JOIN_START",
+      "dest_panel_id": "PANEL-HEM-BAND",
+      "dest_edge_id": "HEM_JOIN_END",
+      "expected_edge_length_cm": 2.8,
+      "actual_2d_source_length_cm": 2.8,
+      "actual_2d_dest_length_cm": 2.8,
+      "actual_3d_source_length_cm": 2.8,
+      "actual_3d_dest_length_cm": 2.8,
+      "length_delta_2d_cm": 0.0,
+      "length_delta_3d_cm": 0.0,
+      "max_3d_vertex_gap_mm": 0.0,
+      "compatible": true,
+      "notches": [
+        "hem_join_r"
+      ]
+    }
+  ],
+  "surface_attachment_count": 1,
+  "surface_attachments": [
+    {
+      "attachment_id": "ATTACH-POCKET-CHEST",
+      "name": "Chest Patch Pocket Topstitch Attachment",
+      "record_kind": "surface_attachment_path",
+      "attachment_type": "topstitched_applique_surface_path",
+      "source_panel_id": "PANEL-POCKET-CHEST",
+      "source_edge_ids": [
+        "POCKET_SIDE_R",
+        "POCKET_BOTTOM",
+        "POCKET_SIDE_L"
+      ],
+      "target_panel_id": "PANEL-FRONT-TORSO",
+      "target_attachment_type": "interior_surface_path",
+      "target_surface_path_2d_cm": [
+        [
+          4.5,
+          53.2
+        ],
+        [
+          4.5,
+          40.7
+        ],
+        [
+          5.5,
+          39.7
+        ],
+        [
+          15.0,
+          39.7
+        ],
+        [
+          16.0,
+          40.7
+        ],
+        [
+          16.0,
+          53.2
+        ]
+      ],
+      "target_surface_path_3d_m": [
+        [
+          0.045,
+          1.245,
+          0.0175
+        ],
+        [
+          0.045,
+          1.2338,
+          0.024
+        ],
+        [
+          0.045,
+          1.2225,
+          0.0292
+        ],
+        [
+          0.045,
+          1.2113,
+          0.0336
+        ],
+        [
+          0.045,
+          1.2,
+          0.0373
+        ],
+        [
+          0.045,
+          1.1888,
+          0.0402
+        ],
+        [
+          0.045,
+          1.1775,
+          0.0423
+        ],
+        [
+          0.045,
+          1.1663,
+          0.0438
+        ],
+        [
+          0.045,
+          1.155,
+          0.045
+        ],
+        [
+          0.045,
+          1.1438,
+          0.0459
+        ],
+        [
+          0.045,
+          1.1325,
+          0.0466
+        ],
+        [
+          0.045,
+          1.1213,
+          0.0472
+        ],
+        [
+          0.055,
+          1.12,
+          0.0456
+        ],
+        [
+          0.0565,
+          1.11,
+          0.0463
+        ],
+        [
+          0.068,
+          1.11,
+          0.044
+        ],
+        [
+          0.0795,
+          1.11,
+          0.0413
+        ],
+        [
+          0.091,
+          1.11,
+          0.0378
+        ],
+        [
+          0.1025,
+          1.11,
+          0.0337
+        ],
+        [
+          0.114,
+          1.11,
+          0.0291
+        ],
+        [
+          0.1255,
+          1.11,
+          0.0232
+        ],
+        [
+          0.137,
+          1.11,
+          0.0171
+        ],
+        [
+          0.1485,
+          1.11,
+          0.01
+        ],
+        [
+          0.15,
+          1.12,
+          0.0057
+        ],
+        [
+          0.16,
+          1.1213,
+          -0.0023
+        ],
+        [
+          0.16,
+          1.1325,
+          -0.004
+        ],
+        [
+          0.16,
+          1.1438,
+          -0.0054
+        ],
+        [
+          0.16,
+          1.155,
+          -0.0063
+        ],
+        [
+          0.16,
+          1.1663,
+          -0.0066
+        ],
+        [
+          0.16,
+          1.1775,
+          -0.0073
+        ],
+        [
+          0.16,
+          1.1888,
+          -0.008
+        ],
+        [
+          0.16,
+          1.2,
+          -0.0097
+        ],
+        [
+          0.16,
+          1.2113,
+          -0.0121
+        ],
+        [
+          0.16,
+          1.2225,
+          -0.0155
+        ],
+        [
+          0.16,
+          1.2338,
+          -0.0201
+        ],
+        [
+          0.16,
+          1.245,
+          -0.026
+        ]
+      ],
+      "intended_relief_mm": 3.5,
+      "expected_path_length_cm": 37.33,
+      "actual_2d_path_length_cm": 37.33,
+      "expected_projected_3d_path_length_cm": 39.39,
+      "actual_3d_path_length_cm": 39.99,
+      "curvature_deviation_cm": 2.66,
+      "curvature_stretch_ratio": 1.0714,
+      "attachment_contract": {
+        "mapping_relationship": "planar_chest_box_to_curved_3d_torso_surface_with_normal_relief",
+        "deviation_explanation": "Planar 2D pocket path (37.33 cm) wraps onto convex front torso superellipse Z-curvature and shoulder slope, adding +2.66 cm geodesic arc length (39.39 cm surface integral + beveled corner rim discretization = 39.99 cm) plus 3.5 mm normal relief.",
+        "measured_rim_relief_mm": {
+          "mean": 3.5,
+          "min": 3.5,
+          "max": 3.5
+        },
+        "tolerances": {
+          "tolerance_2d_cm": 0.25,
+          "tolerance_3d_projection_cm": 1.0,
+          "stretch_ratio_bounds": [
+            1.0,
+            1.12
+          ],
+          "relief_target_mm": 3.5,
+          "relief_tolerance_mm": 1.0
+        }
+      },
+      "compatible": true,
+      "notches": [
+        "pocket_top_left",
+        "pocket_top_right"
+      ]
+    }
+  ]
+}

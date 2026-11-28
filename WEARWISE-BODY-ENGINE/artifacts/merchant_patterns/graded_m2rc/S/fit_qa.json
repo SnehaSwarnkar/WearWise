@@ -1,0 +1,156 @@
+{
+  "avatar_file": "anny_baseline_male.glb",
+  "avatar_is_watertight": true,
+  "avatar_vertex_count": 13718,
+  "avatar_face_count": 27420,
+  "avatar_bounds_cm": [
+    98.56,
+    155.97,
+    42.17
+  ],
+  "fit_clearance_passed": true,
+  "fit_clearance_errors": [],
+  "fit_clearance_contract": {
+    "scope": "static_a_pose_baseline_mannequin_only",
+    "torso_collar_hem_min_clearance_cm": 0.25,
+    "sleeve_min_clearance_cm": "> 0.00",
+    "inside_avatar_volume_allowed": 0,
+    "disclaimer": "Static A-pose clearance applies strictly to baseline mannequin anny_baseline_male.glb and does not claim universal shopper fit."
+  },
+  "total_penetrating_vertices_3d": 0,
+  "total_inside_avatar_vertices": 0,
+  "full_3d_clearance_by_region": {
+    "PANEL-FRONT-TORSO": {
+      "vertex_count": 1089,
+      "min_cm": 0.601,
+      "mean_cm": 3.167,
+      "p95_cm": 5.575,
+      "max_cm": 5.951,
+      "penetrating_vertices": 0,
+      "inside_volume_vertices": 0,
+      "below_min_clearance_vertices": 0,
+      "required_min_clearance_cm": 0.25,
+      "strict_greater": false,
+      "excessive_clearance_vertices": 0,
+      "excessive_threshold_cm": 12.0
+    },
+    "PANEL-BACK-TORSO": {
+      "vertex_count": 1089,
+      "min_cm": 0.367,
+      "mean_cm": 3.624,
+      "p95_cm": 6.702,
+      "max_cm": 7.199,
+      "penetrating_vertices": 0,
+      "inside_volume_vertices": 0,
+      "below_min_clearance_vertices": 0,
+      "required_min_clearance_cm": 0.25,
+      "strict_greater": false,
+      "excessive_clearance_vertices": 0,
+      "excessive_threshold_cm": 12.0
+    },
+    "PANEL-SLEEVE-L": {
+      "vertex_count": 319,
+      "min_cm": 1.152,
+      "mean_cm": 3.148,
+      "p95_cm": 4.237,
+      "max_cm": 5.102,
+      "penetrating_vertices": 0,
+      "inside_volume_vertices": 0,
+      "below_min_clearance_vertices": 0,
+      "required_min_clearance_cm": 0.0,
+      "strict_greater": true,
+      "excessive_clearance_vertices": 0,
+      "excessive_threshold_cm": 10.0
+    },
+    "PANEL-SLEEVE-R": {
+      "vertex_count": 319,
+      "min_cm": 1.152,
+      "mean_cm": 3.148,
+      "p95_cm": 4.237,
+      "max_cm": 5.102,
+      "penetrating_vertices": 0,
+      "inside_volume_vertices": 0,
+      "below_min_clearance_vertices": 0,
+      "required_min_clearance_cm": 0.0,
+      "strict_greater": true,
+      "excessive_clearance_vertices": 0,
+      "excessive_threshold_cm": 10.0
+    },
+    "PANEL-COLLAR-RIB": {
+      "vertex_count": 165,
+      "min_cm": 0.449,
+      "mean_cm": 2.011,
+      "p95_cm": 2.92,
+      "max_cm": 3.007,
+      "penetrating_vertices": 0,
+      "inside_volume_vertices": 0,
+      "below_min_clearance_vertices": 0,
+      "required_min_clearance_cm": 0.25,
+      "strict_greater": false,
+      "excessive_clearance_vertices": 0,
+      "excessive_threshold_cm": 8.0
+    },
+    "PANEL-HEM-BAND": {
+      "vertex_count": 260,
+      "min_cm": 0.406,
+      "mean_cm": 2.07,
+      "p95_cm": 4.769,
+      "max_cm": 5.999,
+      "penetrating_vertices": 0,
+      "inside_volume_vertices": 0,
+      "below_min_clearance_vertices": 0,
+      "required_min_clearance_cm": 0.25,
+      "strict_greater": false,
+      "excessive_clearance_vertices": 0,
+      "excessive_threshold_cm": 14.0
+    },
+    "PANEL-POCKET-CHEST": {
+      "vertex_count": 143,
+      "min_cm": 1.256,
+      "mean_cm": 2.881,
+      "p95_cm": 4.014,
+      "max_cm": 4.191,
+      "penetrating_vertices": 0,
+      "inside_volume_vertices": 0,
+      "below_min_clearance_vertices": 0,
+      "required_min_clearance_cm": 0.25,
+      "strict_greater": false,
+      "excessive_clearance_vertices": 0,
+      "excessive_threshold_cm": 12.0
+    }
+  },
+  "excessive_clearance_summary": {},
+  "front_torso_clearance": {
+    "protruding_vertices": 0,
+    "max_protrusion_cm": 0.0,
+    "min_clearance_cm": 0.79
+  },
+  "rear_scapula_clearance": {
+    "protruding_vertices": 0,
+    "max_protrusion_cm": 0.0,
+    "min_clearance_cm": 1.42
+  },
+  "shoulder_and_armhole_clearance": {
+    "shoulder_crest_clearance_cm": 4.48,
+    "armhole_z_span_cm": 10.23
+  },
+  "underarm_clearance": {
+    "axilla_drop_clearance_cm": 2.75
+  },
+  "sleeve_to_arm_alignment": {
+    "yz_centroid_offset_cm": {
+      "left": 5.09,
+      "right": 5.09
+    }
+  },
+  "hem_and_body_clearance": {
+    "lateral_ease_per_side_cm": 0.37,
+    "lower_front_protruding_vertices": 0,
+    "lower_rear_protruding_vertices": 0
+  },
+  "rear_scapula_protruding_vertices": 0,
+  "max_rear_protrusion_cm": 0.0,
+  "front_chest_protruding_vertices": 0,
+  "max_front_protrusion_cm": 0.0,
+  "note": "Avatar fit metrics are isolated from garment geometry QA and apply strictly to baseline A-pose mannequin."
+}

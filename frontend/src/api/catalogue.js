@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const STORE_BASE_URL = import.meta.env.VITE_STORE_API_URL || "http://127.0.0.1:8001";
 
 /**
  * @param {"men"|"women"|"boys"|"girls"} gender
@@ -11,7 +11,7 @@ export async function fetchCatalogue(gender, filters = {}) {
   if (filters.age_group) params.set("age_group", filters.age_group);
   if (filters.sort_price) params.set("sort_price", "true");
   const qs = params.toString();
-  const res = await fetch(`${BASE_URL}/api/catalogue/${gender}${qs ? "?" + qs : ""}`);
+  const res = await fetch(`${STORE_BASE_URL}/api/catalogue/${gender}${qs ? "?" + qs : ""}`);
   if (!res.ok) throw new Error("Failed to load catalogue");
   return res.json();
 }

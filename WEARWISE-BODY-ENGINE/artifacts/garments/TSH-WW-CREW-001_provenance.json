@@ -1,0 +1,39 @@
+{
+  "sku": "TSH-WW-CREW-001",
+  "title": "Cherry Baby Tee / Signature Boxy Crew Tee",
+  "sample_id": "WW-3D-TSHIRT-TSH-WW-CREW-001",
+  "file_format": "glTF 2.0 Binary (.glb)",
+  "mesh_metrics": {
+    "vertex_count": 864,
+    "triangle_count": 1656,
+    "is_watertight": false,
+    "bounds_meters": [
+      [
+        -0.36100900173187256,
+        -0.2191847860813141,
+        0.019999999552965164
+      ],
+      [
+        0.36100900173187256,
+        0.1291847825050354,
+        0.5400000214576721
+      ]
+    ]
+  },
+  "dimensional_specification": {
+    "size": "M",
+    "chest_circumference_cm": 104.0,
+    "shoulder_breadth_cm": 46.5,
+    "back_length_cm": 68.0,
+    "ease_over_masculine_baseline_cm": {
+      "chest": "+4.5 cm",
+      "shoulder": "+2.0 cm"
+    }
+  },
+  "standards": [
+    "ISO 8559-2: Garment construction and sizing designation",
+    "BS 4952: Finished dimensions under tabletop relaxation"
+  ],
+  "disclaimer": "WearWise 3D reference garment geometry is intended for interactive fit visualization and sizing assistance. Does not represent dynamic finite-element cloth drape simulation.",
+  "created_at": "2026-11-24T17:15:00Z"
+}

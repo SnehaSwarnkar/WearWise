@@ -11,16 +11,18 @@ export function addToCart(item) {
   });
 }
 
-export function updateCartQuantity(itemId, quantity) {
+export function updateCartQuantity(itemId, quantity, size = null) {
   return api.put("/api/cart/update", {
     session_id: getSessionId(),
     item_id: itemId,
     quantity,
+    size,
   });
 }
 
-export function removeFromCart(itemId) {
-  return api.delete(`/api/cart/${getSessionId()}/${itemId}`);
+export function removeFromCart(itemId, size = null) {
+  const qs = size ? `?size=${encodeURIComponent(size)}` : "";
+  return api.delete(`/api/cart/${getSessionId()}/${itemId}${qs}`);
 }
 
 export function clearCart() {

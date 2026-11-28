@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
-import { signup } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 
 function Signup() {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { signup } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,8 +26,7 @@ function Signup() {
     }
     setLoading(true);
     try {
-      const user = await signup(form.name, form.email, form.password);
-      setUser(user);
+      await signup(form.name, form.email, form.password);
       navigate("/select-gender");
     } catch (err) {
       setError(err.message || "Signup failed. Please try again.");
@@ -43,10 +41,25 @@ function Signup() {
       <div className="auth-shape auth-shape-lime" />
       <div className="auth-shape auth-shape-purple" />
 
-      <div className="auth-card">
-        <Link to="/" className="auth-logo">
-          Wear<span>Wise</span>
-        </Link>
+      <div className="auth-card" data-testid="shopper-register-card">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "22px" }}>
+          <Link to="/" className="auth-logo" style={{ marginBottom: 0 }}>
+            Wear<span>Wise</span>
+          </Link>
+          <span
+            style={{
+              background: "#d8ff3f",
+              color: "#151515",
+              border: "2px solid #151515",
+              padding: "4px 10px",
+              fontSize: "11px",
+              fontWeight: 900,
+              letterSpacing: "0.08em",
+            }}
+          >
+            SHOPPER REGISTRATION
+          </span>
+        </div>
 
         <div className="auth-eyebrow">✦ JOIN WEARWISE</div>
 
@@ -57,7 +70,7 @@ function Signup() {
         </h1>
 
         <p className="auth-subtitle">
-          Create an account and discover fashion that actually fits who you are.
+          Create a shopper account and discover fashion that actually fits who you are.
         </p>
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
@@ -116,13 +129,17 @@ function Signup() {
           {error && <p className="auth-error">{error}</p>}
 
           <button className="auth-submit" type="submit" disabled={loading}>
-            {loading ? "Creating account…" : "CREATE ACCOUNT ✦"}
+            {loading ? "Creating account…" : "CREATE SHOPPER ACCOUNT ✦"}
           </button>
         </form>
 
         <p className="auth-switch">
-          Already have an account?{" "}
+          Already have a shopper account?{" "}
           <Link to="/login">Sign in →</Link>
+        </p>
+        <p className="auth-switch" style={{ marginTop: "8px", fontSize: "12px" }}>
+          Selling on WearWise?{" "}
+          <Link to="/seller/login" style={{ color: "#8d6bff" }}>Seller Portal →</Link>
         </p>
       </div>
     </div>

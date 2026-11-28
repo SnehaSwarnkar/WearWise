@@ -15,10 +15,13 @@ class WishlistItem(BaseModel):
     id: str
     session_id: str
     product_id: int
+    sku: Optional[str] = None
+    category: Optional[str] = None
     name: str
     price: int
     image: Optional[str] = None
     brand: Optional[str] = None
+    try_on_mode: Optional[str] = None
     created_at: str
 
 
@@ -32,7 +35,10 @@ class SaveLookRequest(BaseModel):
 class SaveWishlistRequest(BaseModel):
     session_id: str
     product_id: int
+    sku: Optional[str] = None
+    category: Optional[str] = None
     name: str
     price: int
     image: Optional[str] = None
     brand: Optional[str] = None
+    try_on_mode: Optional[str] = None

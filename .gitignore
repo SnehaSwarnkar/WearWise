@@ -1,38 +1,178 @@
-# ── Python ────────────────────────────────────────────────────────────────────
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.egg-info/
-dist/
-build/
-.eggs/
-*.env
-.venv/
-venv/
-backend/venv/
-backend/fastapi_env/
+# ==============================================================================
+# WearWise — Comprehensive Monorepo .gitignore
+# Covers: React/Vite Frontend, FastAPI Backend, Body Engine, & Experiments
+# ==============================================================================
 
-# ── Backend runtime data (generated at run time, not source) ──────────────────
+# ── 1. Python & Bytecode Caches ──────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+develop-eggs/
+downloads/
+eggs/
+.installed.cfg
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.manifest
+*.spec
+
+# ── 2. Virtual Environments ──────────────────────────────────────────────────
+.env/
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.venv/
+*.venv-*/
+.venv-*/
+fastapi_env/
+**/fastapi_env/
+**/.venv*/
+**/venv/
+
+# ── 3. Testing, Coverage & Benchmarking ───────────────────────────────────────
+.pytest_cache/
+**/.pytest_cache/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.benchmarks/
+**/.benchmarks/
+
+# ── 4. Large Machine Learning Weights & Model Caches ─────────────────────────
+# Large model weights belong in external object storage / model registry
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors
+*.h5
+*.onnx
+
+# Cloned candidate / upstream research repositories
+experiments/oxihuman/oxihuman-repo/
+experiments/**/candidate-repo/
+
+# ── 5. Rust Build Artifacts (Oxihuman / Native Modules) ──────────────────────
+target/
+**/target/
+**/*.rs.bk
+
+# ── 6. Local Databases & Runtime Application Data ────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Backend & Engine runtime directories (generated at runtime, not source)
 backend/data/
 backend/uploads/
+WEARWISE-BODY-ENGINE/data/
+data/
+uploads/
+storage/
 
-# ── Node / frontend ───────────────────────────────────────────────────────────
+# ── 7. Node.js & Frontend (React / Vite) ──────────────────────────────────────
 node_modules/
-frontend/node_modules/
+**/node_modules/
 frontend/dist/
+dist-ssr/
+.vite/
+**/.vite/
+*.local
 
-# ── Environment files ─────────────────────────────────────────────────────────
-# frontend/.env only contains VITE_API_URL (no secrets) — safe to commit.
-*.env.local
-*.env.production
-backend/.env
+# Node package manager logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ── 8. Environment & Secret Configuration Files ──────────────────────────────
+# Prevent local secrets and production keys from leaking into version control
 *.env
-!frontend/.env
+*.env.*
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+backend/.env
+WEARWISE-BODY-ENGINE/.env
 
-# ── OS / editor ───────────────────────────────────────────────────────────────
+# Explicitly track documented example/template files and public frontend config
+!.env.example
+!*.env.example
+!frontend/.env
+!frontend/.env.example
+data_backups/
+
+# ── 9. Operating System Artifacts ─────────────────────────────────────────────
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
 Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+
+# ── 10. IDE & Editor Files ───────────────────────────────────────────────────
+# Visual Studio Code
+.vscode/*
+!.vscode/extensions.json
+
+# JetBrains (PyCharm, WebStorm, etc.)
 .idea/
-.vscode/
+*.iws
+*.iml
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim / Emacs
 *.swp
+*.swo
+*.swn
+*.sw?
+*~
+.#*
+
+# ── 11. Logs & Temporary Scratch Files ────────────────────────────────────────
+logs/
+*.log
+tmp/
+temp/
+*.tmp
+artifacts/*.zip
+WEARWISE-BODY-ENGINE/.coverage
+backend/tests/.pytest_cache/
+WEARWISE-BODY-ENGINE/tests/.pytest_cache/

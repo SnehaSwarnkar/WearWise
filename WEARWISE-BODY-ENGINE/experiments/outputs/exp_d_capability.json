@@ -1,0 +1,360 @@
+{
+  "candidate": "OxiHuman",
+  "timestamp": "2026-11-23 04:55:33",
+  "repository_status": {
+    "official_url": "https://github.com/cool-japan/oxihuman",
+    "clone_attempt_result": "fatal: repository 'https://github.com/cool-japan/oxihuman/' not found",
+    "access_state": "PRIVATE_OR_REMOVED",
+    "notes": "As of November 17, 2026, the public repository was removed or made private following the relicensing announcement."
+  },
+  "crates_io_status": {
+    "oxihuman": {
+      "exists": true,
+      "description": "Transitional release with no code. OxiHuman comes under the Business Source License 1.1 from its next release: https://cooljapan.tech/bsl/oxihuman/",
+      "license": "BUSL-1.1",
+      "repository": "https://cooljapan.tech/license/oxihuman/",
+      "homepage": "https://cooljapan.tech/license/oxihuman/",
+      "recent_versions": [
+        {
+          "num": "0.0.1",
+          "license": "BUSL-1.1",
+          "yanked": false,
+          "created_at": "2026-11-17T06:10:53.826485Z",
+          "description": "Transitional release with no code. OxiHuman comes under the Business Source License 1.1 from its next release: https://cooljapan.tech/bsl/oxihuman/"
+        },
+        {
+          "num": "0.2.1",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-07-13T04:58:25.980996Z",
+          "description": "Privacy-first, client-side human body generator in pure Rust \u2014 MakeHuman-compatible independent implementation (facade crate)"
+        },
+        {
+          "num": "0.2.0",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-06-19T09:20:24.205742Z",
+          "description": "Privacy-first, client-side human body generator \u2014 pure Rust MakeHuman port (facade crate)"
+        },
+        {
+          "num": "0.1.2",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-05-05T12:37:10.188637Z",
+          "description": "Privacy-first, client-side human body generator \u2014 pure Rust MakeHuman port (facade crate)"
+        }
+      ]
+    },
+    "oxihuman-morph": {
+      "exists": true,
+      "description": "Transitional release with no code. OxiHuman comes under the Business Source License 1.1 from its next release: https://cooljapan.tech/bsl/oxihuman/",
+      "license": "BUSL-1.1",
+      "repository": "https://cooljapan.tech/license/oxihuman/",
+      "homepage": "https://cooljapan.tech/license/oxihuman/",
+      "recent_versions": [
+        {
+          "num": "0.0.1",
+          "license": "BUSL-1.1",
+          "yanked": false,
+          "created_at": "2026-11-17T06:15:54.466084Z",
+          "description": "Transitional release with no code. OxiHuman comes under the Business Source License 1.1 from its next release: https://cooljapan.tech/bsl/oxihuman/"
+        },
+        {
+          "num": "0.2.1",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-07-13T04:47:55.278140Z",
+          "description": "Parametric morphology engine for human body generation \u2014 targets, blendshapes, FACS"
+        },
+        {
+          "num": "0.2.0",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-06-19T09:12:40.739011Z",
+          "description": "Parametric morphology engine for human body generation \u2014 targets, blendshapes, FACS"
+        },
+        {
+          "num": "0.1.2",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-05-05T12:30:56.161729Z",
+          "description": "Parametric morphology engine for human body generation \u2014 targets, blendshapes, FACS"
+        }
+      ]
+    },
+    "oxihuman-mesh": {
+      "exists": true,
+      "description": "Transitional release with no code. OxiHuman comes under the Business Source License 1.1 from its next release: https://cooljapan.tech/bsl/oxihuman/",
+      "license": "BUSL-1.1",
+      "repository": "https://cooljapan.tech/license/oxihuman/",
+      "homepage": "https://cooljapan.tech/license/oxihuman/",
+      "recent_versions": [
+        {
+          "num": "0.0.1",
+          "license": "BUSL-1.1",
+          "yanked": false,
+          "created_at": "2026-11-17T06:14:54.587137Z",
+          "description": "Transitional release with no code. OxiHuman comes under the Business Source License 1.1 from its next release: https://cooljapan.tech/bsl/oxihuman/"
+        },
+        {
+          "num": "0.2.1",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-07-13T04:48:49.761242Z",
+          "description": "Mesh processing, topology, and geometry algorithms for OxiHuman"
+        },
+        {
+          "num": "0.2.0",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-06-19T09:14:35.890692Z",
+          "description": "Mesh processing, topology, and geometry algorithms for OxiHuman"
+        },
+        {
+          "num": "0.1.2",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-05-05T12:31:51.753880Z",
+          "description": "Mesh processing, topology, and geometry algorithms for OxiHuman"
+        }
+      ]
+    },
+    "oxihuman-export": {
+      "exists": true,
+      "description": "Transitional release with no code. OxiHuman comes under the Business Source License 1.1 from its next release: https://cooljapan.tech/bsl/oxihuman/",
+      "license": "BUSL-1.1",
+      "repository": "https://cooljapan.tech/license/oxihuman/",
+      "homepage": "https://cooljapan.tech/license/oxihuman/",
+      "recent_versions": [
+        {
+          "num": "0.0.1",
+          "license": "BUSL-1.1",
+          "yanked": false,
+          "created_at": "2026-11-17T06:13:53.756774Z",
+          "description": "Transitional release with no code. OxiHuman comes under the Business Source License 1.1 from its next release: https://cooljapan.tech/bsl/oxihuman/"
+        },
+        {
+          "num": "0.2.1",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-07-13T04:51:47.402864Z",
+          "description": "Export pipeline for OxiHuman \u2014 glTF, COLLADA, STL, and streaming formats"
+        },
+        {
+          "num": "0.2.0",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-06-19T09:16:44.364640Z",
+          "description": "Export pipeline for OxiHuman \u2014 glTF, COLLADA, STL, and streaming formats"
+        },
+        {
+          "num": "0.1.2",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-05-05T12:33:39.288237Z",
+          "description": "Export pipeline for OxiHuman \u2014 glTF, COLLADA, STL, and streaming formats"
+        }
+      ]
+    },
+    "oxihuman-wasm": {
+      "exists": true,
+      "description": "Transitional release with no code. OxiHuman comes under the Business Source License 1.1 from its next release: https://cooljapan.tech/bsl/oxihuman/",
+      "license": "BUSL-1.1",
+      "repository": "https://cooljapan.tech/license/oxihuman/",
+      "homepage": "https://cooljapan.tech/license/oxihuman/",
+      "recent_versions": [
+        {
+          "num": "0.0.1",
+          "license": "BUSL-1.1",
+          "yanked": false,
+          "created_at": "2026-11-17T06:18:54.498362Z",
+          "description": "Transitional release with no code. OxiHuman comes under the Business Source License 1.1 from its next release: https://cooljapan.tech/bsl/oxihuman/"
+        },
+        {
+          "num": "0.2.1",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-07-13T04:54:41.641432Z",
+          "description": "WebAssembly bindings for OxiHuman \u2014 full browser-ready API"
+        },
+        {
+          "num": "0.2.0",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-06-19T09:18:49.913874Z",
+          "description": "WebAssembly bindings for OxiHuman \u2014 full browser-ready API"
+        },
+        {
+          "num": "0.1.2",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-05-05T12:35:54.241738Z",
+          "description": "WebAssembly bindings for OxiHuman \u2014 full browser-ready API"
+        }
+      ]
+    },
+    "oxihuman-cli": {
+      "exists": true,
+      "description": "Transitional release with no code. OxiHuman comes under the Business Source License 1.1 from its next release: https://cooljapan.tech/bsl/oxihuman/",
+      "license": "BUSL-1.1",
+      "repository": "https://cooljapan.tech/license/oxihuman/",
+      "homepage": "https://cooljapan.tech/license/oxihuman/",
+      "recent_versions": [
+        {
+          "num": "0.0.1",
+          "license": "BUSL-1.1",
+          "yanked": false,
+          "created_at": "2026-11-17T06:11:54.596655Z",
+          "description": "Transitional release with no code. OxiHuman comes under the Business Source License 1.1 from its next release: https://cooljapan.tech/bsl/oxihuman/"
+        },
+        {
+          "num": "0.2.1",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-07-13T04:57:44.712972Z",
+          "description": "Command-line interface for OxiHuman body generation and export"
+        },
+        {
+          "num": "0.2.0",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-06-19T09:19:46.843755Z",
+          "description": "Command-line interface for OxiHuman body generation and export"
+        },
+        {
+          "num": "0.1.2",
+          "license": "Apache-2.0",
+          "yanked": true,
+          "created_at": "2026-05-05T12:36:34.648708Z",
+          "description": "Command-line interface for OxiHuman body generation and export"
+        }
+      ]
+    }
+  },
+  "morph_targets_inventory": {
+    "total_count": 38,
+    "girth_targets_count": 8,
+    "girth_targets": [
+      "measure/measure-bust-circ-decr",
+      "measure/measure-bust-circ-incr",
+      "measure/measure-underbust-circ-decr",
+      "measure/measure-underbust-circ-incr",
+      "measure/measure-waist-circ-decr",
+      "measure/measure-waist-circ-incr",
+      "measure/measure-hips-circ-decr",
+      "measure/measure-hips-circ-incr"
+    ],
+    "macro_shape_targets_count": 30,
+    "macro_shape_targets_sample": [
+      "macrodetails/height/female-young-averagemuscle-averageweight-maxheight",
+      "macrodetails/height/female-young-averagemuscle-averageweight-minheight",
+      "macrodetails/height/male-young-averagemuscle-averageweight-maxheight",
+      "macrodetails/height/male-young-averagemuscle-averageweight-minheight",
+      "macrodetails/asian-female-young",
+      "macrodetails/caucasian-female-young",
+      "macrodetails/african-female-young",
+      "macrodetails/universal-male-young-minmuscle-minweight",
+      "macrodetails/universal-male-young-minmuscle-maxweight",
+      "macrodetails/universal-male-young-maxmuscle-maxweight",
+      "macrodetails/universal-male-old-minmuscle-minweight",
+      "macrodetails/universal-male-old-minmuscle-maxweight",
+      "macrodetails/universal-male-old-maxmuscle-maxweight",
+      "macrodetails/universal-female-young-minmuscle-minweight",
+      "macrodetails/universal-female-young-minmuscle-maxweight",
+      "macrodetails/universal-female-young-maxmuscle-maxweight",
+      "macrodetails/universal-female-old-minmuscle-minweight",
+      "macrodetails/universal-female-old-minmuscle-maxweight",
+      "macrodetails/universal-female-old-maxmuscle-minweight",
+      "macrodetails/universal-female-old-maxmuscle-maxweight"
+    ],
+    "source_asset": "oxihuman-core-v1.ohpk",
+    "upstream_commit": "1f508f6083b2f823dab15de924b3bde72e08d77c (MakeHuman v1.3.0)"
+  },
+  "wearwise_region_mapping": {
+    "shoulders": {
+      "supported": false,
+      "matching_targets": [],
+      "notes": "GAP: No dedicated shoulder width or shoulder slope morph targets in core pack."
+    },
+    "torso_chest": {
+      "supported": true,
+      "matching_targets": [
+        "measure-bust-circ-incr",
+        "measure-bust-circ-decr"
+      ],
+      "notes": "Circumference fitting only via girth morph targets; no independent pectoral/chest shape controls."
+    },
+    "abdomen": {
+      "supported": false,
+      "matching_targets": [],
+      "notes": "GAP: No stomach/belly protrusion or abdomen shape controls outside global weight/waist."
+    },
+    "waist": {
+      "supported": true,
+      "matching_targets": [
+        "measure-waist-circ-incr",
+        "measure-waist-circ-decr"
+      ],
+      "notes": "Circumference fitting only."
+    },
+    "upper_arm": {
+      "supported": false,
+      "matching_targets": [],
+      "notes": "GAP: No arm thickness, bicep girth, or sleeve fit adjustment morphs."
+    },
+    "lower_arm": {
+      "supported": false,
+      "matching_targets": [],
+      "notes": "GAP: No forearm or wrist morphs."
+    },
+    "hips": {
+      "supported": true,
+      "matching_targets": [
+        "measure-hips-circ-incr",
+        "measure-hips-circ-decr"
+      ],
+      "notes": "Circumference fitting only."
+    },
+    "thighs": {
+      "supported": false,
+      "matching_targets": [],
+      "notes": "GAP: No thigh girth or leg shape targets in core pack."
+    },
+    "calves": {
+      "supported": false,
+      "matching_targets": [],
+      "notes": "GAP: No calf circumference or lower leg targets in core pack."
+    }
+  },
+  "morphology_and_mesh": {
+    "base_mesh_vertex_count": 21833,
+    "topology": "MakeHuman standard adult body mesh (CC0-1.0)",
+    "gender_morphologies": "Supported via male/female macrodetails blendspace",
+    "age_coverage": "Young to Old adult corners (no pediatric/child morphology in core pack)",
+    "garment_fit_suitability": "Suitable for basic waist/bust silhouette, but unsuitable for detailed shoulder/arm/thigh regional fit zones due to lack of localized blendshapes."
+  },
+  "fit_to_measurements_analysis": {
+    "algorithm": "Convex optimization / bounded gradient descent over 8 girth target weights",
+    "inputs": [
+      "bust_circumference",
+      "underbust_circumference",
+      "waist_circumference",
+      "hip_circumference",
+      "height"
+    ],
+    "nature_of_residuals": "Internal self-consistency only (optimizing weights to minimize delta against synthetic vertex slices). Does NOT validate accuracy against real human tape measurements."
+  },
+  "licensing_status": {
+    "current_license": "BUSL-1.1 (Business Source License 1.1)",
+    "change_date": "January 1, 2030 (transitions to Apache-2.0)",
+    "production_use_allowed": false,
+    "commercial_sponsorship_required": true,
+    "yanked_open_source_versions": [
+      "0.1.0 (yanked 2026-11-17)",
+      "0.2.1 (yanked 2026-11-17)"
+    ],
+    "transitional_release": "0.0.1 (published 2026-11-17 under BUSL-1.1 with no code)",
+    "upstream_asset_license": "CC0-1.0 Universal",
+    "production_gate_verdict": "DISQUALIFIED / FAIL \u2014 Relicensed under BUSL-1.1 on 2026-11-17, prohibiting commercial production use until 2030 without commercial sponsorship."
+  }
+}

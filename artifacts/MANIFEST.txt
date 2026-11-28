@@ -1,0 +1,35 @@
+================================================================================
+WearWise Phase 9 Final Engineering Acceptance Audit Manifest
+================================================================================
+Packet Archive: WearWise_Phase9_Engineering_Audit_Packet.zip
+SHA-256 Checksum: 3410bd4b388cf755db2a05501ce927cd7190a88be3463350b69b455596d497c4
+Archive Size: 3417879 bytes
+
+Constituent Files & SHA-256 Hashes:
+cef1b92b6827a2280fe82899302c61c93d1f024d463eeefbf266f287592c77ce  artifacts/skinning_audit_metrics.json
+c0dc8dc0f51a58739c5113d4d0f70da1ffa93ef95f7d45ffc055a3907a295253  artifacts/xpbd_benchmark_reconciliation.json
+5c5fc9708ac5332cd6462ff5ab8ab98b8a8d5c5e1cf177cc9fc67647a288f891  artifacts/xpbd_benchmark_reconciliation.csv
+c6a50963b7c8e40d324a0cc5ce1c0107673f0e63b427b86ca027cbd4e3300e00  artifacts/demonstration/phase9_audit_walkthrough.webp
+e83698cb01ecad62429ecac6e50ba5c8a2468ac53d514776446b631614a3002e  artifacts/demonstration/phase9_audit_walkthrough.gif
+6a546b77d5178f9e6f49031300fa938bfd65d229cc87d8c7aeadd3afd8326de6  scripts/audit_skinning_runtime.py
+2ed12206cc4c92e987adc655fc0fee322a68166c3eb8b860050d39c6e3ab9b7a  frontend/run_browser_xpbd_benchmark.js
+462bda983755bd2abf076b168d7111e85dff17150b47542210344e8af071a8cf  frontend/record_audit_walkthrough.js
+1a86d4fe584cc2202aed0d7d8ef9e1630010c605b30c1f268fa158c8a71f84ba  scripts/verify_phase9.py
+44d621ee09a7981693dee95cdc2a1c1846857b23d33d820271d6807aac9dd3a9  scripts/verify_phase8.py
+17b81ae7512af742435e7a62ee613d3a93c7090b51a88b7d300ef0fe754b37a3  scripts/verify_garment_construction.py
+23187974f2188de03b6fa91eb218e1238494170a203d74fcc86b17bc9dec7671  scripts/benchmark_xpbd.py
+ee29c04aa15affb26dca2e1db7af68f4a70a18ad1a7ff2a01a366aa2c7447ffa  frontend/public/garments/TSH-WW-CREW-001_provenance.json
+8ef0d3e2abca10b2a7209afa7149d1b5585cbc549fbe4de3f850c785d9941a82  artifacts\demonstration\step_01_merchant_studio_open.png
+4d742d7863f15bec8e2ff6df3744c058d6ce23ecfaa9e8116d4e1685f2fda36b  artifacts\demonstration\step_02_merchant_review_sku.png
+73d0ac064e261b83ae6cb0d5cf7bb15a3b922eecec1364e8933e292b763f65fa  artifacts\demonstration\step_03_merchant_select_size_m.png
+3da93a0e0d5e409b6a89da5fc9a6a529e16f6829e9d92cb787386cd3a3eb1ed2  artifacts\demonstration\step_04_merchant_inspect_garment.png
+3da93a0e0d5e409b6a89da5fc9a6a529e16f6829e9d92cb787386cd3a3eb1ed2  artifacts\demonstration\step_05_merchant_approve_and_publish.png
+cc6246b6b3905c941db633b9fdb90ae0c2cc63f229f85912c998b5d8bd66714b  artifacts\demonstration\step_06_shopper_open_tryon.png
+cc6246b6b3905c941db633b9fdb90ae0c2cc63f229f85912c998b5d8bd66714b  artifacts\demonstration\step_07_system_fetch_published_asset.png
+cc6246b6b3905c941db633b9fdb90ae0c2cc63f229f85912c998b5d8bd66714b  artifacts\demonstration\step_08_upright_avatar_loaded.png
+cc6246b6b3905c941db633b9fdb90ae0c2cc63f229f85912c998b5d8bd66714b  artifacts\demonstration\step_09_tshirt_fitted_on_mannequin.png
+722d801a59e96e38372605e87b8950d0f17368f70f8b41c272c10ce747b85fd9  artifacts\demonstration\step_10_arm_elevation_45_cloth_stretch.png
+9dc7fb9b1e3a59b37a5bb90827a9c86e54ab739b8a4aa37d15a0f621b92ea15b  artifacts\demonstration\step_11_arm_elevation_90_max_strain.png
+8e09ad710e5305ba4b33d3e6c1a8e840c822702a78197e691e02d76cc87ad9ca  artifacts\demonstration\step_12_shopper_select_size_l_graded.png
+1840510b7d8a834e4d1f961e80ded2a2dffd91165eba10fecef8ae2b1e2f2bf2  artifacts\demonstration\step_13_toggle_rigid_poplin_profile.png
+012d74949f94460b36362603b4b21f22061d1afda5a2c1e33b23cd7960bb1cee  artifacts\demonstration\step_14_honest_fit_add_to_bag_verified.png

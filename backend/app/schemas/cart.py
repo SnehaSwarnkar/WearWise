@@ -11,6 +11,8 @@ class CartItem(BaseModel):
     brand: Optional[str] = "WEARWISE EDIT"
     color: Optional[str] = None
     size: Optional[str] = None
+    sku: Optional[str] = None
+    published_revision: Optional[int] = None
 
 
 class CartAddRequest(BaseModel):
@@ -22,11 +24,13 @@ class CartUpdateRequest(BaseModel):
     session_id: str
     item_id: int
     quantity: int
+    size: Optional[str] = None
 
 
 class CartRemoveRequest(BaseModel):
     session_id: str
     item_id: int
+    size: Optional[str] = None
 
 
 class CartResponse(BaseModel):

@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "materials": [
+    {
+      "name": "WearWise_WaffleKnit_L",
+      "metallicFactor": 0.05,
+      "roughnessFactor": 0.62,
+      "doubleSided": true,
+      "hasBaseColorTexture": true
+    }
+  ],
+  "embedded_images": [
+    {
+      "size": [
+        2048,
+        2048
+      ],
+      "mode": "RGBA",
+      "byteLength": 104912
+    }
+  ],
+  "uv_valid_components": 7,
+  "errors": []
+}

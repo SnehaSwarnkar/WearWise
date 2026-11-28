@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="655.3" height="722.0" viewBox="0 0 655.3 722.0">
+  <rect width="100%" height="100%" fill="#fdfbf7"/>
+  <polygon points="62.64,682.00 95.76,682.00 128.89,682.00 162.02,682.00 195.14,682.00 228.26,682.00 261.39,682.00 294.52,682.00 327.64,682.00 360.76,682.00 393.89,682.00 427.02,682.00 460.14,682.00 493.26,682.00 526.39,682.00 559.52,682.00 592.64,682.00 598.27,651.00 603.55,620.00 608.13,589.00 611.75,558.00 614.18,527.00 615.28,496.00 615.01,465.00 613.42,434.00 610.63,403.00 606.88,372.00 602.44,341.00 597.64,310.00 577.06,296.43 557.45,282.86 539.71,269.29 524.65,255.71 512.97,242.14 505.18,228.57 501.60,215.00 502.32,201.43 507.26,187.86 516.08,174.29 528.28,160.71 543.16,147.14 559.92,133.57 577.64,120.00 555.64,110.00 533.64,100.00 511.64,90.00 489.64,80.00 467.64,70.00 445.64,60.00 423.64,50.00 401.64,40.00 402.64,59.16 399.99,77.59 393.90,94.57 384.71,109.45 372.89,121.66 359.00,130.74 343.68,136.33 327.64,138.22 311.60,136.33 296.28,130.74 282.39,121.66 270.57,109.45 261.38,94.57 255.29,77.59 252.64,59.16 253.64,40.00 231.64,50.00 209.64,60.00 187.64,70.00 165.64,80.00 143.64,90.00 121.64,100.00 99.64,110.00 77.64,120.00 95.36,133.57 112.12,147.14 127.00,160.71 139.20,174.29 148.02,187.86 152.96,201.43 153.68,215.00 150.10,228.57 142.31,242.14 130.63,255.71 115.57,269.29 97.83,282.86 78.22,296.43 57.64,310.00 52.84,341.00 48.40,372.00 44.65,403.00 41.86,434.00 40.27,465.00 40.00,496.00 41.10,527.00 43.53,558.00 47.15,589.00 51.73,620.00 57.01,651.00" fill="#fce7f3" stroke="#be185d" stroke-width="2"/>
+  <line x1="327.64" y1="602.00" x2="327.64" y2="202.00" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="327.6" y="682.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">FRONT_BOTTOM_SEAM (53.00cm)</text>
+  <text x="615.3" y="496.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">FRONT_SIDE_L (37.47cm)</text>
+  <text x="501.6" y="215.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">FRONT_ARMHOLE_L (26.52cm)</text>
+  <text x="489.6" y="80.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">FRONT_SHOULDER_L (19.33cm)</text>
+  <text x="327.6" y="138.2" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">FRONT_NECKLINE (27.88cm)</text>
+  <text x="165.6" y="80.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">FRONT_SHOULDER_R (19.33cm)</text>
+  <text x="153.7" y="215.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">FRONT_ARMHOLE_R (26.52cm)</text>
+  <text x="40.0" y="496.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">FRONT_SIDE_R (37.47cm)</text>
+  <circle cx="327.64" cy="682.00" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <circle cx="327.64" cy="138.20" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <circle cx="597.64" cy="310.00" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <circle cx="57.64" cy="310.00" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <polyline points="372.64,150.00 372.64,275.00 382.64,285.00 477.64,285.00 487.64,275.00 487.64,150.00" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="12" y="18" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0f172a">PANEL-FRONT-TORSO — Front Torso Panel (units: cm)</text>
+</svg>

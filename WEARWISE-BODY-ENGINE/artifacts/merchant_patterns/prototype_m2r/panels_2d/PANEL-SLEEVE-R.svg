@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="548.3" height="270.6" viewBox="0 0 548.3 270.6">
+  <rect width="100%" height="100%" fill="#fdfbf7"/>
+  <polygon points="69.17,230.63 94.79,230.63 120.42,230.63 146.05,230.63 171.67,230.63 197.29,230.63 222.92,230.63 248.55,230.63 274.17,230.63 299.79,230.63 325.42,230.63 351.05,230.63 376.67,230.63 402.29,230.63 427.92,230.63 453.55,230.63 479.17,230.63 482.82,218.21 486.46,205.78 490.11,193.35 493.76,180.93 497.40,168.51 501.05,156.08 504.69,143.66 508.34,131.23 491.61,117.33 474.89,103.73 458.16,90.75 441.44,78.68 424.71,67.80 407.98,58.38 391.26,50.67 374.53,44.91 357.80,41.29 341.08,40.00 324.35,41.19 307.62,44.98 290.90,51.44 274.17,60.63 257.44,51.44 240.72,44.98 223.99,41.19 207.26,40.00 190.54,41.29 173.81,44.91 157.08,50.67 140.36,58.38 123.63,67.80 106.90,78.68 90.18,90.75 73.45,103.73 56.73,117.33 40.00,131.23 43.65,143.66 47.29,156.08 50.94,168.51 54.58,180.93 58.23,193.35 61.88,205.78 65.52,218.21" fill="#fce7f3" stroke="#be185d" stroke-width="2"/>
+  <line x1="274.17" y1="210.63" x2="274.17" y2="90.63" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="274.2" y="230.6" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">SLEEVE_CUFF_OPENING (41.00cm)</text>
+  <text x="493.8" y="180.9" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">SLEEVE_UNDERARM_B (10.36cm)</text>
+  <text x="391.3" y="50.7" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">SLEEVE_CAP_BACK (26.52cm)</text>
+  <text x="157.1" y="50.7" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">SLEEVE_CAP_FRONT (26.52cm)</text>
+  <text x="54.6" y="180.9" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">SLEEVE_UNDERARM_F (10.36cm)</text>
+  <circle cx="274.17" cy="60.63" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <circle cx="274.17" cy="230.63" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <text x="12" y="18" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0f172a">PANEL-SLEEVE-R — Right Dropped Sleeve (units: cm)</text>
+</svg>

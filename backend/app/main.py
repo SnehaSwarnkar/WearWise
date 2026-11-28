@@ -5,14 +5,23 @@ Entry point. Registers all routers, configures CORS for the Vite dev server,
 and mounts the uploads directory as a static file endpoint.
 """
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from app.routers import products, cart, orders, avatar, wardrobe, saved, assistant, tryon, auth, catalogue
+from app.routers import products, cart, orders, avatar, wardrobe, saved, assistant, tryon, auth, catalogue, seller, admin
+from app.core.security import ensure_auth_seed_and_migration
+from app import database as db
 
 # ── App instance ──────────────────────────────────────────────────────────────
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    ensure_auth_seed_and_migration()
+    yield
+
 
 app = FastAPI(
     title="WearWise API",
@@ -24,6 +33,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 
@@ -36,6 +46,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:4173",
+        "http://127.0.0.1:4173",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     ],
@@ -65,6 +77,8 @@ app.include_router(saved.router)
 app.include_router(assistant.router)
 app.include_router(tryon.router)
 app.include_router(auth.router)
+app.include_router(seller.router)
+app.include_router(admin.router)
 app.include_router(catalogue.router)
 
 
@@ -77,4 +91,11 @@ def root():
 
 @app.get("/health", tags=["Health"])
 def health():
-    return {"status": "healthy"}
+    db_status = db.ping()
+    is_healthy = db_status.get("ok", False) or db_status.get("engine") == "json_files"
+    return {
+        "status": "healthy" if is_healthy else "degraded",
+        "database": db_status,
+        "app": "WearWise API",
+        "version": "1.0.0",
+    }

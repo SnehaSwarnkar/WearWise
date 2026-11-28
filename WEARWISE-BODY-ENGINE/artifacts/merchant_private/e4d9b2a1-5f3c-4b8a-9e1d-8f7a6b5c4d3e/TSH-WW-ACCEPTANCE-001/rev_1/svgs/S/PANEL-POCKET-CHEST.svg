@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300.0" height="428.0" viewBox="0 0 300.0 428.0">
+  <rect width="100%" height="100%" fill="#fdfbf7"/>
+  <text x="16" y="22" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0f172a">SIZE S · PANEL-POCKET-CHEST — Left Chest Patch Pocket</text>
+  <text x="16" y="38" font-family="sans-serif" font-size="10" fill="#475569">Units: cm | Seam Allowance: 1.0 cm | Algorithmic 2D CAD Spec With Cutline (Verify Before Plotter Cutting)</text>
+  <polygon points="85.00,271.14 85.00,137.00 215.00,137.00 215.00,271.14 199.14,287.00 100.86,287.00" fill="none" stroke="#1e293b" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <polygon points="95.00,267.00 105.00,277.00 195.00,277.00 205.00,267.00 205.00,147.00 95.00,147.00" fill="#fce7f3" fill-opacity="0.65" stroke="#be185d" stroke-width="2.0"/>
+  <polyline points="205.00,147.00 95.00,147.00" fill="none" stroke="#0284c7" stroke-width="2.6"/>
+  <line x1="150.00" y1="257.00" x2="150.00" y2="167.00" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="150.0" y="206.0" font-family="sans-serif" font-size="9" fill="#475569" text-anchor="middle">GRAIN (vertical_warp)</text>
+  <text x="217.2" y="300.0" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">POCKET_BOTTOM (11.83cm)</text>
+  <text x="222.6" y="120.3" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">POCKET_SIDE_L (12.00cm)</text>
+  <text x="77.4" y="120.3" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">POCKET_TOP_HEM (11.00cm)</text>
+  <text x="72.0" y="284.8" font-family="monospace" font-size="8.5" fill="#0f172a" text-anchor="middle">POCKET_SIDE_R (12.00cm)</text>
+  <circle cx="95.00" cy="147.00" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <circle cx="205.00" cy="147.00" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <line x1="16" y1="396.0" x2="38" y2="396.0" stroke="#be185d" stroke-width="2.0"/>
+  <text x="44" y="399.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Stitch Line</text>
+  <line x1="115" y1="396.0" x2="137" y2="396.0" stroke="#1e293b" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <text x="143" y="399.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Cut Line (+1.0 cm SA)</text>
+  <line x1="262" y1="396.0" x2="284" y2="396.0" stroke="#0284c7" stroke-width="2.6"/>
+  <text x="290" y="399.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Open Boundary</text>
+  <circle cx="22" cy="411.0" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <text x="32" y="414.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Notch</text>
+  <line x1="82" y1="411.0" x2="104" y2="411.0" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="110" y="414.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Grainline</text>
+  <line x1="172" y1="411.0" x2="194" y2="411.0" stroke="#2563eb" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="200" y="414.0" font-family="sans-serif" font-size="9.5" fill="#0f172a">Topstitch Attachment</text>
+</svg>

@@ -1,5 +1,7 @@
 import { api, getSessionId } from "./client";
 
+const STORE_BASE_URL = import.meta.env.VITE_STORE_API_URL || "http://127.0.0.1:8001";
+
 export function saveAvatarProfile(profile) {
   return api.post("/api/avatar/save", {
     session_id: getSessionId(),
@@ -17,7 +19,7 @@ export function analyzeAvatarPhoto(file, selectedColour) {
   form.append("file", file);
   if (selectedColour) form.append("selected_colour", selectedColour);
   return fetch(
-    (import.meta.env.VITE_API_URL || "http://localhost:8000") + "/api/avatar/analyze-photo",
+    `${STORE_BASE_URL}/api/avatar/analyze-photo`,
     { method: "POST", body: form }
   ).then((r) => {
     if (!r.ok) throw new Error("Photo analysis failed");

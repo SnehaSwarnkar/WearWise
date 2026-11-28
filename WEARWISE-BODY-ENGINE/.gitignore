@@ -1,0 +1,42 @@
+# Virtual environments
+.venv-anny/
+.venv-oxihuman/
+__pycache__/
+*.pyc
+
+# Large model caches
+*.pt
+*.pth
+*.ckpt
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Rust build artifacts
+target/
+
+# Node
+node_modules/
+
+# Env files
+.env
+
+# Cloned candidate repositories
+experiments/oxihuman/oxihuman-repo/
+
+# Test and coverage artifacts
+.coverage
+.coverage.*
+.pytest_cache/
+htmlcov/
+
+# Local databases and binary assets
+data/
+*.db
+*.db-wal
+*.db-shm

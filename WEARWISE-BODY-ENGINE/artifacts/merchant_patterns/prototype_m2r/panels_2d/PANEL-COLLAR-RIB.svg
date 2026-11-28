@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="591.4" height="108.0" viewBox="0 0 591.4 108.0">
+  <rect width="100%" height="100%" fill="#fdfbf7"/>
+  <polygon points="40.00,68.00 59.91,68.00 79.82,68.00 99.73,68.00 119.64,68.00 139.56,68.00 159.47,68.00 179.38,68.00 199.29,68.00 219.20,68.00 239.11,68.00 259.02,68.00 278.94,68.00 298.85,68.00 318.76,68.00 335.38,68.00 351.99,68.00 368.61,68.00 385.22,68.00 401.84,68.00 418.45,68.00 435.07,68.00 451.69,68.00 468.30,68.00 484.92,68.00 501.53,68.00 518.15,68.00 534.77,68.00 551.38,68.00 542.46,61.00 533.54,54.00 524.61,47.00 515.69,40.00 497.36,40.00 479.02,40.00 460.69,40.00 442.36,40.00 424.02,40.00 405.69,40.00 387.36,40.00 369.02,40.00 350.69,40.00 332.36,40.00 314.02,40.00 295.69,40.00 277.36,40.00 259.02,40.00 240.69,40.00 222.36,40.00 204.02,40.00 185.69,40.00 167.36,40.00 149.02,40.00 130.69,40.00 112.36,40.00 94.02,40.00 75.69,40.00 66.77,47.00 57.84,54.00 48.92,61.00" fill="#fce7f3" stroke="#be185d" stroke-width="2"/>
+  <line x1="145.69" y1="54.00" x2="445.69" y2="54.00" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="179.4" y="68.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">COLLAR_NECK_SEAM_FRONT (27.88cm)</text>
+  <text x="435.1" y="68.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">COLLAR_NECK_SEAM_BACK (23.26cm)</text>
+  <text x="533.5" y="54.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">COLLAR_JOIN_END (4.54cm)</text>
+  <text x="295.7" y="40.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">COLLAR_TOP_OPENING (44.00cm)</text>
+  <text x="57.8" y="54.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">COLLAR_JOIN_START (4.54cm)</text>
+  <circle cx="318.79" cy="68.00" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <text x="12" y="18" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0f172a">PANEL-COLLAR-RIB — Ribbed Crewneck Collar (1x1 Rib) (units: cm)</text>
+</svg>

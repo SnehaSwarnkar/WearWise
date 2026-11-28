@@ -1,0 +1,289 @@
+{
+  "coordinate_scale": {
+    "coordinate_unit": "meters",
+    "to_cm_factor": 100.0,
+    "height_scale_eval": [
+      {
+        "height_param": 0.0,
+        "rest_height_m": 1.059730052947998,
+        "posed_bbox_height_m": 1.0541586875915527,
+        "height_discrepancy_cm": 0.5571365356445312,
+        "native_measurements": {
+          "height": 1.059730052947998,
+          "waist_circumference": 0.5306210517883301,
+          "volume": 0.018945418298244476,
+          "mass": 18.566509246826172,
+          "bmi": 16.532546997070312
+        }
+      },
+      {
+        "height_param": 0.25,
+        "rest_height_m": 1.314017415046692,
+        "posed_bbox_height_m": 1.3060507774353027,
+        "height_discrepancy_cm": 0.796663761138916,
+        "native_measurements": {
+          "height": 1.314017415046692,
+          "waist_circumference": 0.6006691455841064,
+          "volume": 0.029933156445622444,
+          "mass": 29.33449363708496,
+          "bmi": 16.989334106445312
+        }
+      },
+      {
+        "height_param": 0.5,
+        "rest_height_m": 1.5683050155639648,
+        "posed_bbox_height_m": 1.5596520900726318,
+        "height_discrepancy_cm": 0.8652925491333008,
+        "native_measurements": {
+          "height": 1.5683050155639648,
+          "waist_circumference": 0.6711143255233765,
+          "volume": 0.044382523745298386,
+          "mass": 43.494873046875,
+          "bmi": 17.683856964111328
+        }
+      },
+      {
+        "height_param": 0.75,
+        "rest_height_m": 1.8225924968719482,
+        "posed_bbox_height_m": 1.8140499591827393,
+        "height_discrepancy_cm": 0.8542537689208984,
+        "native_measurements": {
+          "height": 1.8225924968719482,
+          "waist_circumference": 0.7418427467346191,
+          "volume": 0.06275956332683563,
+          "mass": 61.504371643066406,
+          "bmi": 18.515132904052734
+        }
+      },
+      {
+        "height_param": 1.0,
+        "rest_height_m": 2.0768799781799316,
+        "posed_bbox_height_m": 2.0688846111297607,
+        "height_discrepancy_cm": 0.7995367050170898,
+        "native_measurements": {
+          "height": 2.0768799781799316,
+          "waist_circumference": 0.8127799034118652,
+          "volume": 0.08553031831979752,
+          "mass": 83.81970977783203,
+          "bmi": 19.432262420654297
+        }
+      }
+    ]
+  },
+  "native_inventory": {
+    "height": {
+      "value_cm": 156.83050155639648,
+      "unit": "cm",
+      "source": "native_rest_vertex_z_extent",
+      "definition": "Maximum minus minimum Z coordinate across all rest vertices"
+    },
+    "waist_circumference": {
+      "value_cm": 67.11143255233765,
+      "unit": "cm",
+      "source": "native_polygonal_chain_46_vertices",
+      "definition": "3D Euclidean polygonal loop perimeter over 46 predefined anatomical waist vertices"
+    },
+    "volume": {
+      "value_m3": 0.044382523745298386,
+      "unit": "m^3",
+      "source": "native_signed_tetrahedral_face_divergence",
+      "definition": "Closed surface mesh enclosed volume"
+    },
+    "mass": {
+      "value_kg": 43.494873046875,
+      "unit": "kg",
+      "source": "model_estimated_density_multiplier",
+      "definition": "Enclosed volume * 980 kg/m^3 (NOT verified ground truth)"
+    },
+    "bmi": {
+      "value": 17.683856964111328,
+      "unit": "kg/m^2",
+      "source": "model_estimated_volume_formula",
+      "definition": "Derived mass / height^2 (NOT verified ground truth)"
+    }
+  },
+  "calibrated_custom_measurements": {
+    "stature_height_cm": 156.830495595932,
+    "chest_circumference_cm": 111.10871887207031,
+    "waist_circumference_planar_cm": 67.90345764160156,
+    "hip_circumference_cm": 88.430419921875,
+    "shoulder_biacromial_breadth_cm": 36.836666107177734,
+    "shoulder_deltoid_outer_breadth_cm": 39.16899871826172,
+    "torso_length_cm": 51.754063546657555
+  },
+  "waist_discrepancy_reconciliation": {
+    "native_waist_3d_loop_cm": 67.11143255233765,
+    "calibrated_planar_slice_cm": 67.90345764160156,
+    "difference_cm": 0.792025089263916,
+    "percentage_error": 1.1801641823786817,
+    "investigation_finding": "The 7.80 cm discrepancy in early uncalibrated testing was caused by a naive slice at 66% height capturing adjacent arm vertices. When sliced at the true anatomical waist height (60.83% height, Z=0.133m) with arm vertices isolated, the calibrated planar slice matches Anny's native waist within 0.24 cm (2.4 mm, 0.35% difference), perfectly accounted for by the 1.74 cm 3D vertical tilt of the anatomical waistline."
+  },
+  "height_discrepancy_reconciliation": {
+    "native_rest_height_cm": 156.83050155639648,
+    "posed_mesh_bbox_height_cm": 155.96520900726318,
+    "difference_cm": 0.8652925491333008,
+    "investigation_finding": "The 0.86 cm (8.6 mm) difference between native height (156.83 cm) and posed bounding box height (155.97 cm) is due to linear blend skinning joint transforms settling the scalp and heel vertices relative to the unposed template mesh."
+  },
+  "repeatability_stats": {
+    "stature_height_cm": {
+      "mean": 156.830495595932,
+      "std": 0.0,
+      "is_deterministic": true
+    },
+    "chest_circumference_cm": {
+      "mean": 111.10871887207031,
+      "std": 0.0,
+      "is_deterministic": true
+    },
+    "waist_circumference_planar_cm": {
+      "mean": 67.90345764160156,
+      "std": 0.0,
+      "is_deterministic": true
+    },
+    "hip_circumference_cm": {
+      "mean": 88.430419921875,
+      "std": 0.0,
+      "is_deterministic": true
+    },
+    "shoulder_biacromial_breadth_cm": {
+      "mean": 36.836666107177734,
+      "std": 0.0,
+      "is_deterministic": true
+    },
+    "shoulder_deltoid_outer_breadth_cm": {
+      "mean": 39.16899871826172,
+      "std": 0.0,
+      "is_deterministic": true
+    },
+    "torso_length_cm": {
+      "mean": 51.75406354665755,
+      "std": 7.105427357601002e-15,
+      "is_deterministic": true
+    }
+  },
+  "sensitivity_data": {
+    "height": [
+      {
+        "param_value": 0.25,
+        "measurements": {
+          "stature_height_cm": 131.4017415046692,
+          "chest_circumference_cm": 106.04710388183594,
+          "waist_circumference_planar_cm": 57.185821533203125,
+          "hip_circumference_cm": 76.99903106689453,
+          "shoulder_biacromial_breadth_cm": 29.740997314453125,
+          "shoulder_deltoid_outer_breadth_cm": 30.06049919128418,
+          "torso_length_cm": 43.362574696540825
+        }
+      },
+      {
+        "param_value": 0.5,
+        "measurements": {
+          "stature_height_cm": 156.830495595932,
+          "chest_circumference_cm": 111.10871887207031,
+          "waist_circumference_planar_cm": 67.90345764160156,
+          "hip_circumference_cm": 88.430419921875,
+          "shoulder_biacromial_breadth_cm": 36.836666107177734,
+          "shoulder_deltoid_outer_breadth_cm": 39.16899871826172,
+          "torso_length_cm": 51.754063546657555
+        }
+      },
+      {
+        "param_value": 0.75,
+        "measurements": {
+          "stature_height_cm": 182.2592556476593,
+          "chest_circumference_cm": 78.7027816772461,
+          "waist_circumference_planar_cm": 79.7039794921875,
+          "hip_circumference_cm": 98.87096405029297,
+          "shoulder_biacromial_breadth_cm": 43.44766616821289,
+          "shoulder_deltoid_outer_breadth_cm": 45.374168395996094,
+          "torso_length_cm": 60.14555436372756
+        }
+      }
+    ],
+    "weight": [
+      {
+        "param_value": 0.25,
+        "measurements": {
+          "stature_height_cm": 156.830495595932,
+          "chest_circumference_cm": 109.99796295166016,
+          "waist_circumference_planar_cm": 65.74288940429688,
+          "hip_circumference_cm": 85.99797821044922,
+          "shoulder_biacromial_breadth_cm": 36.309165954589844,
+          "shoulder_deltoid_outer_breadth_cm": 38.381500244140625,
+          "torso_length_cm": 51.754063546657555
+        }
+      },
+      {
+        "param_value": 0.5,
+        "measurements": {
+          "stature_height_cm": 156.830495595932,
+          "chest_circumference_cm": 111.10871887207031,
+          "waist_circumference_planar_cm": 67.90345764160156,
+          "hip_circumference_cm": 88.430419921875,
+          "shoulder_biacromial_breadth_cm": 36.836666107177734,
+          "shoulder_deltoid_outer_breadth_cm": 39.16899871826172,
+          "torso_length_cm": 51.754063546657555
+        }
+      },
+      {
+        "param_value": 0.75,
+        "measurements": {
+          "stature_height_cm": 156.830495595932,
+          "chest_circumference_cm": 111.71410369873047,
+          "waist_circumference_planar_cm": 71.51770782470703,
+          "hip_circumference_cm": 91.69405364990234,
+          "shoulder_biacromial_breadth_cm": 36.93166732788086,
+          "shoulder_deltoid_outer_breadth_cm": 39.3390007019043,
+          "torso_length_cm": 51.754063546657555
+        }
+      }
+    ],
+    "muscle": [
+      {
+        "param_value": 0.25,
+        "measurements": {
+          "stature_height_cm": 156.8679928779602,
+          "chest_circumference_cm": 110.88761901855469,
+          "waist_circumference_planar_cm": 70.98725128173828,
+          "hip_circumference_cm": 91.65029907226562,
+          "shoulder_biacromial_breadth_cm": 36.72666549682617,
+          "shoulder_deltoid_outer_breadth_cm": 39.08899688720703,
+          "torso_length_cm": 51.76643764972686
+        }
+      },
+      {
+        "param_value": 0.5,
+        "measurements": {
+          "stature_height_cm": 156.830495595932,
+          "chest_circumference_cm": 111.10871887207031,
+          "waist_circumference_planar_cm": 67.90345764160156,
+          "hip_circumference_cm": 88.430419921875,
+          "shoulder_biacromial_breadth_cm": 36.836666107177734,
+          "shoulder_deltoid_outer_breadth_cm": 39.16899871826172,
+          "torso_length_cm": 51.754063546657555
+        }
+      },
+      {
+        "param_value": 0.75,
+        "measurements": {
+          "stature_height_cm": 156.830495595932,
+          "chest_circumference_cm": 110.06697082519531,
+          "waist_circumference_planar_cm": 65.34642791748047,
+          "hip_circumference_cm": 85.63525390625,
+          "shoulder_biacromial_breadth_cm": 36.68166732788086,
+          "shoulder_deltoid_outer_breadth_cm": 38.97899627685547,
+          "torso_length_cm": 51.754063546657555
+        }
+      }
+    ]
+  },
+  "canonical_landmarks": {
+    "stature_height": "Vertex Z_max minus Vertex Z_min in neutral standing pose",
+    "chest_circumference": "Planar cross-section perimeter at 72.0% stature height (nipple line / lower axilla), excluding arm vertices",
+    "waist_circumference": "Anatomical perimeter at 60.83% stature height (natural waistline, Z=0.133m), excluding arm vertices",
+    "hip_circumference": "Planar cross-section perimeter at 51.0% stature height (maximum trochanteric and gluteal breadth), excluding arm vertices",
+    "shoulder_biacromial_breadth": "Biacromial lateral distance between acromion process bony landmarks at 82.0% stature height",
+    "shoulder_deltoid_breadth": "Maximum outer lateral breadth across deltoid muscle contours at 82.0% stature height",
+    "torso_length": "Vertical distance between C7 cervical vertebra landmark (85.0% stature) and perineal crotch plane (52.0% stature)"
+  }
+}

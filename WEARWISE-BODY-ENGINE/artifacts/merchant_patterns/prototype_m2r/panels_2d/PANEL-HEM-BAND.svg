@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1140.0" height="108.0" viewBox="0 0 1140.0 108.0">
+  <rect width="100%" height="100%" fill="#fdfbf7"/>
+  <polygon points="40.00,68.00 73.12,68.00 106.25,68.00 139.38,68.00 172.50,68.00 205.62,68.00 238.75,68.00 271.88,68.00 305.00,68.00 338.12,68.00 371.25,68.00 404.38,68.00 437.50,68.00 470.62,68.00 503.75,68.00 536.88,68.00 570.00,68.00 603.12,68.00 636.25,68.00 669.38,68.00 702.50,68.00 735.62,68.00 768.75,68.00 801.88,68.00 835.00,68.00 868.12,68.00 901.25,68.00 934.38,68.00 967.50,68.00 1000.62,68.00 1033.75,68.00 1066.88,68.00 1100.00,68.00 1100.00,58.67 1100.00,49.33 1100.00,40.00 1066.88,40.00 1033.75,40.00 1000.62,40.00 967.50,40.00 934.38,40.00 901.25,40.00 868.12,40.00 835.00,40.00 801.88,40.00 768.75,40.00 735.62,40.00 702.50,40.00 669.38,40.00 636.25,40.00 603.12,40.00 570.00,40.00 536.88,40.00 503.75,40.00 470.62,40.00 437.50,40.00 404.38,40.00 371.25,40.00 338.12,40.00 305.00,40.00 271.88,40.00 238.75,40.00 205.62,40.00 172.50,40.00 139.38,40.00 106.25,40.00 73.12,40.00 40.00,40.00 40.00,49.33 40.00,58.67" fill="#fce7f3" stroke="#be185d" stroke-width="2"/>
+  <line x1="170.00" y1="54.00" x2="970.00" y2="54.00" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="570.0" y="68.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">HEM_LOWER_OPENING (106.00cm)</text>
+  <text x="1100.0" y="49.3" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">HEM_JOIN_END (2.80cm)</text>
+  <text x="835.0" y="40.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">HEM_BODY_SEAM_BACK (53.00cm)</text>
+  <text x="305.0" y="40.0" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">HEM_BODY_SEAM_FRONT (53.00cm)</text>
+  <text x="40.0" y="58.7" font-family="monospace" font-size="9" fill="#0f172a" text-anchor="middle">HEM_JOIN_START (2.80cm)</text>
+  <circle cx="570.00" cy="40.00" r="3.5" fill="#10b981" stroke="#064e3b" stroke-width="1"/>
+  <text x="12" y="18" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0f172a">PANEL-HEM-BAND — Clean 28mm Hem Band (units: cm)</text>
+</svg>

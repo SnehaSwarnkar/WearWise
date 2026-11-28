@@ -1,0 +1,4 @@
+Substeps,Solver_Median_ms,Collision_Median_ms,BufferUpdate_Median_ms,Render_Median_ms,TotalFrame_Median_ms,TotalFrame_p95_ms,TotalFrame_p99_ms,SimUpdates_Hz,Actual_rAF_FPS,Verdict
+4,0.2,0,0,2.1,2.4,2.5,2.6,5000,60,"Acceptably Smooth (Interactive Standard Sustained)"
+6,0.3,0,0,2.1,2.5,2.7,2.8,3333.3,60,"Acceptably Smooth (Interactive Standard Sustained)"
+10,0.5,0,0,2.1,2.7,2.8,3,2000,60,"Acceptably Smooth (Interactive Standard Sustained)"

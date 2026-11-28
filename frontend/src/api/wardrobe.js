@@ -1,6 +1,4 @@
-import { api, getSessionId } from "./client";
-
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import { api, getCsrfToken, getSessionId, getStoreApiBase } from "./client";
 
 export function getWardrobe(category = null) {
   const params = category && category !== "All" ? `?category=${category}` : "";
@@ -12,8 +10,11 @@ export function uploadClothes(files, category = "Tops") {
   form.append("session_id", getSessionId());
   form.append("category", category);
   files.forEach((f) => form.append("files", f));
-  return fetch(`${BASE_URL}/api/wardrobe/upload`, {
+  const csrf = getCsrfToken();
+  return fetch(`${getStoreApiBase()}/api/wardrobe/upload`, {
     method: "POST",
+    credentials: "include",
+    headers: csrf ? { "X-CSRF-Token": csrf } : {},
     body: form,
   }).then((r) => {
     if (!r.ok) throw new Error("Upload failed");
