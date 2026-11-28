@@ -76,6 +76,9 @@ export interface BodyProfile {
   profile_id: string;
   user_id: string;
   current_revision: number;
+  avatar_name?: string | null;
+  body_shape?: string | null;
+  age_range?: string | null;
   presentation_gender: 'masculine' | 'feminine' | 'neutral';
   stature_cm: number;
   reported_weight_kg: number | null;
@@ -90,12 +93,19 @@ export interface ProfileCreateRequest {
   presentation_gender: 'masculine' | 'feminine' | 'neutral';
   stature_cm: number;
   reported_weight_kg?: number | null;
+  avatar_name?: string | null;
+  body_shape?: string | null;
+  age_range?: string | null;
   initial_controls?: Partial<BodyShapeControls>;
 }
 
 export interface ProfileUpdateRequest {
   presentation_gender?: 'masculine' | 'feminine' | 'neutral';
+  stature_cm?: number;
   reported_weight_kg?: number | null;
+  avatar_name?: string | null;
+  body_shape?: string | null;
+  age_range?: string | null;
 }
 
 export interface UpdateControlsRequest {
@@ -117,6 +127,7 @@ export interface AvatarGenerateRequest {
   profile_id: string;
   pose?: string;
   format?: 'glb';
+  rigged?: boolean;
 }
 
 export interface AvatarGenerationResponse {

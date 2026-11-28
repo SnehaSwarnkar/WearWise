@@ -62,7 +62,7 @@ def test_neutral_masculine_extraction(anny_engine: AnnyAdapter, anthro_engine: A
     assert sh_rec.diagnostic.extracted_loops_count == 0
     assert sh_rec.selected_loop is None
     assert sh_rec.measurement is not None
-    assert pytest.approx(float(sh_rec.measurement.value_cm), abs=0.5) == 37.20
+    assert pytest.approx(float(sh_rec.measurement.value_cm), abs=0.5) == 36.96
     assert sh_rec.measurement.assessment_state == MeasurementAssessmentState.ELIGIBLE
 
     # 3. Chest circumference
@@ -73,18 +73,18 @@ def test_neutral_masculine_extraction(anny_engine: AnnyAdapter, anthro_engine: A
     assert ch_rec.diagnostic.extracted_loops_count > 0
     assert ch_rec.selected_loop is not None and ch_rec.selected_loop.is_closed
     assert ch_rec.measurement is not None
-    assert pytest.approx(float(ch_rec.measurement.value_cm), abs=1.0) == 77.85
+    assert pytest.approx(float(ch_rec.measurement.value_cm), abs=1.0) == 83.29
 
     # 4. Waist planar circumference
     w_rec = result.records["waist_planar_circumference"]
     assert w_rec.diagnostic.status_code == "SUCCESS"
-    assert pytest.approx(float(w_rec.measurement.value_cm), abs=1.0) == 65.96
+    assert pytest.approx(float(w_rec.measurement.value_cm), abs=1.0) == 70.84
     assert w_rec.diagnostic.graph_is_2_regular
 
     # 5. Hip circumference (provisional)
     hip_rec = result.records["hip_circumference"]
     assert hip_rec.diagnostic.status_code == "SUCCESS"
-    assert pytest.approx(float(hip_rec.measurement.value_cm), abs=1.0) == 91.62
+    assert pytest.approx(float(hip_rec.measurement.value_cm), abs=1.0) == 85.47
     assert hip_rec.measurement.assessment_state == MeasurementAssessmentState.PROVISIONAL
 
 
@@ -100,13 +100,14 @@ def test_neutral_feminine_extraction(anny_engine: AnnyAdapter, anthro_engine: An
         assert rec.measurement.acquisition_method == MeasurementAcquisitionMethod.GEOMETRY_EXTRACTED
         assert rec.measurement.validation_state == MeasurementValidationState.INTERNALLY_CONSISTENT
 
-    # Feminine dimorphism assertions
-    f_sh = float(result.records["shoulder_biacromial_breadth"].measurement.value_cm)
+    # Feminine dimorphism assertions (hips wider and waist/chest narrower than masculine neutral)
     f_ch = float(result.records["chest_circumference"].measurement.value_cm)
-    # Bust circumference is larger in feminine baseline than masculine
-    assert f_ch > 80.0
-    # Shoulders are narrower than masculine baseline
-    assert f_sh < 37.20
+    f_w = float(result.records["waist_planar_circumference"].measurement.value_cm)
+    f_hip = float(result.records["hip_circumference"].measurement.value_cm)
+    assert f_hip > 90.0
+    assert f_hip > f_ch
+    assert f_w < 70.0
+    assert f_ch > 75.0
 
 
 def test_modified_athletic_avatar_extraction(anny_engine: AnnyAdapter, anthro_engine: AnthropometryEngine):

@@ -36,14 +36,60 @@ class ProfileRepository:
         stature_cm: Decimal,
         reported_weight_kg: Optional[Decimal] = None,
         initial_controls: Optional[Dict[str, float]] = None,
+        avatar_name: Optional[str] = None,
+        body_shape: Optional[str] = None,
+        age_range: Optional[str] = None,
     ) -> BodyProfileModel:
         """
-        Atomically creates a new body profile with initial revision 1,
-        canonical stature measurement, and initial shape controls.
+        Atomically creates the user's single primary body profile (or updates the
+        existing primary profile if one already exists for this user_id, enforcing
+        one primary avatar per customer account).
         """
+        existing_list = self.get_profiles_by_user(user_id)
+        if existing_list:
+            primary = existing_list[0]
+            primary.presentation_gender = presentation_gender
+            primary.stature_cm = stature_cm
+            if reported_weight_kg is not None:
+                primary.reported_weight_kg = reported_weight_kg
+            if avatar_name is not None:
+                primary.avatar_name = avatar_name
+            if body_shape is not None:
+                primary.body_shape = body_shape
+            if age_range is not None:
+                primary.age_range = age_range
+
+            if initial_controls:
+                self.update_controls(
+                    profile_id=primary.id,
+                    expected_revision=primary.current_revision,
+                    controls=initial_controls,
+                )
+            else:
+                self.record_measurements(
+                    profile_id=primary.id,
+                    expected_revision=primary.current_revision,
+                    measurements=[
+                        {
+                            "measurement_code": "stature",
+                            "value_cm": stature_cm,
+                            "unit": "cm",
+                            "acquisition_method": "user_reported",
+                            "validation_state": "unvalidated",
+                            "assessment_state": "eligible",
+                            "landmark_convention": "plantar_to_vertex_bounding_box",
+                        }
+                    ],
+                )
+            self.db.flush()
+            return self.get_profile(primary.id) or primary
+
         profile = BodyProfileModel(
             user_id=user_id,
             current_revision=1,
+            avatar_name=avatar_name,
+            body_shape=body_shape,
+            age_range=age_range,
             presentation_gender=presentation_gender,
             stature_cm=stature_cm,
             reported_weight_kg=reported_weight_kg,
@@ -128,8 +174,12 @@ class ProfileRepository:
         profile_id: uuid.UUID,
         presentation_gender: Optional[str] = None,
         reported_weight_kg: Optional[Decimal] = None,
+        stature_cm: Optional[Decimal] = None,
+        avatar_name: Optional[str] = None,
+        body_shape: Optional[str] = None,
+        age_range: Optional[str] = None,
     ) -> Optional[BodyProfileModel]:
-        """Updates non-anthropometric profile metadata."""
+        """Updates profile metadata (gender, height, weight, avatar name, body shape, age range)."""
         profile = self.get_profile(profile_id)
         if not profile:
             return None
@@ -137,6 +187,19 @@ class ProfileRepository:
             profile.presentation_gender = presentation_gender
         if reported_weight_kg is not None:
             profile.reported_weight_kg = reported_weight_kg
+        if stature_cm is not None:
+            profile.stature_cm = stature_cm
+            latest_rev = self.get_latest_revision(profile_id)
+            if latest_rev and latest_rev.measurements:
+                for m in latest_rev.measurements:
+                    if m.lifecycle_status == "active" and m.measurement_code == "stature":
+                        m.value_cm = stature_cm
+        if avatar_name is not None:
+            profile.avatar_name = avatar_name
+        if body_shape is not None:
+            profile.body_shape = body_shape
+        if age_range is not None:
+            profile.age_range = age_range
         self.db.flush()
         return profile
 

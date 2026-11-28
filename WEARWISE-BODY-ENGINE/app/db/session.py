@@ -60,6 +60,27 @@ def run_migrations(db_url: Optional[str] = None) -> None:
     command.upgrade(cfg, "head")
 
 
+def _ensure_sqlite_columns(target_engine) -> None:
+    """Idempotently adds non-breaking Phase 13 profile metadata columns if missing."""
+    try:
+        from sqlalchemy import inspect, text
+        insp = inspect(target_engine)
+        if "body_profiles" not in insp.get_table_names():
+            return
+        existing_cols = {c["name"] for c in insp.get_columns("body_profiles")}
+        additions = [
+            ("avatar_name", "VARCHAR(80)"),
+            ("body_shape", "VARCHAR(48)"),
+            ("age_range", "VARCHAR(32)"),
+        ]
+        with target_engine.begin() as conn:
+            for col_name, col_type in additions:
+                if col_name not in existing_cols:
+                    conn.execute(text(f"ALTER TABLE body_profiles ADD COLUMN {col_name} {col_type}"))
+    except Exception:
+        pass
+
+
 def init_db(target_engine=None):
     """Initializes tables in database using Alembic migrations or declarative metadata."""
     eng = target_engine or engine
@@ -69,6 +90,7 @@ def init_db(target_engine=None):
     except Exception:
         # Fallback to create_all if alembic runner context is unavailable
         Base.metadata.create_all(bind=eng)
+    _ensure_sqlite_columns(eng)
 
 
 def get_db() -> Generator[Session, None, None]:

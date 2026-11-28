@@ -167,5 +167,24 @@ describe('WeldedClothSolver (Phase 10.4-10.7)', () => {
     const poplin = runWithFabric('rigid_poplin_140');
     expect(knit.maxDisplacementCm).not.toBe(poplin.maxDisplacementCm);
     expect(knit.maxStretchRatio).toBeGreaterThanOrEqual(poplin.maxStretchRatio * 0.99);
+    expect(knit.strainSummary).toBeDefined();
+    expect(Number.isFinite(knit.strainSummary!.maxTensionPct)).toBe(true);
+  });
+
+  it('computes real per-particle relative strain buffers and anatomical elbow articulation', () => {
+    const solver = new WeldedClothSolver();
+    solver.bindAvatar(buildMockRiggedAvatar());
+    solver.bindGarment(buildMockTwoPanelGarment());
+
+    const p8 = ARTICULATED_POSES.find((p) => p.id === 'P8')!;
+    solver.setExactPose(p8.state);
+    for (let i = 0; i < 20; i++) solver.step(1 / 60);
+
+    const buf = solver.getStrainBufferCopy();
+    expect(buf.length).toBe(6);
+    expect(Array.from(buf).every((v) => Number.isFinite(v))).toBe(true);
+    const m = solver.getMetrics();
+    expect(m.strainSummary).toBeDefined();
+    expect(['Comfortable', 'Fitted', 'Snug', 'Tight']).toContain(m.strainSummary!.overallComfort);
   });
 });

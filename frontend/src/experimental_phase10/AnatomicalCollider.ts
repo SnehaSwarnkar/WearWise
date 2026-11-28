@@ -43,6 +43,8 @@ export class AnatomicalCollider {
   // Bone references for anatomical capsules
   private bPelvisL: THREE.Bone | null = null;
   private bPelvisR: THREE.Bone | null = null;
+  private bThighL: THREE.Bone | null = null;
+  private bThighR: THREE.Bone | null = null;
   private bSpine05: THREE.Bone | null = null;
   private bSpine03: THREE.Bone | null = null;
   private bSpine02: THREE.Bone | null = null;
@@ -65,6 +67,7 @@ export class AnatomicalCollider {
   // Upper-body skinned mesh subset for narrow-phase triangle collision
   private upperVertCount = 0;
   private upperTriCount = 0;
+  private maxAvatarY = 1.56;
   private restPos!: Float32Array;
   private skinJoints!: Uint16Array;
   private skinWeights!: Float32Array;
@@ -105,6 +108,8 @@ export class AnatomicalCollider {
 
     this.bPelvisL = findBone('pelvis.L');
     this.bPelvisR = findBone('pelvis.R');
+    this.bThighL = findBone('thigh01.L');
+    this.bThighR = findBone('thigh01.R');
     this.bSpine05 = findBone('spine05');
     this.bSpine03 = findBone('spine03');
     this.bSpine02 = findBone('spine02');
@@ -139,8 +144,10 @@ export class AnatomicalCollider {
       const y = pos.getY(i);
       if (y > maxY) maxY = y;
     }
-    const minKeepY = maxY * 0.44;
-    const maxKeepY = maxY * 0.92;
+    this.maxAvatarY = maxY;
+    const minKeepY = maxY * 0.42;
+    const maxKeepY = maxY * 0.94;
+    const maxKeepX = Math.max(0.55, maxY * 0.52);
     const oldToNew = new Int32Array(totalV).fill(-1);
     const keepVerts: number[] = [];
 
@@ -148,7 +155,7 @@ export class AnatomicalCollider {
     for (let i = 0; i < totalV; i++) {
       const vx = pos.getX(i);
       const vy = pos.getY(i);
-      if (vy >= minKeepY && vy <= maxKeepY && Math.abs(vx) <= 0.55) {
+      if (vy >= minKeepY && vy <= maxKeepY && Math.abs(vx) <= maxKeepX) {
         oldToNew[i] = keepVerts.length;
         keepVerts.push(i);
       }
@@ -209,6 +216,15 @@ export class AnatomicalCollider {
 
   private updateCapsules(): void {
     const cols: CapsuleCollider[] = [];
+    const heightScale = Math.max(0.80, Math.min(1.25, this.maxAvatarY / 1.68));
+    let shoulderSpan = 0.36;
+    if (this.bUpperL && this.bUpperR) {
+      this.bUpperL.getWorldPosition(this.tmpA);
+      this.bUpperR.getWorldPosition(this.tmpB);
+      shoulderSpan = Math.max(0.24, this.tmpA.distanceTo(this.tmpB));
+    }
+    const widthScale = Math.max(0.76, Math.min(1.30, shoulderSpan / 0.36));
+
     const pushCap = (name: string, b1: THREE.Bone | null, b2: THREE.Bone | null, radius: number, zOff = 0) => {
       if (!b1 || !b2) return;
       const a = new THREE.Vector3();
@@ -222,40 +238,73 @@ export class AnatomicalCollider {
       cols.push({ name, a, b, radius });
     };
 
-    // Inner anti-tunneling capsule cores (sit ~1.5 cm inside skin; exact surface handled by skinned mesh)
-    pushCap('waist_spine', this.bSpine05, this.bSpine03, 0.095, 0.02);
-    pushCap('mid_torso', this.bSpine03, this.bSpine01, 0.105, 0.025);
-    pushCap('neck', this.bNeck01, this.bNeck03, 0.048, 0.0);
+    // Inner anti-tunneling capsule cores (scaled to avatar stature & torso breadth; exact surface handled by skinned mesh)
+    if (this.bPelvisL && this.bPelvisR) {
+      this.bPelvisL.getWorldPosition(this.tmpA);
+      this.bPelvisR.getWorldPosition(this.tmpB);
+      this.tmpA.y += 0.02 * heightScale;
+      this.tmpB.y += 0.02 * heightScale;
+      this.tmpA.z += 0.015 * heightScale;
+      this.tmpB.z += 0.015 * heightScale;
+      cols.push({ name: 'pelvis_hip', a: this.tmpA.clone(), b: this.tmpB.clone(), radius: 0.105 * widthScale });
+    }
+    if (this.bPelvisL) {
+      this.bPelvisL.getWorldPosition(this.tmpA);
+      if (this.bThighL) {
+        this.bThighL.getWorldPosition(this.tmpB);
+      } else {
+        this.tmpB.copy(this.tmpA);
+        this.tmpB.y -= 0.14 * heightScale;
+      }
+      this.tmpA.z += 0.02 * heightScale;
+      this.tmpB.z += 0.02 * heightScale;
+      cols.push({ name: 'hip_thigh_L', a: this.tmpA.clone(), b: this.tmpB.clone(), radius: 0.098 * widthScale });
+    }
+    if (this.bPelvisR) {
+      this.bPelvisR.getWorldPosition(this.tmpA);
+      if (this.bThighR) {
+        this.bThighR.getWorldPosition(this.tmpB);
+      } else {
+        this.tmpB.copy(this.tmpA);
+        this.tmpB.y -= 0.14 * heightScale;
+      }
+      this.tmpA.z += 0.02 * heightScale;
+      this.tmpB.z += 0.02 * heightScale;
+      cols.push({ name: 'hip_thigh_R', a: this.tmpA.clone(), b: this.tmpB.clone(), radius: 0.098 * widthScale });
+    }
+    pushCap('waist_spine', this.bSpine05, this.bSpine03, 0.094 * widthScale, 0.018 * heightScale);
+    pushCap('mid_torso', this.bSpine03, this.bSpine01, 0.102 * widthScale, 0.022 * heightScale);
+    pushCap('neck', this.bNeck01, this.bNeck03, 0.044 * widthScale, 0.0);
 
     // Pectoral / upper-chest inner cores
     if (this.bSpine02 && this.bClavL && this.bShoulderL) {
       this.bSpine02.getWorldPosition(this.tmpA);
       this.bShoulderL.getWorldPosition(this.tmpB);
-      this.tmpA.x += 0.05;
-      this.tmpA.z += 0.03;
-      this.tmpB.x -= 0.025;
-      this.tmpB.y -= 0.06;
-      this.tmpB.z += 0.025;
-      cols.push({ name: 'chest_L', a: this.tmpA.clone(), b: this.tmpB.clone(), radius: 0.074 });
+      this.tmpA.x += 0.045 * widthScale;
+      this.tmpA.z += 0.026 * heightScale;
+      this.tmpB.x -= 0.022 * widthScale;
+      this.tmpB.y -= 0.055 * heightScale;
+      this.tmpB.z += 0.022 * heightScale;
+      cols.push({ name: 'chest_L', a: this.tmpA.clone(), b: this.tmpB.clone(), radius: 0.068 * widthScale });
     }
     if (this.bSpine02 && this.bClavR && this.bShoulderR) {
       this.bSpine02.getWorldPosition(this.tmpA);
       this.bShoulderR.getWorldPosition(this.tmpB);
-      this.tmpA.x -= 0.05;
-      this.tmpA.z += 0.03;
-      this.tmpB.x += 0.025;
-      this.tmpB.y -= 0.06;
-      this.tmpB.z += 0.025;
-      cols.push({ name: 'chest_R', a: this.tmpA.clone(), b: this.tmpB.clone(), radius: 0.074 });
+      this.tmpA.x -= 0.045 * widthScale;
+      this.tmpA.z += 0.026 * heightScale;
+      this.tmpB.x += 0.022 * widthScale;
+      this.tmpB.y -= 0.055 * heightScale;
+      this.tmpB.z += 0.022 * heightScale;
+      cols.push({ name: 'chest_R', a: this.tmpA.clone(), b: this.tmpB.clone(), radius: 0.068 * widthScale });
     }
 
     // Deltoid / shoulder & arms inner cores
-    pushCap('deltoid_L', this.bShoulderL, this.bUpperL, 0.054);
-    pushCap('deltoid_R', this.bShoulderR, this.bUpperR, 0.054);
-    pushCap('upperarm_L', this.bUpperL, this.bLowerL, 0.046);
-    pushCap('upperarm_R', this.bUpperR, this.bLowerR, 0.046);
-    pushCap('forearm_L', this.bLowerL, this.bWristL, 0.036);
-    pushCap('forearm_R', this.bLowerR, this.bWristR, 0.036);
+    pushCap('deltoid_L', this.bShoulderL, this.bUpperL, 0.050 * widthScale);
+    pushCap('deltoid_R', this.bShoulderR, this.bUpperR, 0.050 * widthScale);
+    pushCap('upperarm_L', this.bUpperL, this.bLowerL, 0.042 * widthScale);
+    pushCap('upperarm_R', this.bUpperR, this.bLowerR, 0.042 * widthScale);
+    pushCap('forearm_L', this.bLowerL, this.bWristL, 0.034 * widthScale);
+    pushCap('forearm_R', this.bLowerR, this.bWristR, 0.034 * widthScale);
 
     this.capsules = cols;
   }
@@ -532,15 +581,15 @@ export class AnatomicalCollider {
           const dy = py - this.tmpC.y;
           const dz = pz - this.tmpC.z;
           const dist2 = dx * dx + dy * dy + dz * dz;
-          if (dist2 > 0.025 * 0.025) continue;
+          if (dist2 > 0.048 * 0.048) continue;
 
           const nx = this.triNormals[t * 3];
           const ny = this.triNormals[t * 3 + 1];
           const nz = this.triNormals[t * 3 + 2];
           const signedDist = dx * nx + dy * ny + dz * nz;
 
-          // Inside surface or closer than thicknessM (band limited to -1.2cm so opposite side doesn't trigger)
-          if (signedDist < thicknessM && signedDist > -0.012) {
+          // Inside surface or closer than thicknessM (wide enough for curvy hips/chest while avoiding opposite side)
+          if (signedDist < thicknessM && signedDist > -0.042) {
             const pen = thicknessM - signedDist;
             if (pen > bestDepth) {
               bestDepth = pen;

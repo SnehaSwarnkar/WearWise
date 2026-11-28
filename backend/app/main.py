@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from app.routers import products, cart, orders, avatar, wardrobe, saved, assistant, tryon, auth, catalogue, seller
+from app.routers import products, cart, orders, avatar, wardrobe, saved, assistant, tryon, auth, catalogue, seller, admin
 from app.core.security import ensure_auth_seed_and_migration
 from app import database as db
 
@@ -78,6 +78,7 @@ app.include_router(assistant.router)
 app.include_router(tryon.router)
 app.include_router(auth.router)
 app.include_router(seller.router)
+app.include_router(admin.router)
 app.include_router(catalogue.router)
 
 

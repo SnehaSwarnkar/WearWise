@@ -41,6 +41,15 @@ export type SimulationLifecycleState =
   | 'STABLE'
   | 'ERROR';
 
+export interface StrainRegionSummary {
+  chestPct: number;
+  shouldersPct: number;
+  underarmsPct: number;
+  waistPct: number;
+  maxTensionPct: number;
+  overallComfort: 'Comfortable' | 'Fitted' | 'Snug' | 'Tight';
+}
+
 export interface SimulationMetrics {
   simState: SimulationLifecycleState;
   resetEpoch: number;
@@ -80,6 +89,9 @@ export interface SimulationMetrics {
   maxVelocityMs: number;
   seamSeparationMm: number;
 
+  // Simulated surface stretch summary
+  strainSummary?: StrainRegionSummary;
+
   // Quantitative collision (Phase 10.4)
   penetrationCount: number;
   penetratingParticles: number;
@@ -90,6 +102,140 @@ export interface SimulationMetrics {
   tunnelingIncidents: number;
 }
 
+const _sharedAxisX = new THREE.Vector3(1, 0, 0);
+const _sharedAxisY = new THREE.Vector3(0, 1, 0);
+const _sharedAxisZ = new THREE.Vector3(0, 0, 1);
+
+export interface PoseRigScratch {
+  tmpParentQ: THREE.Quaternion;
+  tmpInvParentQ: THREE.Quaternion;
+  tmpQ: THREE.Quaternion;
+  tmpLocalQ: THREE.Quaternion;
+  tmpUpperCurrQ: THREE.Quaternion;
+  tmpDeltaQ: THREE.Quaternion;
+  tmpAxis: THREE.Vector3;
+}
+
+export function createPoseRigScratch(): PoseRigScratch {
+  return {
+    tmpParentQ: new THREE.Quaternion(),
+    tmpInvParentQ: new THREE.Quaternion(),
+    tmpQ: new THREE.Quaternion(),
+    tmpLocalQ: new THREE.Quaternion(),
+    tmpUpperCurrQ: new THREE.Quaternion(),
+    tmpDeltaQ: new THREE.Quaternion(),
+    tmpAxis: new THREE.Vector3(),
+  };
+}
+
+function rotateBoneAroundWorldAxis(
+  bone: THREE.Bone | undefined,
+  restQ: THREE.Quaternion | undefined,
+  axis: THREE.Vector3,
+  angleDeg: number,
+  accumulate: boolean,
+  scratch: PoseRigScratch
+): void {
+  if (!bone || !restQ) return;
+  if (!accumulate) {
+    bone.quaternion.copy(restQ);
+  }
+  if (Math.abs(angleDeg) < 1e-4) {
+    bone.updateMatrixWorld(true);
+    return;
+  }
+  const rad = (angleDeg * Math.PI) / 180.0;
+  if (bone.parent) {
+    bone.parent.updateMatrixWorld(true);
+    bone.parent.getWorldQuaternion(scratch.tmpParentQ);
+    scratch.tmpInvParentQ.copy(scratch.tmpParentQ).invert();
+    scratch.tmpQ.setFromAxisAngle(axis, rad);
+    scratch.tmpLocalQ.copy(scratch.tmpInvParentQ).multiply(scratch.tmpQ).multiply(scratch.tmpParentQ);
+    bone.quaternion.premultiply(scratch.tmpLocalQ);
+  }
+  bone.updateMatrixWorld(true);
+}
+
+/**
+ * Shared upper-body articulation helper used identically by main-thread
+ * visual skeletons and the XPBD cloth worker so limbs & garment never diverge.
+ * Computes anatomically aligned elbow hinge axes rotated by the posed humerus.
+ */
+export function applyArticulatedPoseToRig(
+  bones: Map<string, THREE.Bone>,
+  restQuats: Map<string, THREE.Quaternion>,
+  restUpperWorldQuats: { L?: THREE.Quaternion; R?: THREE.Quaternion },
+  pose: ArticulationState,
+  scratch: PoseRigScratch
+): void {
+  const spineNames = ['spine04', 'spine03', 'spine02', 'spine01'];
+  const fPer = pose.torsoForwardLean / spineNames.length;
+  const lPer = -pose.torsoLateralLean / spineNames.length;
+  const tPer = pose.torsoTwist / spineNames.length;
+  for (const sName of spineNames) {
+    const b = bones.get(sName);
+    const rq = restQuats.get(sName);
+    rotateBoneAroundWorldAxis(b, rq, _sharedAxisX, fPer, false, scratch);
+    rotateBoneAroundWorldAxis(b, rq, _sharedAxisZ, lPer, true, scratch);
+    rotateBoneAroundWorldAxis(b, rq, _sharedAxisY, tPer, true, scratch);
+  }
+
+  rotateBoneAroundWorldAxis(bones.get('clavicle.L'), restQuats.get('clavicle.L'), _sharedAxisZ, pose.clavicleLift, false, scratch);
+  rotateBoneAroundWorldAxis(bones.get('clavicle.R'), restQuats.get('clavicle.R'), _sharedAxisZ, -pose.clavicleLift, false, scratch);
+
+  const bUpL = bones.get('upperarm01.L');
+  const rqUpL = restQuats.get('upperarm01.L');
+  rotateBoneAroundWorldAxis(bUpL, rqUpL, _sharedAxisZ, pose.shoulderElevL, false, scratch);
+  rotateBoneAroundWorldAxis(bUpL, rqUpL, _sharedAxisX, -pose.armForwardL, true, scratch);
+
+  const bUpR = bones.get('upperarm01.R');
+  const rqUpR = restQuats.get('upperarm01.R');
+  rotateBoneAroundWorldAxis(bUpR, rqUpR, _sharedAxisZ, -pose.shoulderElevR, false, scratch);
+  rotateBoneAroundWorldAxis(bUpR, rqUpR, _sharedAxisX, -pose.armForwardR, true, scratch);
+
+  // Rotate anatomical elbow flexion hinge axis with the posed humerus
+  scratch.tmpAxis.copy(_sharedAxisX);
+  if (bUpL && restUpperWorldQuats.L) {
+    bUpL.getWorldQuaternion(scratch.tmpUpperCurrQ);
+    scratch.tmpDeltaQ.copy(restUpperWorldQuats.L).invert().premultiply(scratch.tmpUpperCurrQ);
+    scratch.tmpAxis.applyQuaternion(scratch.tmpDeltaQ).normalize();
+  }
+  rotateBoneAroundWorldAxis(bones.get('lowerarm01.L'), restQuats.get('lowerarm01.L'), scratch.tmpAxis, -pose.elbowFlexL, false, scratch);
+
+  scratch.tmpAxis.copy(_sharedAxisX);
+  if (bUpR && restUpperWorldQuats.R) {
+    bUpR.getWorldQuaternion(scratch.tmpUpperCurrQ);
+    scratch.tmpDeltaQ.copy(restUpperWorldQuats.R).invert().premultiply(scratch.tmpUpperCurrQ);
+    scratch.tmpAxis.applyQuaternion(scratch.tmpDeltaQ).normalize();
+  }
+  rotateBoneAroundWorldAxis(bones.get('lowerarm01.R'), restQuats.get('lowerarm01.R'), scratch.tmpAxis, -pose.elbowFlexR, false, scratch);
+
+  const foreL = bones.get('lowerarm02.L');
+  const restForeL = restQuats.get('lowerarm02.L');
+  if (foreL && restForeL) {
+    foreL.quaternion.copy(restForeL).multiply(scratch.tmpQ.setFromAxisAngle(_sharedAxisY, (pose.forearmTwist * Math.PI) / 180));
+    foreL.updateMatrixWorld(true);
+  }
+  const foreR = bones.get('lowerarm02.R');
+  const restForeR = restQuats.get('lowerarm02.R');
+  if (foreR && restForeR) {
+    foreR.quaternion.copy(restForeR).multiply(scratch.tmpQ.setFromAxisAngle(_sharedAxisY, (-pose.forearmTwist * Math.PI) / 180));
+    foreR.updateMatrixWorld(true);
+  }
+  const wristL = bones.get('wrist.L');
+  const restWristL = restQuats.get('wrist.L');
+  if (wristL && restWristL) {
+    wristL.quaternion.copy(restWristL).multiply(scratch.tmpQ.setFromAxisAngle(_sharedAxisX, (pose.wristFlex * Math.PI) / 180));
+    wristL.updateMatrixWorld(true);
+  }
+  const wristR = bones.get('wrist.R');
+  const restWristR = restQuats.get('wrist.R');
+  if (wristR && restWristR) {
+    wristR.quaternion.copy(restWristR).multiply(scratch.tmpQ.setFromAxisAngle(_sharedAxisX, (pose.wristFlex * Math.PI) / 180));
+    wristR.updateMatrixWorld(true);
+  }
+}
+
 export class WeldedClothSolver {
   private skeleton: THREE.Skeleton | null = null;
   private collider = new AnatomicalCollider();
@@ -97,6 +243,8 @@ export class WeldedClothSolver {
   // Articulated upper-body bones + rest local quaternions
   private bones = new Map<string, THREE.Bone>();
   private restQuats = new Map<string, THREE.Quaternion>();
+  private restUpperWorldQuats: { L?: THREE.Quaternion; R?: THREE.Quaternion } = {};
+  private poseScratch: PoseRigScratch = createPoseRigScratch();
 
   // Reference world-matrix inverses for delta-transform garment following
   private restSpine01Inv = new THREE.Matrix4();
@@ -121,6 +269,10 @@ export class WeldedClothSolver {
   private pos!: Float32Array;
   private prevPos!: Float32Array;
   private restPos!: Float32Array;
+  private strain!: Float32Array;
+  private strainSumTmp!: Float32Array;
+  private strainCountTmp!: Uint16Array;
+  private particleRegion!: Uint8Array; // 0=chest, 1=shoulders, 2=underarms, 3=waist
   private restMinY = 0.88;
   private restSpanY = 0.34;
   private invMass!: Float32Array;
@@ -172,6 +324,14 @@ export class WeldedClothSolver {
   private avgVelocityMs = 0;
   private maxVelocityMs = 0;
   private seamSeparationMm = 0;
+  private lastStrainSummary: StrainRegionSummary = {
+    chestPct: 0,
+    shouldersPct: 0,
+    underarmsPct: 0,
+    waistPct: 0,
+    maxTensionPct: 0,
+    overallComfort: 'Comfortable',
+  };
   private lastPenReport: PenetrationReport = {
     totalParticles: 0,
     penetratingCount: 0,
@@ -246,11 +406,17 @@ export class WeldedClothSolver {
       if (bUpL) {
         this.restUpperLInv.copy(bUpL.matrixWorld).invert();
         this.hasUpperLRest = true;
+        const wq = new THREE.Quaternion();
+        bUpL.getWorldQuaternion(wq);
+        this.restUpperWorldQuats.L = wq;
       }
       const bUpR = this.bones.get('upperarm01.R');
       if (bUpR) {
         this.restUpperRInv.copy(bUpR.matrixWorld).invert();
         this.hasUpperRRest = true;
+        const wq = new THREE.Quaternion();
+        bUpR.getWorldQuaternion(wq);
+        this.restUpperWorldQuats.R = wq;
       }
 
       this.collider.bind(mainSkMesh);
@@ -273,6 +439,22 @@ export class WeldedClothSolver {
 
     const quantKey = (x: number, y: number, z: number) =>
       `${Math.round(x * 2000)}_${Math.round(y * 2000)}_${Math.round(z * 2000)}`; // 0.5 mm weld grid
+
+    garmentRoot.updateMatrixWorld(true);
+    const gBox = new THREE.Box3().setFromObject(garmentRoot);
+    const gHalfWidth = Number.isFinite(gBox.max.x - gBox.min.x) ? Math.max(0.18, (gBox.max.x - gBox.min.x) * 0.5) : 0.35;
+    let shoulderAnchorX = Math.min(0.21, Math.max(0.14, gHalfWidth * 0.46));
+    const bUpL = this.bones.get('upperarm01.L');
+    const bUpR = this.bones.get('upperarm01.R');
+    if (bUpL && bUpR) {
+      const pL = new THREE.Vector3();
+      const pR = new THREE.Vector3();
+      bUpL.getWorldPosition(pL);
+      bUpR.getWorldPosition(pR);
+      const span = Math.abs(pL.x - pR.x) * 0.46;
+      if (span > 0.11 && span < 0.28) shoulderAnchorX = span;
+    }
+    const sleeveBlendWidth = Math.max(0.10, shoulderAnchorX * 0.78);
 
     garmentRoot.traverse((obj) => {
       const mesh = obj as THREE.Mesh;
@@ -305,12 +487,12 @@ export class WeldedClothSolver {
 
           let side = 0;
           let blend = 0.0;
-          if (isSleeveL || x > 0.20) {
+          if (isSleeveL || x > shoulderAnchorX + 0.02) {
             side = 1;
-            blend = Math.min(1.0, Math.max(0.0, (x - 0.17) / 0.14));
-          } else if (isSleeveR || x < -0.20) {
+            blend = Math.min(1.0, Math.max(0.0, (x - shoulderAnchorX) / sleeveBlendWidth));
+          } else if (isSleeveR || x < -(shoulderAnchorX + 0.02)) {
             side = -1;
-            blend = Math.min(1.0, Math.max(0.0, (-x - 0.17) / 0.14));
+            blend = Math.min(1.0, Math.max(0.0, (-x - shoulderAnchorX) / sleeveBlendWidth));
           }
           tempSides.push(side);
           tempBlends.push(blend);
@@ -337,14 +519,35 @@ export class WeldedClothSolver {
     this.pos = new Float32Array(tempCoords);
     this.prevPos = new Float32Array(tempCoords);
     this.restPos = new Float32Array(tempCoords);
+    this.strain = new Float32Array(this.particleCount);
+    this.strainSumTmp = new Float32Array(this.particleCount);
+    this.strainCountTmp = new Uint16Array(this.particleCount);
+    this.particleRegion = new Uint8Array(this.particleCount);
+
     let minY = Infinity, maxY = -Infinity;
     for (let i = 0; i < this.particleCount; i++) {
       const y = this.restPos[i * 3 + 1];
       if (y < minY) minY = y;
       if (y > maxY) maxY = y;
     }
-    this.restMinY = Number.isFinite(minY) ? minY + 0.04 : 0.88;
-    this.restSpanY = Number.isFinite(maxY - minY) && maxY - minY > 0.1 ? (maxY - minY) * 0.72 : 0.34;
+    const spanY = Number.isFinite(maxY - minY) && maxY - minY > 0.05 ? maxY - minY : 0.55;
+    const baseMinY = Number.isFinite(minY) ? minY : 0.75;
+    this.restMinY = baseMinY + 0.04;
+    this.restSpanY = Math.max(0.18, spanY * 0.72);
+    for (let i = 0; i < this.particleCount; i++) {
+      const rx = Math.abs(this.restPos[i * 3]);
+      const ry = this.restPos[i * 3 + 1];
+      const normY = (ry - baseMinY) / spanY;
+      if (rx >= shoulderAnchorX * 0.85 && normY >= 0.45 && normY <= 0.88) {
+        this.particleRegion[i] = 2; // underarms / sleeve junction
+      } else if (normY > 0.78) {
+        this.particleRegion[i] = 1; // shoulders / collar
+      } else if (normY < 0.42) {
+        this.particleRegion[i] = 3; // waist / lower torso
+      } else {
+        this.particleRegion[i] = 0; // chest / upper torso
+      }
+    }
     this.invMass = new Float32Array(tempInvMass);
     this.isCollar = new Uint8Array(tempCollar);
     this.sleeveSide = new Int8Array(tempSides);
@@ -420,6 +623,15 @@ export class WeldedClothSolver {
     this.conKind = new Uint8Array(cKind);
     this.conLambda = new Float32Array(this.conCount);
 
+    // Seat garment cleanly outside avatar skin (e.g. wider hips/chest) while keeping CAD rest lengths intact
+    if (this.particleCount > 0) {
+      for (let pass = 0; pass < 5; pass++) {
+        this.collider.resolveCollisions(this.pos, this.invMass, this.particleCount, 0.008, true, this.pos, 0.96);
+      }
+      this.prevPos.set(this.pos);
+      this.syncMeshes();
+    }
+
     this.lastPenReport = this.collider.measurePenetration(this.pos, this.particleCount);
   }
 
@@ -455,12 +667,20 @@ export class WeldedClothSolver {
     return { ...this.currentPose };
   }
 
+  /** Instantaneously set current & target pose cleanly (for exact synchronized worker steps). */
+  public setExactPose(pose: ArticulationState): void {
+    this.targetPose = { ...pose };
+    this.currentPose = { ...pose };
+    this.poseDirty = true;
+  }
+
   public reset(): void {
     if (!this.pos) return;
     this.simState = 'RESETTING';
     this.resetEpoch++;
     this.pos.set(this.restPos);
     this.prevPos.set(this.restPos);
+    if (this.strain) this.strain.fill(0);
     if (this.conLambda) this.conLambda.fill(0);
     this.targetPose = { ...NEUTRAL_POSE };
     this.currentPose = { ...NEUTRAL_POSE };
@@ -484,84 +704,8 @@ export class WeldedClothSolver {
     this.collider.updatePoseGeometry();
   }
 
-  private rotateBoneWorldAxis(boneName: string, axis: THREE.Vector3, angleDeg: number, accumulate = false): void {
-    const bone = this.bones.get(boneName);
-    const restQ = this.restQuats.get(boneName);
-    if (!bone || !restQ) return;
-    if (!accumulate) {
-      bone.quaternion.copy(restQ);
-    }
-    if (Math.abs(angleDeg) < 1e-4) {
-      bone.updateMatrixWorld(true);
-      return;
-    }
-    const rad = (angleDeg * Math.PI) / 180.0;
-    if (bone.parent) {
-      bone.parent.updateMatrixWorld(true);
-      bone.parent.getWorldQuaternion(this.tmpParentQ);
-      this.tmpInvParentQ.copy(this.tmpParentQ).invert();
-      this.tmpQ.setFromAxisAngle(axis, rad);
-      this.tmpLocalQ.copy(this.tmpInvParentQ).multiply(this.tmpQ).multiply(this.tmpParentQ);
-      bone.quaternion.premultiply(this.tmpLocalQ);
-    }
-    bone.updateMatrixWorld(true);
-  }
-
   private applyPoseToSkeleton(pose: ArticulationState): void {
-    const axisX = new THREE.Vector3(1, 0, 0);
-    const axisY = new THREE.Vector3(0, 1, 0);
-    const axisZ = new THREE.Vector3(0, 0, 1);
-
-    // 1. Spine chain (distribute lean & twist smoothly across 4 segments)
-    const spineNames = ['spine04', 'spine03', 'spine02', 'spine01'];
-    const fPer = pose.torsoForwardLean / spineNames.length;
-    const lPer = -pose.torsoLateralLean / spineNames.length;
-    const tPer = pose.torsoTwist / spineNames.length;
-    for (const sName of spineNames) {
-      this.rotateBoneWorldAxis(sName, axisX, fPer, false);
-      this.rotateBoneWorldAxis(sName, axisZ, lPer, true);
-      this.rotateBoneWorldAxis(sName, axisY, tPer, true);
-    }
-
-    // 2. Clavicles (upward shrug around world Z)
-    this.rotateBoneWorldAxis('clavicle.L', axisZ, pose.clavicleLift, false);
-    this.rotateBoneWorldAxis('clavicle.R', axisZ, -pose.clavicleLift, false);
-
-    // 3. Upper arms (coronal elevation around world Z + forward flexion around world -X)
-    this.rotateBoneWorldAxis('upperarm01.L', axisZ, pose.shoulderElevL, false);
-    this.rotateBoneWorldAxis('upperarm01.L', axisX, -pose.armForwardL, true);
-    this.rotateBoneWorldAxis('upperarm01.R', axisZ, -pose.shoulderElevR, false);
-    this.rotateBoneWorldAxis('upperarm01.R', axisX, -pose.armForwardR, true);
-
-    // 4. Elbows (flexion around world -X brings forearm forward/up)
-    this.rotateBoneWorldAxis('lowerarm01.L', axisX, -pose.elbowFlexL, false);
-    this.rotateBoneWorldAxis('lowerarm01.R', axisX, -pose.elbowFlexR, false);
-
-    // 5. Forearm twist (local Y axial rotation) & wrist flexion (local X)
-    const foreL = this.bones.get('lowerarm02.L');
-    const restForeL = this.restQuats.get('lowerarm02.L');
-    if (foreL && restForeL) {
-      foreL.quaternion.copy(restForeL).multiply(this.tmpQ.setFromAxisAngle(axisY, (pose.forearmTwist * Math.PI) / 180));
-      foreL.updateMatrixWorld(true);
-    }
-    const foreR = this.bones.get('lowerarm02.R');
-    const restForeR = this.restQuats.get('lowerarm02.R');
-    if (foreR && restForeR) {
-      foreR.quaternion.copy(restForeR).multiply(this.tmpQ.setFromAxisAngle(axisY, (-pose.forearmTwist * Math.PI) / 180));
-      foreR.updateMatrixWorld(true);
-    }
-    const wristL = this.bones.get('wrist.L');
-    const restWristL = this.restQuats.get('wrist.L');
-    if (wristL && restWristL) {
-      wristL.quaternion.copy(restWristL).multiply(this.tmpQ.setFromAxisAngle(axisX, (pose.wristFlex * Math.PI) / 180));
-      wristL.updateMatrixWorld(true);
-    }
-    const wristR = this.bones.get('wrist.R');
-    const restWristR = this.restQuats.get('wrist.R');
-    if (wristR && restWristR) {
-      wristR.quaternion.copy(restWristR).multiply(this.tmpQ.setFromAxisAngle(axisX, (pose.wristFlex * Math.PI) / 180));
-      wristR.updateMatrixWorld(true);
-    }
+    applyArticulatedPoseToRig(this.bones, this.restQuats, this.restUpperWorldQuats, pose, this.poseScratch);
   }
 
   private updateDeltaTransforms(): void {
@@ -623,7 +767,7 @@ export class WeldedClothSolver {
     const alphaWeft = (this.fabric.stretchCompliance / this.fabric.weftResistance) * invDt2;
     const alphaShear = this.fabric.shearCompliance * invDt2;
     const alphaBend = this.fabric.bendCompliance * invDt2;
-    const gravY = -1.65 * this.fabric.gravityScale * subDt * subDt;
+    const gravY = -1.25 * this.fabric.gravityScale * subDt * subDt;
     const thicknessM = Math.max(0.003, (this.fabric.thicknessMm + 2.2) / 1000.0);
 
     const duE = this.deltaTorsoUpper.elements;
@@ -731,20 +875,20 @@ export class WeldedClothSolver {
           const targetY = tyT + (tyA - tyT) * blend;
           const targetZ = tzT + (tzA - tzT) * blend;
 
-          const pull = (0.16 + this.fabric.recoveryStiffness) * blend;
+          const pull = (0.06 + this.fabric.recoveryStiffness * 0.40) * blend;
           nx += (targetX - nx) * pull;
           ny += (targetY - ny) * pull;
           nz += (targetZ - nz) * pull;
         } else if (this.isCollar[i]) {
-          // Soft elastic neckline anchor (Phase 10.4.5): moves with spine01, no hard pin
-          nx += (txHi - nx) * 0.28;
-          ny += (tyHi - ny) * 0.28;
-          nz += (tzHi - nz) * 0.28;
+          // Soft elastic neckline anchor: moves with spine01 without rigid clamping
+          nx += (txHi - nx) * 0.16;
+          ny += (tyHi - ny) * 0.16;
+          nz += (tzHi - nz) * 0.16;
         } else {
-          // Torso equilibrium recovery memory (fabric-dependent)
-          const rec = this.fabric.recoveryStiffness;
+          // Gentle fabric-dependent torso memory so cloth drapes naturally under gravity
+          const rec = this.fabric.recoveryStiffness * 0.20;
           nx += (txT - nx) * rec;
-          ny += (tyT - ny) * (rec * 0.65);
+          ny += (tyT - ny) * (rec * 0.30);
           nz += (tzT - nz) * rec;
         }
 
@@ -753,7 +897,8 @@ export class WeldedClothSolver {
         this.pos[ix + 2] = nz;
       }
 
-      // 2. Solve XPBD constraints with Lagrange multipliers (2nd pass on final substep BEFORE final collision)
+      // 2. Solve XPBD constraints with Lagrange multipliers (3 passes keep structural edges accurate & prevent fake gravity stretch)
+      solveConstraintsPass();
       solveConstraintsPass();
       if (s === substeps - 1) {
         solveConstraintsPass();
@@ -839,9 +984,16 @@ export class WeldedClothSolver {
     let bCount = 0;
     let sumRes = 0.0;
 
+    if (this.strainSumTmp && this.strainCountTmp) {
+      this.strainSumTmp.fill(0);
+      this.strainCountTmp.fill(0);
+    }
+
     for (let c = 0; c < this.conCount; c++) {
-      const ia = this.conA[c] * 3;
-      const ib = this.conB[c] * 3;
+      const pA = this.conA[c];
+      const pB = this.conB[c];
+      const ia = pA * 3;
+      const ib = pB * 3;
       const dx = this.pos[ia] - this.pos[ib];
       const dy = this.pos[ia + 1] - this.pos[ib + 1];
       const dz = this.pos[ia + 2] - this.pos[ib + 2];
@@ -860,7 +1012,51 @@ export class WeldedClothSolver {
         if (ratio < minComp) minComp = ratio;
         sumStr += ratio;
         sCount++;
+        if (this.strainSumTmp && this.strainCountTmp) {
+          const rel = ratio - 1.0;
+          this.strainSumTmp[pA] += rel;
+          this.strainSumTmp[pB] += rel;
+          this.strainCountTmp[pA]++;
+          this.strainCountTmp[pB]++;
+        }
       }
+    }
+
+    if (this.strain && this.strainSumTmp && this.strainCountTmp) {
+      const regSum = [0, 0, 0, 0];
+      const regCnt = [0, 0, 0, 0];
+      let maxTension = 0;
+      for (let i = 0; i < this.particleCount; i++) {
+        const cnt = this.strainCountTmp[i];
+        const avgRel = cnt > 0 ? this.strainSumTmp[i] / cnt : 0;
+        this.strain[i] = avgRel;
+        const pct = Math.max(0, avgRel * 100);
+        if (pct > maxTension) maxTension = pct;
+        const r = this.particleRegion ? this.particleRegion[i] : 0;
+        regSum[r] += pct;
+        regCnt[r]++;
+      }
+      const avgPct = (idx: number) => (regCnt[idx] > 0 ? Number((regSum[idx] / regCnt[idx]).toFixed(2)) : 0);
+      const chestPct = avgPct(0);
+      const shouldersPct = avgPct(1);
+      const underarmsPct = avgPct(2);
+      const waistPct = avgPct(3);
+      const overallComfort: StrainRegionSummary['overallComfort'] =
+        chestPct >= 4.2 || (shouldersPct >= 4.5 && maxTension >= 8.0)
+          ? 'Tight'
+          : chestPct >= 2.2 || underarmsPct >= 3.2
+            ? 'Snug'
+            : chestPct >= 1.0 || shouldersPct >= 1.2
+              ? 'Fitted'
+              : 'Comfortable';
+      this.lastStrainSummary = {
+        chestPct,
+        shouldersPct,
+        underarmsPct,
+        waistPct,
+        maxTensionPct: Number(maxTension.toFixed(2)),
+        overallComfort,
+      };
     }
 
     this.maxStretchRatio = maxStr;
@@ -907,6 +1103,13 @@ export class WeldedClothSolver {
     return out;
   }
 
+  public getStrainBufferCopy(reuse?: Float32Array): Float32Array {
+    if (!this.strain) return new Float32Array(0);
+    const out = reuse && reuse.length === this.strain.length ? reuse : new Float32Array(this.strain.length);
+    out.set(this.strain);
+    return out;
+  }
+
   public applyParticleBuffer(buf: Float32Array): void {
     if (!this.pos || buf.length !== this.pos.length) return;
     this.pos.set(buf);
@@ -948,6 +1151,7 @@ export class WeldedClothSolver {
       avgVelocityMs: Number(this.avgVelocityMs.toFixed(4)),
       maxVelocityMs: Number(this.maxVelocityMs.toFixed(4)),
       seamSeparationMm: Number(this.seamSeparationMm.toFixed(3)),
+      strainSummary: this.lastStrainSummary,
       penetrationCount: this.lastPenReport.penetratingCount,
       penetratingParticles: this.lastPenReport.penetratingCount,
       maxPenetrationMm: this.lastPenReport.maxPenetrationMm,

@@ -27,6 +27,7 @@ class SellerProductCreate(BaseModel):
     name: str
     sku: str
     category: str = "Tops"
+    gender: str = "unisex"
     subcategory: str = "Apparel"
     description: str = ""
     color_variant: str = "#151515"
@@ -42,6 +43,7 @@ class SellerProductCreate(BaseModel):
 class SellerProductUpdate(BaseModel):
     name: Optional[str] = None
     category: Optional[str] = None
+    gender: Optional[str] = None
     description: Optional[str] = None
     color_variant: Optional[str] = None
     color_variants: Optional[list[str]] = None
@@ -265,6 +267,7 @@ def create_seller_product(payload: SellerProductCreate, seller: dict = Depends(r
         "name": payload.name.strip(),
         "sku": sku_clean,
         "category": payload.category.strip() or "Tops",
+        "gender": (payload.gender or "unisex").strip().lower(),
         "subcategory": payload.subcategory.strip() or "Apparel",
         "description": payload.description.strip(),
         "color_variant": payload.color_variant.strip(),

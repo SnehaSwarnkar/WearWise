@@ -92,6 +92,21 @@ export async function sellerLogin(email, password) {
   return data.user;
 }
 
+export async function adminLogin(email, password) {
+  const res = await authFetch("/api/auth/admin/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(cleanErrorDetail(err, "Administrator login failed"));
+  }
+  const data = await res.json();
+  clearLegacyAuthStorage();
+  return data.user;
+}
+
 export async function applyForSeller(payload) {
   const res = await authFetch("/api/auth/seller/apply", {
     method: "POST",

@@ -24,12 +24,19 @@ class CreateProfileRequest(BaseModel):
     presentation_gender: str = Field(..., pattern="^(masculine|feminine|neutral)$")
     stature_cm: float = Field(..., ge=100.0, le=230.0)
     reported_weight_kg: Optional[float] = Field(None, ge=30.0, le=300.0)
+    avatar_name: Optional[str] = Field(None, max_length=80)
+    body_shape: Optional[str] = Field(None, max_length=48)
+    age_range: Optional[str] = Field(None, max_length=32)
     initial_controls: Optional[Dict[str, float]] = None
 
 
 class UpdateProfileRequest(BaseModel):
     presentation_gender: Optional[str] = Field(None, pattern="^(masculine|feminine|neutral)$")
+    stature_cm: Optional[float] = Field(None, ge=100.0, le=230.0)
     reported_weight_kg: Optional[float] = Field(None, ge=30.0, le=300.0)
+    avatar_name: Optional[str] = Field(None, max_length=80)
+    body_shape: Optional[str] = Field(None, max_length=48)
+    age_range: Optional[str] = Field(None, max_length=32)
 
 
 class MeasurementItem(BaseModel):
@@ -55,6 +62,9 @@ class ProfileResponse(BaseModel):
     profile_id: str
     user_id: str
     current_revision: int
+    avatar_name: Optional[str] = None
+    body_shape: Optional[str] = None
+    age_range: Optional[str] = None
     presentation_gender: str
     stature_cm: float
     reported_weight_kg: Optional[float]

@@ -14,7 +14,8 @@
 | Document | Scope |
 | :--- | :--- |
 | [WEARWISE_MASTER_PROJECT_DOSSIER.md](WEARWISE_MASTER_PROJECT_DOSSIER.md) | **Canonical Master Dossier:** Architecture, 12 Mermaid diagrams, equations, IEEE references, test/benchmark matrices, verified screenshots, and thesis mapping |
-| [WEARWISE_PHASE13_CONSOLIDATED_REPORT.md](WEARWISE_PHASE13_CONSOLIDATED_REPORT.md) | **Phase 13 Report:** Separate Shopper & Seller portals, HTTP-only cookies, CSRF, cross-service RBAC, Playwright E2E, and verification counts |
+| [WEARWISE_PHASE13_FINAL_REPORT.md](WEARWISE_PHASE13_FINAL_REPORT.md) | **Phase 13 Final Report:** Consumer UX redesign, 8-link customer nav, multi-step Avatar onboarding, Anny gender/calibration fix, XPBD strain heatmap, and Admin Portal |
+| [WEARWISE_PHASE13_CONSOLIDATED_REPORT.md](WEARWISE_PHASE13_CONSOLIDATED_REPORT.md) | **Phase 13 Auth Baseline:** Separate Shopper & Seller portals, HTTP-only cookies, CSRF, cross-service RBAC, Playwright E2E, and verification counts |
 | [WEARWISE_PHASE12_1_CONSOLIDATED_REPORT.md](WEARWISE_PHASE12_1_CONSOLIDATED_REPORT.md) | **Phase 12.1 Report:** Dual-mode `tryOnCapabilities` validation, VTON provider comparison (FASHN AI v1 vs Vertex AI India), and Rev3 verification |
 | [WEARWISE_PROJECT_CLEANUP_REPORT.md](WEARWISE_PROJECT_CLEANUP_REPORT.md) | **Cleanup Audit:** Phase 12 + 12.1 workspace pruning (`1,125 -> 751` files), retained baseline GLBs, and manifest |
 | [WEARWISE_PHASE11_5_CONSOLIDATED_REPORT.md](WEARWISE_PHASE11_5_CONSOLIDATED_REPORT.md) | **Phase 11.5 Baseline:** Closed-loop Anny calibration (`5×3` fit matrix) and XPBD collision pass ordering fix |
@@ -44,10 +45,12 @@ WearWise/
 
 | Capability | Key Route(s) | Honest Status | Notes |
 | :--- | :--- | :--- | :--- |
-| **Dual-Portal Entry & Auth** | `/auth`, `/login`, `/signup`, `/seller/login`, `/seller/register` | **Staging Verified** | Backend `403` cross-portal blocks; pending seller approval gating (`status="pending"`). |
-| **Seller Console Portal** | `/seller/dashboard`, `/seller/products`, `/seller/orders`, `/seller/studio` (`/merchant-studio`) | **Staging Verified** | Brand-scoped products/orders, `Choose Virtual Try-On Options`, 5-gate QA, `_publish_lock`. |
-| **Marketplace & PDP** | `/explore`, `/product/:sku` | **Staging Verified** | 8 categories, real reviews (`"No customer reviews yet"` when empty), zero AI recommendations, `tryOnCapabilities`. |
-| **Interactive 3D Fitting Room** | `/experimental-try-on`, `/try-on` (legacy) | **Staging Verified (Pre-Built Avatars)** | Graded Rev3 `TSH-WW-CREW-001` (`S`/`M`/`L`), Web Worker XPBD physics, `P0–P11` poses, canonical `ww-session-id` bag. *(On-the-fly PyTorch regeneration on Windows hosts hits `[WinError 4551]` DLL policy block; mitigated safely via lazy import.)* |
+| **3-Role Portal Auth** | `/login`, `/seller/login`, `/seller/register`, `/admin/login` | **Staging Verified** | Separate Customer, Seller & Admin sign-in flows; backend `403` cross-portal blocks; seller `pending`/`rejected` approval gating. |
+| **Customer Storefront & Shop** | `/home`, `/explore`, `/shop`, `/shop/men`, `/shop/women`, `/shop/kids`, `/product/:sku` | **Staging Verified** | 8-item consumer nav, real catalog filtering, wishlist, reviews, zero developer telemetry, `tryOnCapabilities`. |
+| **Avatar Studio & Onboarding** | `/avatar`, `/avatar/create`, `/avatar/dashboard` | **Staging Verified** | 4-step consumer body profile wizard, Anny closed-loop 3D synthesis (`<= 1.6 cm` error), persistent primary avatar. |
+| **Interactive 3D Fitting Room** | `/try-on` (`/experimental-try-on`) | **Staging Verified** | Published garment GLBs (`/shopper-asset/{size}`), Web Worker XPBD physics, `Normal View` & `Fit Tension Heatmap`, `P0–P11` poses. |
+| **Seller Console Portal** | `/seller/dashboard`, `/seller/products`, `/seller/orders`, `/seller/studio` | **Staging Verified** | Brand-scoped products/orders, `Choose Virtual Try-On Options`, 5-gate QA, `_publish_lock`. |
+| **Admin Portal & Diagnostics** | `/admin`, `/admin/diagnostics` | **Staging Verified** | Seller approval/rejection workflow, product/customer moderation, platform health, audit logs & restricted QA telemetry. |
 | **Image-Based Try-On (VTON)** | `/image-try-on`, `/api/v1/try-on/vton/jobs` | **Contract-Tested; Key Pending (`503`)** | Consent gate, EXIF pixel strip, FASHN AI v1 / HTTP `VTON_API_URL` adapter, `finally` temp upload cleanup; fails closed with `503` when keys are unset. |
 | **Bag & Demo Checkout** | `/cart`, `/checkout`, `/order-confirmation`, `/orders` | **Staging Verified (Demo Payment)** | Canonical `ww-session-id` bag persistence; checkout persists `DEMO_NO_PAYMENT_CAPTURED` demo orders cleanly. |
 

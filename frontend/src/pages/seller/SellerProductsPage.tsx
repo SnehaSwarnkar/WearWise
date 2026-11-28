@@ -19,6 +19,7 @@ export default function SellerProductsPage({
     name: '',
     sku: '',
     category: 'Shirts',
+    gender: 'unisex',
     description: '',
     color_variant: '#151515',
     price: '1499',
@@ -59,6 +60,7 @@ export default function SellerProductsPage({
         name: '',
         sku: '',
         category: 'Shirts',
+        gender: 'unisex',
         description: '',
         color_variant: '#151515',
         price: '1499',
@@ -178,6 +180,19 @@ export default function SellerProductsPage({
               {['Tops', 'Shirts', 'Trousers', 'Jeans', 'Skirts', 'Dresses', 'Jackets'].map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
+            </select>
+          </label>
+          <label className="auth-field">
+            <span>SECTION</span>
+            <select
+              value={form.gender}
+              onChange={(e) => setForm({ ...form, gender: e.target.value })}
+              style={{ padding: '10px', border: '2px solid #151515', background: '#fff' }}
+            >
+              <option value="men">Men</option>
+              <option value="women">Women</option>
+              <option value="kids">Kids</option>
+              <option value="unisex">Unisex</option>
             </select>
           </label>
           <label className="auth-field">

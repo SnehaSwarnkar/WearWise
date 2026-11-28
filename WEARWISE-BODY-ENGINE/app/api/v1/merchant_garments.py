@@ -1171,6 +1171,7 @@ def get_shopper_asset(garment_id: str, size: str = "M", revision: Optional[int] 
     qa_report = garment.get("qa_report") or {}
 
     if sv and sv.get("asset_url"):
+        rev_q = pub_rev if pub_rev is not None else 1
         return {
             "garment_id": garment.get("id"),
             "sku": garment.get("sku"),
@@ -1180,7 +1181,7 @@ def get_shopper_asset(garment_id: str, size: str = "M", revision: Optional[int] 
             "version": garment.get("published_version", "v1.0"),
             "size": size,
             "available_sizes": garment.get("available_sizes", list(size_variants.keys())),
-            "asset_url": sv["asset_url"],
+            "asset_url": f"/api/v1/merchant/garments/{garment.get('id')}/shopper-asset/{size.upper()}?revision={rev_q}",
             "sha256": sv.get("sha256"),
             "fabric_profile": fabric_props,
             "measurements": measurements.get(size, measurements),
@@ -1211,6 +1212,53 @@ def get_shopper_asset(garment_id: str, size: str = "M", revision: Optional[int] 
         "all_size_measurements": measurements,
         "qa_status": qa_report.get("overall_status", "UNKNOWN"),
     }
+
+
+@router.get("/{garment_id}/shopper-asset/{size}")
+def get_shopper_published_asset_binary(
+    garment_id: str,
+    size: str,
+    revision: Optional[int] = Query(None),
+):
+    """Streams published glTF 2.0 binary payload for shoppers after verifying published status."""
+    garment = mongo.find_document(COLL_GARMENTS, {"id": garment_id, "is_deleted": False})
+    if not garment:
+        garment = mongo.find_document(COLL_GARMENTS, {"sku": garment_id, "is_deleted": False})
+    if not garment and garment_id == "TSH-WW-CREW-001":
+        garment = _create_seed_garment(DEFAULT_BRAND_ID)
+    if not garment:
+        raise HTTPException(status_code=404, detail=f"Garment {garment_id} not found")
+    if garment.get("status") != "published":
+        raise HTTPException(
+            status_code=403,
+            detail=f"Access denied: Garment {garment_id} is not published for shoppers.",
+        )
+
+    pub_rev = garment.get("published_revision") or garment.get("revision") or 1
+    if revision is not None and int(revision) != int(pub_rev):
+        raise HTTPException(
+            status_code=409,
+            detail=f"Revision mismatch: requested revision {revision}, but published revision is {pub_rev}.",
+        )
+
+    sz = size.upper()
+    ast = mongo.find_document(
+        COLL_ASSETS,
+        {"garment_id": garment.get("id"), "revision": int(pub_rev), "size": sz},
+    )
+    fpath = (ast or {}).get("storage_path")
+    if not fpath:
+        sv = (garment.get("size_variants") or {}).get(sz) or {}
+        fpath = sv.get("storage_path")
+    if not fpath or not os.path.exists(fpath):
+        raise HTTPException(status_code=404, detail=f"Published asset binary missing for size {sz}")
+
+    return FileResponse(
+        path=fpath,
+        media_type="model/gltf-binary",
+        filename=(ast or {}).get("glb_file", f"{garment.get('sku', garment_id)}_{sz}_rev{pub_rev}.glb"),
+        headers={"Cache-Control": "public, max-age=300", "ETag": f'"{(ast or {}).get("sha256", "")}"'},
+    )
 
 
 def _create_seed_garment(brand_id: str) -> Dict[str, Any]:

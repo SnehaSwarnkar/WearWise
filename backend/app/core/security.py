@@ -27,7 +27,7 @@ from app import database as db
 from app.config import APP_ENV
 
 VALID_ROLES = {"shopper", "seller", "admin"}
-VALID_STATUSES = {"active", "pending", "suspended"}
+VALID_STATUSES = {"active", "pending", "rejected", "suspended"}
 
 AUTH_COOKIE_NAME = "ww_auth_session"
 CSRF_COOKIE_NAME = "ww_csrf_token"
@@ -110,9 +110,15 @@ def sanitize_user_for_client(user: dict[str, Any]) -> dict[str, Any]:
         "brand_id": u.get("brand_id"),
         "store_name": u.get("store_name"),
         "store_slug": u.get("store_slug"),
+        "owner_name": u.get("owner_name") or u.get("name"),
+        "phone": u.get("phone"),
         "business_email": u.get("business_email"),
+        "business_type": u.get("business_type"),
+        "business_address": u.get("business_address"),
         "store_description": u.get("store_description"),
         "brand_tagline": u.get("brand_tagline"),
+        "rejection_reason": u.get("rejection_reason"),
+        "verified_at": u.get("verified_at"),
         "gender": u.get("gender"),
         "bodyType": u.get("bodyType"),
         "kidsGender": u.get("kidsGender"),
@@ -444,6 +450,8 @@ def ensure_auth_seed_and_migration(force: bool = False) -> dict[str, int]:
         seller_pw = os.getenv("SEED_SELLER_PASSWORD", "WearWiseSeller#2026")
         shopper_pw = os.getenv("SEED_SHOPPER_PASSWORD", "WearWiseShopper#2026")
         admin_pw = os.getenv("SEED_ADMIN_PASSWORD", "WearWiseAdmin#2026")
+        # Development/demo admin account (`admin@wearwise.com`) — DEV ONLY, must be rotated before production
+        dev_admin_pw = os.getenv("DEV_ADMIN_PASSWORD", "123456")
 
         seed_accounts = [
             {
@@ -519,6 +527,18 @@ def ensure_auth_seed_and_migration(force: bool = False) -> dict[str, int]:
                 "status": "active",
                 "is_active": True,
                 "seller_approved": False,
+                "createdAt": now_iso,
+            },
+            {
+                "id": "adm-dev-002",
+                "name": "WearWise Administrator",
+                "email": "admin@wearwise.com",
+                "password_hash": hash_password(dev_admin_pw),
+                "role": "admin",
+                "status": "active",
+                "is_active": True,
+                "seller_approved": False,
+                "requires_password_rotation": True,
                 "createdAt": now_iso,
             },
         ]

@@ -6,10 +6,13 @@ class Product(BaseModel):
     id: int
     name: str
     category: str
+    gender: Optional[str] = "unisex"      # men | women | kids | unisex
+    occasion: Optional[str] = "casual"
+    ageGroup: Optional[str] = None
     price: int
-    match: str
-    className: str
-    colors: list[str]
+    match: str = ""
+    className: str = "product-pink"
+    colors: list[str] = Field(default_factory=lambda: ["#151515"])
     image: Optional[str] = None
     brand: Optional[str] = "WEARWISE EDIT"
     seller_name: Optional[str] = None
@@ -18,6 +21,9 @@ class Product(BaseModel):
     published_revision: Optional[int] = None
     published_version: Optional[str] = None
     available_sizes: Optional[list[str]] = None
+    inventory_count: int = 25
+    available: bool = True
+    created_at: Optional[str] = None
     size_variants: Optional[dict[str, Any]] = None
     measurement_chart: Optional[dict[str, Any]] = None
     material_profile: Optional[dict[str, Any]] = None

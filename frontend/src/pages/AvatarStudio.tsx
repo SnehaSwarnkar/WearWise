@@ -122,7 +122,7 @@ export const AvatarStudio: React.FC = () => {
         controls: controls,
       });
 
-      setActiveProfile(updatedProfile);
+      setActiveProfile({ ...activeProfile, ...updatedProfile });
       setDirty(false);
       setBanner({
         type: 'success',
@@ -152,7 +152,7 @@ export const AvatarStudio: React.FC = () => {
           expected_revision: currentRev,
           controls: controls,
         });
-        setActiveProfile(updated);
+        setActiveProfile({ ...activeProfile, ...updated });
         setDirty(false);
       }
 

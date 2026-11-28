@@ -16,10 +16,14 @@ class LoginRequest(BaseModel):
 
 
 class SellerApplyRequest(BaseModel):
-    name: str
+    name: Optional[str] = None
     email: str
     password: str
     store_name: str
+    owner_name: Optional[str] = None
+    phone: Optional[str] = None
+    business_type: Optional[str] = "Apparel Brand"
+    business_address: Optional[str] = None
     store_description: Optional[str] = ""
 
 
@@ -36,8 +40,9 @@ class AdminCreateSellerRequest(BaseModel):
 
 
 class SellerStatusUpdateRequest(BaseModel):
-    status: str  # active | pending | suspended
+    status: str  # active | pending | rejected | suspended
     seller_approved: Optional[bool] = None
+    rejection_reason: Optional[str] = None
 
 
 class UserResponse(BaseModel):
@@ -51,9 +56,15 @@ class UserResponse(BaseModel):
     brand_id: Optional[str] = None
     store_name: Optional[str] = None
     store_slug: Optional[str] = None
+    owner_name: Optional[str] = None
+    phone: Optional[str] = None
     business_email: Optional[str] = None
+    business_type: Optional[str] = None
+    business_address: Optional[str] = None
     store_description: Optional[str] = None
     brand_tagline: Optional[str] = None
+    rejection_reason: Optional[str] = None
+    verified_at: Optional[str] = None
     gender: Optional[str] = None          # men | women | kids
     bodyType: Optional[str] = None
     kidsGender: Optional[str] = None      # boys | girls  (kids only)

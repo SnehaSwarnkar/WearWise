@@ -37,6 +37,9 @@ class ProfileService:
         stature_cm: float,
         reported_weight_kg: Optional[float] = None,
         initial_controls: Optional[Dict[str, float]] = None,
+        avatar_name: Optional[str] = None,
+        body_shape: Optional[str] = None,
+        age_range: Optional[str] = None,
     ) -> BodyProfileModel:
         """
         Creates a new profile for the authenticated user with initial revision,
@@ -69,6 +72,9 @@ class ProfileService:
             stature_cm=stat_dec,
             reported_weight_kg=wt_dec,
             initial_controls=initial_controls,
+            avatar_name=avatar_name.strip() if avatar_name else None,
+            body_shape=body_shape.strip() if body_shape else None,
+            age_range=age_range.strip() if age_range else None,
         )
         return profile
 
@@ -90,17 +96,36 @@ class ProfileService:
         requesting_user_id: uuid.UUID,
         presentation_gender: Optional[str] = None,
         reported_weight_kg: Optional[float] = None,
+        stature_cm: Optional[float] = None,
+        avatar_name: Optional[str] = None,
+        body_shape: Optional[str] = None,
+        age_range: Optional[str] = None,
     ) -> BodyProfileModel:
-        """Updates non-anthropometric metadata after verifying ownership."""
+        """Updates profile metadata and optional canonical stature after verifying ownership."""
         profile = self.get_profile(profile_id, requesting_user_id)
         if presentation_gender is not None and presentation_gender not in ("masculine", "feminine", "neutral"):
             raise ValidationError(f"Invalid presentation_gender '{presentation_gender}'")
-        
+        if stature_cm is not None and not (100.0 <= stature_cm <= 230.0):
+            raise ValidationError(
+                f"Stature ({stature_cm} cm) is outside safe anatomical bounds [100.0, 230.0] cm.",
+                code="MEASUREMENT_OUT_OF_BOUNDS",
+            )
+        if reported_weight_kg is not None and not (30.0 <= reported_weight_kg <= 300.0):
+            raise ValidationError(
+                f"Reported weight ({reported_weight_kg} kg) is outside permitted bounds [30.0, 300.0] kg.",
+                code="WEIGHT_OUT_OF_BOUNDS",
+            )
+
+        stat_dec = Decimal(f"{stature_cm:.2f}") if stature_cm is not None else None
         wt_dec = Decimal(f"{reported_weight_kg:.2f}") if reported_weight_kg is not None else None
         updated = self.repo.update_profile_metadata(
             profile_id=profile_id,
             presentation_gender=presentation_gender,
             reported_weight_kg=wt_dec,
+            stature_cm=stat_dec,
+            avatar_name=avatar_name.strip() if avatar_name is not None else None,
+            body_shape=body_shape.strip() if body_shape is not None else None,
+            age_range=age_range.strip() if age_range is not None else None,
         )
         return updated or profile
 
@@ -191,6 +216,8 @@ class ProfileService:
         return {
             "profile_id": str(profile_id),
             "new_revision": new_rev.revision_number,
+            "current_revision": new_rev.revision_number,
             "controls": ctrl_dict,
+            "shape_controls": ctrl_dict,
             "is_avatar_stale": True,
         }

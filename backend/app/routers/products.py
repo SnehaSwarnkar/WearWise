@@ -267,23 +267,43 @@ def _pub_doc_to_product(pub: dict) -> dict:
     }
 
 
-def _list_published_products() -> list[dict]:
-    if not db.is_mongo_active():
-        return []
-    cdb = db.get_db()
-    if cdb is None:
-        return []
-    docs = list(cdb["catalog_publications"].find({"status": "published"}, {"_id": 0}))
+def _get_disabled_product_keys() -> set[str]:
+    rows = db.find_all("product_moderation")
+    return {
+        str(r.get("identifier"))
+        for r in rows
+        if r.get("moderation_status") in ("disabled", "removed") and r.get("identifier")
+    }
+
+
+def _list_published_products(include_disabled: bool = False) -> list[dict]:
+    docs: list[dict] = []
+    if db.is_mongo_active():
+        cdb = db.get_db()
+        if cdb is not None:
+            docs = list(cdb["catalog_publications"].find({"status": "published"}, {"_id": 0}))
+    else:
+        docs = [d for d in db.find_all("catalog_publications") if d.get("status") == "published"]
+    if not include_disabled:
+        disabled = _get_disabled_product_keys()
+        docs = [
+            d for d in docs
+            if d.get("moderation_status") not in ("disabled", "removed")
+            and str(d.get("sku")) not in disabled
+            and str(d.get("garment_id")) not in disabled
+        ]
     return [_pub_doc_to_product(d) for d in docs]
 
-# Static product catalogue — preserves baseline IDs & prices while adding dual-mode capabilities
+# Staging & baseline marketplace catalogue — preserves baseline IDs & prices while supporting Men, Women, Kids & dual-mode capabilities
 PRODUCTS: list[dict] = [
     {
         "id": 1,
         "name": "Cherry Baby Tee",
         "category": "Tops",
+        "gender": "women",
+        "occasion": "casual",
         "price": 799,
-        "match": "94% Style Match",
+        "match": "",
         "className": "product-pink",
         "colors": ["#ff3d9a", "#ffffff", "#1d1d1d"],
         "image": None,
@@ -293,6 +313,9 @@ PRODUCTS: list[dict] = [
         "sku": "TSH-WW-CREW-001",
         "try_on_mode": "IMAGE_AND_THREE_D",
         "available_sizes": ["S", "M", "L"],
+        "inventory_count": 42,
+        "available": True,
+        "created_at": "2026-11-20T10:00:00Z",
         "size_variants": {
             "S": {"asset_url": "/garments/TSH-WW-CREW-001_S.glb"},
             "M": {"asset_url": "/garments/TSH-WW-CREW-001_M.glb"},
@@ -304,8 +327,10 @@ PRODUCTS: list[dict] = [
         "id": 2,
         "name": "Cloud Oversized Shirt",
         "category": "Tops",
+        "gender": "unisex",
+        "occasion": "casual",
         "price": 1199,
-        "match": "89% Style Match",
+        "match": "",
         "className": "product-lime",
         "colors": ["#d8ff3f", "#ffffff", "#8d6bff"],
         "brand": "WEARWISE EDIT",
@@ -313,13 +338,19 @@ PRODUCTS: list[dict] = [
         "description": "A relaxed oversized shirt in citrusy lime poplin. Easy to wear, hard to ignore.",
         "sku": "TSH-WW-OVERSIZE-002",
         "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["S", "M", "L", "XL"],
+        "inventory_count": 30,
+        "available": True,
+        "created_at": "2026-11-21T10:00:00Z",
     },
     {
         "id": 3,
         "name": "Classic Wide Leg Denim",
         "category": "Jeans",
+        "gender": "women",
+        "occasion": "casual",
         "price": 1499,
-        "match": "96% Style Match",
+        "match": "",
         "className": "product-blue",
         "colors": ["#6f8fe8", "#232323", "#b9d3ff"],
         "brand": "WEARWISE EDIT",
@@ -327,13 +358,19 @@ PRODUCTS: list[dict] = [
         "description": "Wide-leg silhouette in classic blue denim. The kind you wear with everything.",
         "sku": "JNS-WW-WIDE-003",
         "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["S", "M", "L"],
+        "inventory_count": 28,
+        "available": True,
+        "created_at": "2026-11-19T10:00:00Z",
     },
     {
         "id": 4,
         "name": "Sunset Mini Dress",
         "category": "Dresses",
+        "gender": "women",
+        "occasion": "party",
         "price": 1899,
-        "match": "92% Style Match",
+        "match": "",
         "className": "product-orange",
         "colors": ["#ff633d", "#ff3d9a", "#ffd43b"],
         "brand": "WEARWISE EDIT",
@@ -341,13 +378,19 @@ PRODUCTS: list[dict] = [
         "description": "A vibrant mini dress blending sunset orange, pink and yellow. Made for golden hours.",
         "sku": "DRS-WW-MINI-004",
         "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["XS", "S", "M", "L"],
+        "inventory_count": 18,
+        "available": True,
+        "created_at": "2026-11-22T10:00:00Z",
     },
     {
         "id": 5,
         "name": "Electric Purple Jacket",
         "category": "Jackets",
+        "gender": "men",
+        "occasion": "party",
         "price": 2299,
-        "match": "91% Style Match",
+        "match": "",
         "className": "product-purple",
         "colors": ["#8d6bff", "#1d1d1d", "#ff3d9a"],
         "brand": "WEARWISE EDIT",
@@ -355,13 +398,19 @@ PRODUCTS: list[dict] = [
         "description": "A striking electric purple jacket that makes any outfit an event.",
         "sku": "JKT-WW-ELEC-005",
         "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["M", "L", "XL"],
+        "inventory_count": 15,
+        "available": True,
+        "created_at": "2026-11-23T10:00:00Z",
     },
     {
         "id": 6,
         "name": "Matcha Everyday Top",
         "category": "Tops",
+        "gender": "women",
+        "occasion": "casual",
         "price": 899,
-        "match": "88% Style Match",
+        "match": "",
         "className": "product-green",
         "colors": ["#9ecb72", "#ffffff", "#1d1d1d"],
         "brand": "WEARWISE EDIT",
@@ -369,13 +418,19 @@ PRODUCTS: list[dict] = [
         "description": "A muted matcha green top for days when you want effortless and easy.",
         "sku": "TSH-WW-MATCHA-006",
         "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["S", "M", "L"],
+        "inventory_count": 35,
+        "available": True,
+        "created_at": "2026-11-18T10:00:00Z",
     },
     {
         "id": 7,
         "name": "Studio Tailored Oxford Shirt",
         "category": "Shirts",
+        "gender": "men",
+        "occasion": "work",
         "price": 1399,
-        "match": "90% Style Match",
+        "match": "",
         "className": "product-lime",
         "colors": ["#ffffff", "#6f8fe8", "#1d1d1d"],
         "brand": "WEARWISE TAILORED",
@@ -383,13 +438,19 @@ PRODUCTS: list[dict] = [
         "description": "Crisp button-down Oxford shirt with relaxed collar drape.",
         "sku": "SHR-WW-OXF-007",
         "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["S", "M", "L", "XL"],
+        "inventory_count": 24,
+        "available": True,
+        "created_at": "2026-11-24T10:00:00Z",
     },
     {
         "id": 8,
         "name": "Pleated Wide Trousers",
         "category": "Trousers",
+        "gender": "men",
+        "occasion": "work",
         "price": 1799,
-        "match": "93% Style Match",
+        "match": "",
         "className": "product-blue",
         "colors": ["#232323", "#8d6bff", "#9ecb72"],
         "brand": "WEARWISE TAILORED",
@@ -397,13 +458,19 @@ PRODUCTS: list[dict] = [
         "description": "High-rise tailored pleated trousers with full-length drape.",
         "sku": "TRS-WW-PLEAT-008",
         "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["S", "M", "L", "XL"],
+        "inventory_count": 20,
+        "available": True,
+        "created_at": "2026-11-24T12:00:00Z",
     },
     {
         "id": 9,
         "name": "A-Line Studio Midi Skirt",
         "category": "Skirts",
+        "gender": "women",
+        "occasion": "work",
         "price": 1599,
-        "match": "91% Style Match",
+        "match": "",
         "className": "product-orange",
         "colors": ["#ff633d", "#1d1d1d", "#ffffff"],
         "brand": "WEARWISE EDIT",
@@ -411,6 +478,179 @@ PRODUCTS: list[dict] = [
         "description": "Structured A-line midi skirt with clean side zip construction.",
         "sku": "SKT-WW-MIDI-009",
         "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["XS", "S", "M", "L"],
+        "inventory_count": 22,
+        "available": True,
+        "created_at": "2026-11-17T10:00:00Z",
+    },
+    {
+        "id": 10,
+        "name": "Men's Everyday Crew Tee",
+        "category": "Tops",
+        "gender": "men",
+        "occasion": "casual",
+        "price": 899,
+        "match": "",
+        "className": "product-blue",
+        "colors": ["#151515", "#ffffff", "#6f8fe8"],
+        "brand": "WEARWISE MEN",
+        "seller_name": "WEARWISE MEN",
+        "description": "Heavyweight 240 GSM combed cotton crew tee with relaxed drop shoulder and 3D fitting support.",
+        "sku": "TSH-WW-MEN-010",
+        "try_on_mode": "THREE_D_ONLY",
+        "available_sizes": ["S", "M", "L"],
+        "inventory_count": 38,
+        "available": True,
+        "created_at": "2026-11-25T09:00:00Z",
+        "size_variants": {
+            "S": {"asset_url": "/garments/TSH-WW-CREW-001_S.glb"},
+            "M": {"asset_url": "/garments/TSH-WW-CREW-001_M.glb"},
+            "L": {"asset_url": "/garments/TSH-WW-CREW-001_L.glb"},
+        },
+    },
+    {
+        "id": 11,
+        "name": "Men's Slim Chino Trousers",
+        "category": "Trousers",
+        "gender": "men",
+        "occasion": "casual",
+        "price": 1799,
+        "match": "",
+        "className": "product-lime",
+        "colors": ["#c8a96e", "#1d1d1d", "#2c3e50"],
+        "brand": "WEARWISE MEN",
+        "seller_name": "WEARWISE MEN",
+        "description": "Tailored stretch-cotton chinos designed for weekday to weekend comfort.",
+        "sku": "TRS-WW-CHINO-011",
+        "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["S", "M", "L", "XL"],
+        "inventory_count": 26,
+        "available": True,
+        "created_at": "2026-11-25T10:00:00Z",
+    },
+    {
+        "id": 12,
+        "name": "Men's Structured Wool-Blend Blazer",
+        "category": "Jackets",
+        "gender": "men",
+        "occasion": "work",
+        "price": 3499,
+        "match": "",
+        "className": "product-purple",
+        "colors": ["#1d1d1d", "#334155", "#8d6bff"],
+        "brand": "WEARWISE TAILORED",
+        "seller_name": "WEARWISE TAILORED",
+        "description": "Clean two-button tailored blazer with structured shoulder line.",
+        "sku": "JKT-WW-BLZR-012",
+        "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["M", "L", "XL"],
+        "inventory_count": 14,
+        "available": True,
+        "created_at": "2026-11-25T11:00:00Z",
+    },
+    {
+        "id": 13,
+        "name": "Women's Power Blazer Dress",
+        "category": "Dresses",
+        "gender": "women",
+        "occasion": "work",
+        "price": 3299,
+        "match": "",
+        "className": "product-purple",
+        "colors": ["#1d1d1d", "#8d6bff", "#ffffff"],
+        "brand": "WEARWISE WOMEN",
+        "seller_name": "WEARWISE WOMEN",
+        "description": "Double-breasted tailored blazer dress with crisp lapel structure.",
+        "sku": "DRS-WW-BLZR-013",
+        "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["XS", "S", "M", "L"],
+        "inventory_count": 19,
+        "available": True,
+        "created_at": "2026-11-25T12:00:00Z",
+    },
+    {
+        "id": 14,
+        "name": "Kids' Graphic Cotton Tee",
+        "category": "Tops",
+        "gender": "kids",
+        "occasion": "casual",
+        "ageGroup": "6-10",
+        "price": 599,
+        "match": "",
+        "className": "product-blue",
+        "colors": ["#6f8fe8", "#ffffff", "#d8ff3f"],
+        "brand": "WEARWISE KIDS",
+        "seller_name": "WEARWISE KIDS",
+        "description": "Soft breathable organic cotton crew tee made for everyday play.",
+        "sku": "KID-WW-TEE-014",
+        "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["4-6Y", "6-8Y", "8-10Y", "10-12Y"],
+        "inventory_count": 45,
+        "available": True,
+        "created_at": "2026-11-25T13:00:00Z",
+    },
+    {
+        "id": 15,
+        "name": "Kids' Denim Jogger Set",
+        "category": "Trousers",
+        "gender": "kids",
+        "occasion": "casual",
+        "ageGroup": "6-10",
+        "price": 999,
+        "match": "",
+        "className": "product-lime",
+        "colors": ["#6f8fe8", "#1d1d1d"],
+        "brand": "WEARWISE KIDS",
+        "seller_name": "WEARWISE KIDS",
+        "description": "Flexible cotton-denim joggers with soft elastic waist for all-day movement.",
+        "sku": "KID-WW-JOG-015",
+        "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["4-6Y", "6-8Y", "8-10Y", "10-12Y"],
+        "inventory_count": 32,
+        "available": True,
+        "created_at": "2026-11-25T14:00:00Z",
+    },
+    {
+        "id": 16,
+        "name": "Kids' Festive Cotton Kurta Set",
+        "category": "Shirts",
+        "gender": "kids",
+        "occasion": "festive",
+        "ageGroup": "6-10",
+        "price": 1399,
+        "match": "",
+        "className": "product-orange",
+        "colors": ["#ff633d", "#ffd43b", "#ffffff"],
+        "brand": "WEARWISE KIDS",
+        "seller_name": "WEARWISE KIDS",
+        "description": "Breathable festive cotton kurta paired with soft tapered pyjama.",
+        "sku": "KID-WW-KUR-016",
+        "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["4-6Y", "6-8Y", "8-10Y", "10-12Y"],
+        "inventory_count": 20,
+        "available": True,
+        "created_at": "2026-11-25T15:00:00Z",
+    },
+    {
+        "id": 17,
+        "name": "Kids' Floral Everyday Dress",
+        "category": "Dresses",
+        "gender": "kids",
+        "occasion": "casual",
+        "ageGroup": "2-5",
+        "price": 799,
+        "match": "",
+        "className": "product-pink",
+        "colors": ["#ff3d9a", "#ffffff", "#ffd43b"],
+        "brand": "WEARWISE KIDS",
+        "seller_name": "WEARWISE KIDS",
+        "description": "Lightweight flared cotton dress with soft lining for comfort.",
+        "sku": "KID-WW-DRS-017",
+        "try_on_mode": "IMAGE_ONLY",
+        "available_sizes": ["2-4Y", "4-6Y", "6-8Y"],
+        "inventory_count": 28,
+        "available": True,
+        "created_at": "2026-11-25T16:00:00Z",
     },
 ]
 
@@ -423,18 +663,25 @@ def _category_matches(product_category: str, filter_category: str) -> bool:
     return pc == fc
 
 
-@router.get("/", response_model=list[Product])
-def list_products(
-    category: str | None = Query(None, description="Filter by category"),
-    sort_price: bool = Query(False, description="Sort ascending by price"),
+def _query_products(
+    category: str | None = None,
+    gender: str | None = None,
+    occasion: str | None = None,
+    search: str | None = None,
+    min_price: int | None = None,
+    max_price: int | None = None,
+    sort: str | None = None,
+    sort_price: bool = False,
 ):
-    """Return all products, merging published digital garments from MongoDB."""
+    disabled = _get_disabled_product_keys()
     pub_by_sku = {p["sku"]: p for p in _list_published_products() if p.get("sku")}
     result: list[dict] = []
     seen_skus: set[str] = set()
 
     for static_p in PRODUCTS:
         sku = static_p.get("sku")
+        if str(sku) in disabled or str(static_p.get("id")) in disabled:
+            continue
         if sku and sku in pub_by_sku:
             pub_p = pub_by_sku[sku]
             merged = {
@@ -457,31 +704,118 @@ def list_products(
 
     if category and category != "All":
         result = [p for p in result if _category_matches(p["category"], category)]
-    if sort_price:
+    if gender and gender.lower() not in ("all", ""):
+        g = gender.strip().lower()
+        if g in ("men", "women"):
+            result = [p for p in result if (p.get("gender") or "unisex").lower() in (g, "unisex")]
+        else:
+            result = [p for p in result if (p.get("gender") or "").lower() == g]
+    if occasion and occasion.lower() not in ("all", ""):
+        occ = occasion.strip().lower()
+        result = [p for p in result if (p.get("occasion") or "").lower() == occ]
+    if search and search.strip():
+        q = search.strip().lower()
+        result = [
+            p for p in result
+            if q in (p.get("name") or "").lower()
+            or q in (p.get("category") or "").lower()
+            or q in (p.get("description") or "").lower()
+            or q in (p.get("seller_name") or p.get("brand") or "").lower()
+        ]
+    if min_price is not None:
+        result = [p for p in result if int(p.get("price", 0)) >= min_price]
+    if max_price is not None:
+        result = [p for p in result if int(p.get("price", 0)) <= max_price]
+
+    effective_sort = (sort or ("price_asc" if sort_price else "featured")).lower()
+    if effective_sort == "price_asc":
         result = sorted(result, key=lambda p: p["price"])
+    elif effective_sort == "price_desc":
+        result = sorted(result, key=lambda p: p["price"], reverse=True)
+    elif effective_sort == "newest":
+        result = sorted(result, key=lambda p: str(p.get("created_at") or ""), reverse=True)
+    elif effective_sort == "popular":
+        result = sorted(
+            result,
+            key=lambda p: (p.get("review_count", 0), 1 if (p.get("tryOnCapabilities") or {}).get("threeDTryOnEnabled") else 0),
+            reverse=True,
+        )
     return result
+
+
+@router.get("/", response_model=list[Product])
+def list_products(
+    category: str | None = Query(None, description="Filter by category"),
+    gender: str | None = Query(None, description="Filter by department: men | women | kids"),
+    occasion: str | None = Query(None, description="Filter by occasion"),
+    search: str | None = Query(None, description="Search by name, brand, category, or description"),
+    min_price: int | None = Query(None, ge=0),
+    max_price: int | None = Query(None, ge=0),
+    sort: str | None = Query(None, description="featured | price_asc | price_desc | newest | popular"),
+    sort_price: bool = Query(False, description="Legacy ascending price sort"),
+):
+    """Return all active catalog products, merging published digital garments from MongoDB/JSON."""
+    return _query_products(
+        category=category,
+        gender=gender,
+        occasion=occasion,
+        search=search,
+        min_price=min_price,
+        max_price=max_price,
+        sort=sort,
+        sort_price=sort_price,
+    )
+
+
+@router.get("/recommendations")
+def catalog_recommendations(
+    gender: str | None = Query(None),
+    category: str | None = Query(None),
+    limit: int = Query(8, ge=1, le=24),
+):
+    """
+    Returns catalog-based product selections ordered by 3D availability, review count, and recency.
+    Explicitly declares non-AI catalog selection logic rather than fabricating personalized AI scores.
+    """
+    items = _query_products(category=category, gender=gender, sort="popular")
+    return {
+        "basis": "catalog_category_and_availability",
+        "basis_description": "Selected from active catalog listings by department, category, customer reviews, and try-on availability.",
+        "items": items[:limit],
+    }
 
 
 @router.get("/sku/{sku}", response_model=Product)
 def get_product_by_sku(sku: str):
-    """Resolves a published product by SKU using its active MongoDB catalog publication pointer."""
+    """Resolves a published product by SKU using its active catalog publication pointer."""
+    disabled = _get_disabled_product_keys()
+    if sku in disabled:
+        raise HTTPException(status_code=404, detail=f"Product '{sku}' is currently unavailable.")
+
     static_match = next((p for p in PRODUCTS if p.get("sku") == sku), None)
+    pub = None
     if db.is_mongo_active():
         cdb = db.get_db()
         if cdb is not None:
             pub = cdb["catalog_publications"].find_one({"sku": sku, "status": "published"}, {"_id": 0})
-            if pub:
-                pub_p = _pub_doc_to_product(pub)
-                if static_match:
-                    merged = {
-                        **static_match,
-                        **{k: v for k, v in pub_p.items() if v is not None},
-                        "id": static_match["id"],
-                        "price": static_match["price"] if sku == "TSH-WW-CREW-001" else pub_p["price"],
-                        "className": static_match["className"],
-                    }
-                    return _enrich_product(merged)
-                return _enrich_product(pub_p)
+    else:
+        pub = next(
+            (d for d in db.find_all("catalog_publications") if d.get("sku") == sku and d.get("status") == "published"),
+            None,
+        )
+
+    if pub and pub.get("moderation_status") not in ("disabled", "removed"):
+        pub_p = _pub_doc_to_product(pub)
+        if static_match:
+            merged = {
+                **static_match,
+                **{k: v for k, v in pub_p.items() if v is not None},
+                "id": static_match["id"],
+                "price": static_match["price"] if sku == "TSH-WW-CREW-001" else pub_p["price"],
+                "className": static_match["className"],
+            }
+            return _enrich_product(merged)
+        return _enrich_product(pub_p)
     if static_match:
         return _enrich_product(static_match)
     raise HTTPException(status_code=404, detail=f"Published product not found for SKU '{sku}'.")

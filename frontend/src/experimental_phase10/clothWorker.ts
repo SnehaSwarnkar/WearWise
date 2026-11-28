@@ -31,16 +31,17 @@ export type WorkerInMsg =
   | { type: 'INIT'; epoch: number; avatar: SerializedAvatarInit; garmentMeshes: SerializedGarmentMesh[] }
   | { type: 'STEP'; epoch: number; dtSec: number; pose: ArticulationState; fabricId: string }
   | { type: 'RESET'; epoch: number }
-  | { type: 'RECYCLE'; buffer: ArrayBuffer };
+  | { type: 'RECYCLE'; buffer: ArrayBuffer; strainBuffer?: ArrayBuffer };
 
 export type WorkerOutMsg =
   | { type: 'INIT_OK'; epoch: number; rigInfo: { boneCount: number; hasSkinnedMesh: boolean }; metrics: SimulationMetrics }
-  | { type: 'FRAME'; epoch: number; posBuffer: ArrayBuffer; metrics: SimulationMetrics; workerSolveMs: number }
-  | { type: 'RESET_ACK'; epoch: number; posBuffer: ArrayBuffer; metrics: SimulationMetrics }
+  | { type: 'FRAME'; epoch: number; posBuffer: ArrayBuffer; strainBuffer: ArrayBuffer; metrics: SimulationMetrics; workerSolveMs: number }
+  | { type: 'RESET_ACK'; epoch: number; posBuffer: ArrayBuffer; strainBuffer: ArrayBuffer; metrics: SimulationMetrics }
   | { type: 'ERROR'; epoch: number; message: string };
 
 const solver = new WeldedClothSolver();
 let recycledBuffer: Float32Array | undefined;
+let recycledStrainBuffer: Float32Array | undefined;
 let initialized = false;
 
 function buildWorkerAvatar(data: SerializedAvatarInit): THREE.Group {
@@ -105,6 +106,9 @@ self.onmessage = (ev: MessageEvent<WorkerInMsg>) => {
   try {
     if (msg.type === 'RECYCLE') {
       recycledBuffer = new Float32Array(msg.buffer);
+      if (msg.strainBuffer) {
+        recycledStrainBuffer = new Float32Array(msg.strainBuffer);
+      }
       return;
     }
 
@@ -124,11 +128,13 @@ self.onmessage = (ev: MessageEvent<WorkerInMsg>) => {
     if (msg.type === 'RESET') {
       solver.reset();
       const outArr = solver.getParticleBufferCopy(recycledBuffer);
+      const outStrain = solver.getStrainBufferCopy(recycledStrainBuffer);
       recycledBuffer = undefined;
+      recycledStrainBuffer = undefined;
       const metrics = solver.getMetrics();
       (self as unknown as Worker).postMessage(
-        { type: 'RESET_ACK', epoch: msg.epoch, posBuffer: outArr.buffer, metrics } as WorkerOutMsg,
-        [outArr.buffer]
+        { type: 'RESET_ACK', epoch: msg.epoch, posBuffer: outArr.buffer, strainBuffer: outStrain.buffer, metrics } as WorkerOutMsg,
+        [outArr.buffer, outStrain.buffer]
       );
       return;
     }
@@ -136,15 +142,18 @@ self.onmessage = (ev: MessageEvent<WorkerInMsg>) => {
     if (msg.type === 'STEP') {
       const t0 = performance.now();
       solver.setFabric(msg.fabricId);
-      solver.setTargetPose(msg.pose);
+      // Use exact main-thread interpolated pose so worker collisions and skeleton never desync
+      solver.setExactPose(msg.pose);
       solver.step(msg.dtSec);
       const workerSolveMs = performance.now() - t0;
       const outArr = solver.getParticleBufferCopy(recycledBuffer);
+      const outStrain = solver.getStrainBufferCopy(recycledStrainBuffer);
       recycledBuffer = undefined;
+      recycledStrainBuffer = undefined;
       const metrics = solver.getMetrics();
       (self as unknown as Worker).postMessage(
-        { type: 'FRAME', epoch: msg.epoch, posBuffer: outArr.buffer, metrics, workerSolveMs } as WorkerOutMsg,
-        [outArr.buffer]
+        { type: 'FRAME', epoch: msg.epoch, posBuffer: outArr.buffer, strainBuffer: outStrain.buffer, metrics, workerSolveMs } as WorkerOutMsg,
+        [outArr.buffer, outStrain.buffer]
       );
     }
   } catch (err: any) {

@@ -8,16 +8,22 @@ export default function PortalAccessDenied({
   returnTo,
   returnLabel,
 }: {
-  requiredPortal: 'Seller Portal' | 'Shopper Portal';
+  requiredPortal: 'Admin Portal' | 'Seller Portal' | 'Shopper Portal';
   message: string;
   returnTo: string;
   returnLabel: string;
 }) {
+  const testId =
+    requiredPortal === 'Admin Portal'
+      ? 'admin-access-denied'
+      : requiredPortal === 'Seller Portal'
+        ? 'seller-access-denied'
+        : 'shopper-access-denied';
   return (
     <div className="auth-page" style={{ background: '#151515' }}>
       <div
         className="auth-card"
-        data-testid={requiredPortal === 'Seller Portal' ? 'seller-access-denied' : 'shopper-access-denied'}
+        data-testid={testId}
         style={{ background: '#fff8f1', boxShadow: '12px 12px 0 #ff3d9a' }}
       >
         <div className="auth-eyebrow" style={{ color: '#ff3d9a' }}>

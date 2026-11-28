@@ -13,6 +13,7 @@ const BODY_ENGINE_PROXY = {
 
 const SHARED_PROXY = {
   '/api/auth': COMMERCE_PROXY,
+  '/api/admin': COMMERCE_PROXY,
   '/api/seller': COMMERCE_PROXY,
   '/api/products': COMMERCE_PROXY,
   '/api/cart': COMMERCE_PROXY,

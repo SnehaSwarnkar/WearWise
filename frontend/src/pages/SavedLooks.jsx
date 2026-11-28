@@ -241,7 +241,7 @@ function SavedLooks() {
                     <div className="wishlist-info">
 
                       <span>
-                        {item.brand || "FASHION"}
+                        {item.brand || "WEARWISE"}
                       </span>
 
                       <h3>
@@ -249,8 +249,60 @@ function SavedLooks() {
                       </h3>
 
                       <strong>
-                        {item.price || ""}
+                        {item.price ? `₹${Number(item.price).toLocaleString("en-IN")}` : ""}
                       </strong>
+
+                      <div style={{ display: "flex", gap: "8px", marginTop: "10px", flexWrap: "wrap" }}>
+                        {item.sku ? (
+                          <>
+                            <Link
+                              to={`/product/${encodeURIComponent(item.sku)}`}
+                              style={{
+                                padding: "6px 10px",
+                                border: "1.5px solid #151515",
+                                background: "#fff",
+                                color: "#151515",
+                                fontWeight: 800,
+                                fontSize: "12px",
+                                textDecoration: "none",
+                              }}
+                            >
+                              View Details
+                            </Link>
+                            {item.try_on_mode !== "IMAGE_ONLY" && (
+                              <Link
+                                to={`/try-on?sku=${encodeURIComponent(item.sku)}`}
+                                style={{
+                                  padding: "6px 10px",
+                                  border: "1.5px solid #151515",
+                                  background: "#d8ff3f",
+                                  color: "#151515",
+                                  fontWeight: 900,
+                                  fontSize: "12px",
+                                  textDecoration: "none",
+                                }}
+                              >
+                                Try On Avatar →
+                              </Link>
+                            )}
+                          </>
+                        ) : (
+                          <Link
+                            to="/shop"
+                            style={{
+                              padding: "6px 10px",
+                              border: "1.5px solid #151515",
+                              background: "#fff",
+                              color: "#151515",
+                              fontWeight: 800,
+                              fontSize: "12px",
+                              textDecoration: "none",
+                            }}
+                          >
+                            Browse Shop →
+                          </Link>
+                        )}
+                      </div>
 
                     </div>
 

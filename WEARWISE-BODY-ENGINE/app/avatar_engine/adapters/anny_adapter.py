@@ -402,12 +402,13 @@ class AnnyAdapter:
         t_start = time.perf_counter()
 
         # 1. Validate presentation
+        # In NAVER Anny's MakeHuman phenotype space: gender=0.0 is male, gender=1.0 is female, 0.5 is neutral.
         pres = shape_spec.presentation
         pres_str = pres.value if isinstance(pres, PresentationGender) else str(pres).lower()
         if pres_str == "masculine":
-            gender_val = 1.0
-        elif pres_str == "feminine":
             gender_val = 0.0
+        elif pres_str == "feminine":
+            gender_val = 1.0
         elif pres_str == "neutral":
             gender_val = 0.5
         else:
@@ -420,16 +421,18 @@ class AnnyAdapter:
                 f"target_stature_cm must be in [100.0, 230.0] cm, got {stature_cm}"
             )
 
-        # 3. Map phenotypes
+        # 3. Map phenotypes with realistic adult presentation baselines
         # In Anny, height parameter [0.0, 1.0] corresponds approximately to [105.0, 207.0] cm
         h_norm = (stature_cm - 105.0) / (207.0 - 105.0)
         h_clamped = float(np.clip(h_norm, 0.0, 1.0))
 
+        base_weight = 0.58 if pres_str == "masculine" else (0.54 if pres_str == "feminine" else 0.55)
+        base_muscle = 0.55 if pres_str == "masculine" else (0.45 if pres_str == "feminine" else 0.50)
         phenotype_dict: Dict[str, float] = {
             "gender": gender_val,
             "age": 0.50,
-            "muscle": 0.50,
-            "weight": 0.50,
+            "muscle": base_muscle,
+            "weight": base_weight,
             "height": h_clamped,
             "proportions": 0.50,
         }
@@ -448,64 +451,72 @@ class AnnyAdapter:
                 clamped_params[param_name] = (requested_val, clamped)
             local_kwargs[param_name] = clamped
 
-        # Shoulders (scale_x: lateral width, scale_y: depth/muscle)
+        # Shoulders (scale_x: biacromial breadth, scale_y: deltoid fullness)
         if "shoulders" in reg_scales:
             sh = reg_scales["shoulders"]
-            apply_local("measure-shoulder-dist-incr", sh.scale_x)
-            apply_local("l-upperarm-shoulder-muscle-incr", sh.scale_y * 0.5)
-            apply_local("r-upperarm-shoulder-muscle-incr", sh.scale_y * 0.5)
+            apply_local("measure-shoulder-dist-incr", sh.scale_x * 1.15)
+            deltoid = sh.scale_y * 0.5 + max(0.0, sh.scale_x) * 0.25
+            apply_local("l-upperarm-shoulder-muscle-incr", deltoid)
+            apply_local("r-upperarm-shoulder-muscle-incr", deltoid)
 
-        # Chest (scale_y: pectoral / bust projection)
+        # Chest (scale_y: chest girth + pectoral / bust projection)
         if "torso_chest" in reg_scales:
             tc = reg_scales["torso_chest"]
+            apply_local("measure-bust-circ-incr", tc.scale_y * 0.85)
             if pres_str == "feminine":
-                apply_local("breast-volume-vert-up", tc.scale_y)
+                apply_local("breast-volume-vert-up", tc.scale_y * 0.70)
             elif pres_str == "masculine":
-                apply_local("measure-frontchest-dist-incr", tc.scale_y)
+                apply_local("measure-frontchest-dist-incr", tc.scale_y * 0.85)
+                apply_local("torso-muscle-pectoral-incr", tc.scale_y * 0.65)
             else:  # neutral
-                apply_local("measure-frontchest-dist-incr", tc.scale_y * 0.5)
-                apply_local("breast-volume-vert-up", tc.scale_y * 0.5)
+                apply_local("measure-frontchest-dist-incr", tc.scale_y * 0.45)
+                apply_local("breast-volume-vert-up", tc.scale_y * 0.40)
 
-        # Waist / Abdomen (scale_y: belly protrusion, scale_x: waist definition / indentation)
+        # Waist / Abdomen (scale_y: belly fullness, scale_x: waist taper/width)
         if "waist_abdomen" in reg_scales:
             wa = reg_scales["waist_abdomen"]
-            # Belly fullness (sagittal protrusion)
-            apply_local("stomach-pregnant-incr", wa.scale_y)
-            # Waist definition: scale_x is negative for narrow waist, positive for thick waist
-            apply_local("measure-waist-circ-incr", wa.scale_x)
+            apply_local("stomach-navel-out", wa.scale_y * 0.75)
+            if wa.scale_y >= 0.0:
+                apply_local("stomach-pregnant-incr", wa.scale_y * 0.45)
+            apply_local("measure-waist-circ-incr", wa.scale_x * 0.90)
+            apply_local("torso-vshape-incr", -wa.scale_x * 0.45)
 
         # Arms (scale_x: lateral girth)
         if "arms" in reg_scales:
             ar = reg_scales["arms"]
-            apply_local("l-upperarm-scale-horiz-incr", ar.scale_x)
-            apply_local("r-upperarm-scale-horiz-incr", ar.scale_x)
+            apply_local("measure-upperarm-circ-incr", ar.scale_x * 0.85)
+            apply_local("l-upperarm-scale-horiz-incr", ar.scale_x * 0.50)
+            apply_local("r-upperarm-scale-horiz-incr", ar.scale_x * 0.50)
 
         # Hips (scale_x: pelvic breadth / circumference)
         if "hips" in reg_scales:
             hp = reg_scales["hips"]
-            apply_local("measure-hips-circ-incr", hp.scale_x)
-            apply_local("hip-trans-out", hp.scale_x * 0.3)
+            apply_local("measure-hips-circ-incr", hp.scale_x * 0.90)
+            apply_local("hip-scale-horiz-incr", hp.scale_x * 0.35)
+            apply_local("hip-trans-out", hp.scale_x * 0.25)
 
         # Thighs (scale_x: upper leg girth)
         if "thighs" in reg_scales:
             th = reg_scales["thighs"]
-            apply_local("measure-thigh-circ-incr", th.scale_x)
-            apply_local("l-upperleg-fat-incr", th.scale_x * 0.5)
-            apply_local("r-upperleg-fat-incr", th.scale_x * 0.5)
+            apply_local("measure-thigh-circ-incr", th.scale_x * 0.90)
+            apply_local("l-upperleg-scale-horiz-incr", th.scale_x * 0.40)
+            apply_local("r-upperleg-scale-horiz-incr", th.scale_x * 0.40)
 
         # Calves (scale_x: lower leg gastrocnemius girth)
         if "calves" in reg_scales:
             cl = reg_scales["calves"]
-            apply_local("measure-calf-circ-incr", cl.scale_x)
-            apply_local("l-lowerleg-scale-horiz-incr", cl.scale_x * 0.5)
-            apply_local("r-lowerleg-scale-horiz-incr", cl.scale_x * 0.5)
+            apply_local("measure-calf-circ-incr", cl.scale_x * 0.90)
+            apply_local("l-lowerleg-scale-horiz-incr", cl.scale_x * 0.45)
+            apply_local("r-lowerleg-scale-horiz-incr", cl.scale_x * 0.45)
 
-        # 5. Forward Pass (+ Closed-Loop Measurement Calibration when target_measurements provided)
+        # 5. Forward Pass (+ Multi-Target Closed-Loop Calibration when target_measurements provided)
         model = self.get_model()
         faces = self._faces.copy() if self._faces is not None else np.zeros((0, 3), dtype=np.int32)
         target_m_dict = shape_spec.target_measurements or {}
         t_chest = target_m_dict.get("chest_circumference")
         t_waist = target_m_dict.get("waist_planar_circumference") or target_m_dict.get("waist_circumference")
+        t_hip = target_m_dict.get("hip_circumference")
+        t_shoulder = target_m_dict.get("shoulder_biacromial_breadth")
 
         def run_forward(pheno: Dict[str, float], loc: Dict[str, float]):
             torch, _ = _load_anny_runtime()
@@ -527,33 +538,84 @@ class AnnyAdapter:
             return vnp, sf, out_t.get("bone_poses")
 
         calibration_info: Dict[str, Any] = {"calibrated": False, "iterations": 0}
-        if t_chest is not None or t_waist is not None:
+        requested_codes = []
+        if t_chest is not None:
+            requested_codes.append("chest_circumference")
+        if t_waist is not None:
+            requested_codes.append("waist_planar_circumference")
+        if t_hip is not None:
+            requested_codes.append("hip_circumference")
+        if t_shoulder is not None:
+            requested_codes.append("shoulder_biacromial_breadth")
+
+        if requested_codes:
             from app.anthropometry.engine import AnthropometryEngine
             anth_eng = AnthropometryEngine()
-            # Initialize weight/muscle/bust/waist from target if available
-            w_cur = float(np.clip(0.5 + (((t_chest or 92.0) - 90.0) / 55.0), 0.15, 1.0))
-            phenotype_dict["weight"] = w_cur
-            phenotype_dict["muscle"] = float(np.clip(0.45 + (((t_chest or 92.0) - 90.0) / 80.0), 0.25, 0.85))
-            bust_cur = float(local_kwargs.get("measure-bust-circ-incr", 0.0))
-            waist_cur = float(local_kwargs.get("measure-waist-circ-incr", 0.0))
 
-            for it in range(1, 6):
-                local_kwargs["measure-bust-circ-incr"] = float(np.clip(bust_cur, -1.0, 1.0))
-                local_kwargs["torso-scale-horiz-incr"] = float(np.clip(bust_cur * 0.35, -0.5, 0.5))
-                local_kwargs["torso-scale-depth-incr"] = float(np.clip(bust_cur * 0.35, -0.5, 0.5))
-                local_kwargs["measure-waist-circ-incr"] = float(np.clip(waist_cur, -1.0, 1.0))
+            ref_chest = 94.0 if pres_str == "masculine" else 88.0
+            if t_chest is not None:
+                w_cur = float(np.clip(base_weight + ((float(t_chest) - ref_chest) / 40.0), 0.05, 1.0))
+                phenotype_dict["weight"] = w_cur
+                phenotype_dict["muscle"] = float(np.clip(base_muscle + ((float(t_chest) - ref_chest) / 65.0), 0.15, 0.90))
+            else:
+                w_cur = phenotype_dict["weight"]
+
+            bust_cur = float(local_kwargs.get("measure-bust-circ-incr", 0.0))
+            torso_scale_cur = float(local_kwargs.get("torso-scale-horiz-incr", 0.0))
+            waist_cur = float(local_kwargs.get("measure-waist-circ-incr", 0.0))
+            navel_cur = float(local_kwargs.get("stomach-navel-out", 0.0))
+            preg_cur = float(local_kwargs.get("stomach-pregnant-incr", 0.0))
+            hip_cur = float(local_kwargs.get("measure-hips-circ-incr", 0.0))
+            hip_h_cur = float(local_kwargs.get("hip-scale-horiz-incr", 0.0))
+            sh_cur = float(local_kwargs.get("measure-shoulder-dist-incr", 0.0))
+
+            for it in range(1, 8):
+                if t_chest is not None:
+                    local_kwargs["measure-bust-circ-incr"] = float(np.clip(bust_cur, -1.0, 1.0))
+                    local_kwargs["torso-scale-horiz-incr"] = float(np.clip(torso_scale_cur, -0.65, 0.75))
+                    local_kwargs["torso-scale-depth-incr"] = float(np.clip(torso_scale_cur * 0.85, -0.60, 0.75))
+                    if pres_str == "masculine":
+                        local_kwargs["measure-frontchest-dist-incr"] = float(np.clip(bust_cur * 0.5, -1.0, 1.0))
+                if t_waist is not None:
+                    local_kwargs["measure-waist-circ-incr"] = float(np.clip(waist_cur, -1.0, 1.0))
+                    local_kwargs["stomach-navel-out"] = float(np.clip(navel_cur, -1.0, 1.0))
+                    if preg_cur > 0.0:
+                        local_kwargs["stomach-pregnant-incr"] = float(np.clip(preg_cur, 0.0, 1.0))
+                if t_hip is not None:
+                    local_kwargs["measure-hips-circ-incr"] = float(np.clip(hip_cur, -1.0, 1.0))
+                    local_kwargs["hip-scale-horiz-incr"] = float(np.clip(hip_h_cur, -0.65, 0.75))
+                    local_kwargs["hip-scale-depth-incr"] = float(np.clip(hip_h_cur * 0.75, -0.65, 0.75))
+                if t_shoulder is not None:
+                    local_kwargs["measure-shoulder-dist-incr"] = float(np.clip(sh_cur, -1.0, 1.0))
 
                 verts_np, scale_factor, bone_poses_tensor = run_forward(phenotype_dict, local_kwargs)
                 tm_c = trimesh.Trimesh(vertices=verts_np, faces=faces, process=False)
                 md_c = MeshData(vertices=verts_np, faces=faces, normals=np.asarray(tm_c.vertex_normals, dtype=np.float32), metadata={})
-                res_c = anth_eng.extract_all(md_c, self.get_landmark_provider(md_c), "calib", ("chest_circumference", "waist_planar_circumference"))
-                m_chest = float(res_c.records["chest_circumference"].measurement.value_cm) if res_c.records["chest_circumference"].measurement else None
-                m_waist = float(res_c.records["waist_planar_circumference"].measurement.value_cm) if res_c.records["waist_planar_circumference"].measurement else None
+                res_c = anth_eng.extract_all(md_c, self.get_landmark_provider(md_c), "calib", tuple(requested_codes))
+
+                def _val(code: str) -> Optional[float]:
+                    rec = res_c.records.get(code)
+                    return float(rec.measurement.value_cm) if rec and rec.measurement else None
+
+                m_chest = _val("chest_circumference")
+                m_waist = _val("waist_planar_circumference")
+                m_hip = _val("hip_circumference")
+                m_sh = _val("shoulder_biacromial_breadth")
 
                 err_c = (float(t_chest) - m_chest) if (t_chest is not None and m_chest is not None) else 0.0
                 err_w = (float(t_waist) - m_waist) if (t_waist is not None and m_waist is not None) else 0.0
-                tol_c = max(1.2, 0.015 * float(t_chest)) if t_chest is not None else 999.0
-                tol_w = max(1.2, 0.015 * float(t_waist)) if t_waist is not None else 999.0
+                err_h = (float(t_hip) - m_hip) if (t_hip is not None and m_hip is not None) else 0.0
+                err_s = (float(t_shoulder) - m_sh) if (t_shoulder is not None and m_sh is not None) else 0.0
+
+                def _tol(target: Optional[float]) -> float:
+                    return max(1.5, 0.018 * float(target)) if target is not None else 999.0
+
+                converged = (
+                    (t_chest is None or (m_chest is not None and abs(err_c) <= _tol(t_chest)))
+                    and (t_waist is None or (m_waist is not None and abs(err_w) <= _tol(t_waist)))
+                    and (t_hip is None or (m_hip is not None and abs(err_h) <= _tol(t_hip)))
+                    and (t_shoulder is None or (m_sh is not None and abs(err_s) <= _tol(t_shoulder)))
+                )
 
                 calibration_info = {
                     "calibrated": True,
@@ -564,17 +626,37 @@ class AnnyAdapter:
                     "target_waist_cm": t_waist,
                     "measured_waist_cm": m_waist,
                     "waist_error_cm": round(-err_w, 2) if m_waist is not None else None,
-                    "converged": abs(err_c) <= tol_c and abs(err_w) <= tol_w,
+                    "target_hip_cm": t_hip,
+                    "measured_hip_cm": m_hip,
+                    "hip_error_cm": round(-err_h, 2) if m_hip is not None else None,
+                    "target_shoulder_cm": t_shoulder,
+                    "measured_shoulder_cm": m_sh,
+                    "shoulder_error_cm": round(-err_s, 2) if m_sh is not None else None,
+                    "converged": converged,
                 }
-                if calibration_info["converged"]:
+                if converged:
                     break
 
                 if t_chest is not None and m_chest is not None:
-                    bust_cur = float(np.clip(bust_cur + err_c * 0.045, -1.0, 1.0))
-                    w_cur = float(np.clip(w_cur + err_c * 0.012, 0.05, 1.0))
+                    bust_cur = float(np.clip(bust_cur + err_c * 0.055, -1.0, 1.0))
+                    # Recruit torso scale once bust approaches saturation or on larger errors
+                    torso_scale_cur = float(np.clip(torso_scale_cur + err_c * 0.025, -0.65, 0.75))
+                    w_cur = float(np.clip(w_cur + err_c * 0.014, 0.05, 1.0))
                     phenotype_dict["weight"] = w_cur
                 if t_waist is not None and m_waist is not None:
-                    waist_cur = float(np.clip(waist_cur + err_w * 0.065, -1.0, 1.0))
+                    waist_cur = float(np.clip(waist_cur + err_w * 0.075, -1.0, 1.0))
+                    # Recruit abdominal depth once measure-waist-circ-incr saturates or error remains > 2 cm
+                    if abs(waist_cur) > 0.80 or abs(err_w) > 2.0:
+                        navel_cur = float(np.clip(navel_cur + err_w * 0.055, -1.0, 1.0))
+                        if err_w > 1.5:
+                            preg_cur = float(np.clip(preg_cur + err_w * 0.045, 0.0, 1.0))
+                        elif err_w < -1.5 and preg_cur > 0.0:
+                            preg_cur = float(np.clip(preg_cur + err_w * 0.045, 0.0, 1.0))
+                if t_hip is not None and m_hip is not None:
+                    hip_cur = float(np.clip(hip_cur + err_h * 0.055, -1.0, 1.0))
+                    hip_h_cur = float(np.clip(hip_h_cur + err_h * 0.025, -0.65, 0.75))
+                if t_shoulder is not None and m_sh is not None:
+                    sh_cur = float(np.clip(sh_cur + err_s * 0.16, -1.0, 1.0))
         else:
             verts_np, scale_factor, bone_poses_tensor = run_forward(phenotype_dict, local_kwargs)
 
@@ -666,6 +748,24 @@ class AnnyAdapter:
             error_message=error_msg,
         )
 
+    @staticmethod
+    def _compute_glb_alignment_shift(verts_yup: np.ndarray) -> Tuple[float, float, float]:
+        """Align feet to y=0.0 and center torso X/Z around world origin for garment alignment."""
+        y_shift = float(-verts_yup[:, 1].min())
+        x_shift = float(-0.5 * (verts_yup[:, 0].min() + verts_yup[:, 0].max()))
+        h_tot = float(verts_yup[:, 1].max() - verts_yup[:, 1].min())
+        torso_mask = (
+            (verts_yup[:, 1] >= verts_yup[:, 1].min() + 0.45 * h_tot)
+            & (verts_yup[:, 1] <= verts_yup[:, 1].min() + 0.85 * h_tot)
+            & (np.abs(verts_yup[:, 0]) < 0.22)
+        )
+        if np.any(torso_mask):
+            tz = verts_yup[torso_mask, 2]
+            z_shift = float(-0.5 * (tz.min() + tz.max()))
+        else:
+            z_shift = float(-0.5 * (verts_yup[:, 2].min() + verts_yup[:, 2].max()))
+        return x_shift, y_shift, z_shift
+
     def export_glb(self, mesh_data: MeshData, rigged: bool = False) -> bytes:
         """
         Serializes MeshData to web-optimized glTF 2.0 binary container in memory.
@@ -696,6 +796,9 @@ class AnnyAdapter:
                 process=False,
             )
             tm.apply_transform(t_rot_x_neg90)
+            v_glb = np.asarray(tm.vertices, dtype=np.float64)
+            x_shift, y_shift, z_shift = self._compute_glb_alignment_shift(v_glb)
+            tm.apply_translation([x_shift, y_shift, z_shift])
 
             glb_bytes = tm.export(file_type="glb")
             if not isinstance(glb_bytes, bytes):
@@ -732,9 +835,11 @@ class AnnyAdapter:
             ], dtype=np.float64)
 
             verts_yup = (mesh_data.vertices.astype(np.float64) @ t_rot[:3, :3].T).astype(np.float32)
-            # Align feet to y = 0.0 floor plane consistently
-            y_shift = float(-verts_yup[:, 1].min())
+            # Align feet to y = 0.0 floor plane and center X/Z consistently for garment alignment
+            x_shift, y_shift, z_shift = self._compute_glb_alignment_shift(verts_yup)
+            verts_yup[:, 0] += x_shift
             verts_yup[:, 1] += y_shift
+            verts_yup[:, 2] += z_shift
 
             faces = mesh_data.faces.astype(np.uint32)
             tm_tmp = trimesh.Trimesh(vertices=verts_yup, faces=faces, process=False)
@@ -745,9 +850,10 @@ class AnnyAdapter:
             weights_full = model.dense_vertex_bone_weights.detach().cpu().numpy()
 
             bone_world_mats = np.zeros((len(bones), 4, 4), dtype=np.float64)
+            shift_vec = np.array([x_shift, y_shift, z_shift], dtype=np.float64)
             for i in range(len(bones)):
                 m = t_rot @ bone_poses_zup[i]
-                m[:3, 3] = m[:3, 3] * scale_f + np.array([0.0, y_shift, 0.0])
+                m[:3, 3] = m[:3, 3] * scale_f + shift_vec
                 bone_world_mats[i] = m
 
             bone_local_mats = np.zeros_like(bone_world_mats)

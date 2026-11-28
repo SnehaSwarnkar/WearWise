@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import {
+  adminLogin as apiAdminLogin,
   clearLegacyAuthStorage,
   getMe,
   logout as apiLogout,
@@ -43,6 +44,7 @@ export interface StoreAuthContextType {
   sessionId: string;
   login: (email: string, password: string) => Promise<StoreUser>;
   sellerLogin: (email: string, password: string) => Promise<StoreUser>;
+  adminLogin: (email: string, password: string) => Promise<StoreUser>;
   signup: (name: string, email: string, password: string) => Promise<StoreUser>;
   logout: () => Promise<void>;
   updateProfile: (updates: Partial<StoreUser>) => Promise<StoreUser>;
@@ -94,6 +96,12 @@ export const StoreAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
     return loggedIn;
   };
 
+  const adminLogin = async (email: string, password: string): Promise<StoreUser> => {
+    const loggedIn = await apiAdminLogin(email, password);
+    setUser(loggedIn);
+    return loggedIn;
+  };
+
   const signup = async (name: string, email: string, password: string): Promise<StoreUser> => {
     const registered = await apiSignup(name, email, password);
     setUser(registered);
@@ -129,6 +137,7 @@ export const StoreAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
         sessionId,
         login,
         sellerLogin,
+        adminLogin,
         signup,
         logout,
         updateProfile,

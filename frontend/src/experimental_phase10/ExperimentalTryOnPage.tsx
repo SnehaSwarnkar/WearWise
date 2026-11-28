@@ -5,10 +5,11 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import Header from '../pages/Header';
 import { addToCart } from '../api/cart';
-import { getBodyApiBase } from '../api/client';
+import { apiClient, devAuthHeaderProvider, getBodyApiBase } from '../api/client';
 import { fetchProductBySku } from '../api/products';
 import { ARTICULATED_POSES } from './ArticulatedPoseLibrary';
-import { WorkerClothClient } from './WorkerClothClient';
+import { StrainRegionSummary } from './WeldedClothSolver';
+import { ClothVisualizationMode, WorkerClothClient } from './WorkerClothClient';
 
 const BODY_ENGINE_BASE = getBodyApiBase();
 
@@ -20,10 +21,10 @@ interface AvatarOption {
   chestCm: number;
   waistCm: number;
   shoulderCm: number;
+  requiresCredentials?: boolean;
 }
 
-// Calibrated Anny profiles from Phase 11.5 closed-loop validation
-const STAGING_AVATAR_PROFILES: AvatarOption[] = [
+const PRESET_AVATAR_PROFILES: AvatarOption[] = [
   {
     id: 'PROFILE_B_ATHLETIC_MALE',
     label: 'Athletic Build (178.5 cm · Chest 100 cm)',
@@ -92,14 +93,13 @@ interface ResolvedGarmentAsset {
 const CONSUMER_POSES = [
   { id: 'P0', label: 'Standing Natural' },
   { id: 'P1', label: 'Arms Raised Slightly' },
-  { id: 'P2', label: 'Arms Out (T-Pose)' },
+  { id: 'P2', label: 'Arms Out' },
   { id: 'P3', label: 'Arms Overhead' },
   { id: 'P6', label: 'Elbows Bent' },
   { id: 'P9', label: 'Leaning Forward' },
 ];
 
 const DEFAULT_SIZE_CHEST: Record<string, number> = { S: 96, M: 104, L: 112 };
-const DEFAULT_SIZE_WAIST: Record<string, number> = { S: 92, M: 100, L: 108 };
 const DEFAULT_SIZE_SHOULDER: Record<string, number> = { S: 43, M: 46, L: 49 };
 
 function mapFabricToSolverId(backendFabricId?: string): string {
@@ -123,10 +123,10 @@ function describeFitReason(size: string, fit: FitLabel, chestEase: number): stri
     return `Size ${size} is closest to your body measurements and should provide a comfortable everyday fit.`;
   }
   if (fit === 'Snug fit') {
-    return `Size ${size} sits closer to the chest and shoulders for a tailored feel.`;
+    return `Size ${size} sits closer across the chest and shoulders for a tailored feel.`;
   }
   if (fit === 'Relaxed fit') {
-    return `Size ${size} gives extra room around the chest (+${chestEase.toFixed(0)} cm) for a looser silhouette.`;
+    return `Size ${size} gives extra room through the chest (+${chestEase.toFixed(0)} cm) for a looser silhouette.`;
   }
   if (fit === 'Too tight') {
     return `Size ${size} may feel tight across the chest or shoulders. Consider sizing up.`;
@@ -134,7 +134,28 @@ function describeFitReason(size: string, fit: FitLabel, chestEase: number): stri
   if (fit === 'Too loose') {
     return `Size ${size} will drape noticeably oversized on your frame. Consider sizing down.`;
   }
-  return 'Your size recommendation is currently unavailable. Please check your measurements or choose using the size guide.';
+  return 'Your size recommendation is currently unavailable. Please check your body profile or size guide.';
+}
+
+function zoneLabel(pct: number): { text: string; bg: string; color: string } {
+  if (pct >= 5.0) return { text: 'Tight', bg: '#fee2e2', color: '#991b1b' };
+  if (pct >= 2.6) return { text: 'Snug', bg: '#fef3c7', color: '#92400e' };
+  if (pct >= 1.2) return { text: 'Fitted', bg: '#ecfccb', color: '#3f6212' };
+  return { text: 'Comfortable', bg: '#dcfce7', color: '#166534' };
+}
+
+async function loadGltfFromUrl(loader: GLTFLoader, url: string, withCreds = false): Promise<any> {
+  if (!withCreds && !url.startsWith('/api/') && !url.includes('/api/')) {
+    return new Promise((res, rej) => loader.load(url, res, undefined, rej));
+  }
+  const resp = await fetch(url, {
+    credentials: 'include',
+    headers: devAuthHeaderProvider.getAuthHeaders(),
+    cache: 'no-store',
+  });
+  if (!resp.ok) throw new Error('Asset unavailable');
+  const buf = await resp.arrayBuffer();
+  return new Promise((res, rej) => loader.parse(buf, '', res, rej));
 }
 
 export default function ExperimentalTryOnPage() {
@@ -143,7 +164,9 @@ export default function ExperimentalTryOnPage() {
   const requestedRev = searchParams.get('revision');
   const selectedColor = searchParams.get('color') || 'Coral Pink';
   const [selectedSize, setSelectedSize] = useState<string>(searchParams.get('size') || 'M');
-  const [selectedAvatarId, setSelectedAvatarId] = useState<string>(STAGING_AVATAR_PROFILES[0].id);
+
+  const [avatarOptions, setAvatarOptions] = useState<AvatarOption[]>(PRESET_AVATAR_PROFILES);
+  const [selectedAvatarId, setSelectedAvatarId] = useState<string>(PRESET_AVATAR_PROFILES[0].id);
 
   const [garmentMeta, setGarmentMeta] = useState<ResolvedGarmentAsset | null>(null);
   const [catalogProduct, setCatalogProduct] = useState<any>(null);
@@ -152,6 +175,9 @@ export default function ExperimentalTryOnPage() {
 
   const [activePoseId, setActivePoseId] = useState<string>('P0');
   const [paused, setPaused] = useState<boolean>(false);
+  const [vizMode, setVizMode] = useState<ClothVisualizationMode>('normal');
+  const [fabricChoice, setFabricChoice] = useState<string>('waffle_knit_240');
+  const [strainSummary, setStrainSummary] = useState<StrainRegionSummary | null>(null);
   const [cartMsg, setCartMsg] = useState<string | null>(null);
   const [addingToCart, setAddingToCart] = useState<boolean>(false);
 
@@ -160,14 +186,52 @@ export default function ExperimentalTryOnPage() {
   const controlsRef = useRef<OrbitControls | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const pausedRef = useRef<boolean>(false);
+  const vizModeRef = useRef<ClothVisualizationMode>('normal');
 
   useEffect(() => {
     pausedRef.current = paused;
   }, [paused]);
 
+  useEffect(() => {
+    vizModeRef.current = vizMode;
+    clientRef.current?.setVisualizationMode(vizMode);
+  }, [vizMode]);
+
+  useEffect(() => {
+    clientRef.current?.setFabric(fabricChoice);
+  }, [fabricChoice]);
+
+  // Include authenticated customer's personal saved rigged avatar if present
+  useEffect(() => {
+    let alive = true;
+    apiClient
+      .listProfiles()
+      .then((list) => {
+        if (!alive || !Array.isArray(list) || list.length === 0) return;
+        const p = list[0];
+        if (!p.latest_asset_url) return;
+        const userOption: AvatarOption = {
+          id: 'USER_PRIMARY',
+          label: `${p.avatar_name || 'My Saved Avatar'} (${Math.round(p.stature_cm)} cm)`,
+          glbUrl: `${BODY_ENGINE_BASE}${p.latest_asset_url}`,
+          statureCm: Number(p.stature_cm || 172),
+          chestCm: Number(p.active_measurements?.chest_circumference?.value_cm || 96),
+          waistCm: Number(p.active_measurements?.waist_planar_circumference?.value_cm || 80),
+          shoulderCm: Number(p.active_measurements?.shoulder_biacromial_breadth?.value_cm || 41),
+          requiresCredentials: true,
+        };
+        setAvatarOptions([userOption, ...PRESET_AVATAR_PROFILES]);
+        setSelectedAvatarId('USER_PRIMARY');
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const activeAvatar = useMemo(
-    () => STAGING_AVATAR_PROFILES.find((a) => a.id === selectedAvatarId) || STAGING_AVATAR_PROFILES[0],
-    [selectedAvatarId]
+    () => avatarOptions.find((a) => a.id === selectedAvatarId) || avatarOptions[0],
+    [avatarOptions, selectedAvatarId]
   );
 
   const resolveAndLoad = useCallback(async () => {
@@ -196,11 +260,12 @@ export default function ExperimentalTryOnPage() {
       }
       const meta: ResolvedGarmentAsset = await res.json();
       setGarmentMeta(meta);
+      setFabricChoice(mapFabricToSolverId(meta.fabric_profile?.id));
       setLoadState('ready');
     } catch {
       setGarmentMeta(null);
       setLoadState('error');
-      setErrorMsg('We could not load the 3D preview for this garment and size right now. Please try another size or return to the catalog.');
+      setErrorMsg('We could not load the 3D preview for this garment and size right now. Please try another size or return to the shop.');
     }
   }, [sku, selectedSize, requestedRev]);
 
@@ -229,7 +294,7 @@ export default function ExperimentalTryOnPage() {
     container.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 1.05, -0.05);
+    controls.target.set(0, 1.05, 0);
     controls.update();
     controlsRef.current = controls;
 
@@ -244,6 +309,13 @@ export default function ExperimentalTryOnPage() {
     const client = new WorkerClothClient();
     clientRef.current = client;
 
+    let frameTick = 0;
+    client.setCallbacks((m) => {
+      if (m.strainSummary && (frameTick % 6 === 0 || m.simState === 'STABLE')) {
+        setStrainSummary(m.strainSummary);
+      }
+    });
+
     const loader = new GLTFLoader();
     const garmentAssetFullUrl =
       garmentMeta.asset_url.startsWith('http') || garmentMeta.asset_url.startsWith('/garments/')
@@ -252,8 +324,8 @@ export default function ExperimentalTryOnPage() {
 
     let disposed = false;
     Promise.all([
-      new Promise<any>((res, rej) => loader.load(activeAvatar.glbUrl, res, undefined, rej)),
-      new Promise<any>((res, rej) => loader.load(garmentAssetFullUrl, res, undefined, rej)),
+      loadGltfFromUrl(loader, activeAvatar.glbUrl, Boolean(activeAvatar.requiresCredentials)),
+      loadGltfFromUrl(loader, garmentAssetFullUrl, false),
     ])
       .then(async ([avatarGltf, garmentGltf]) => {
         if (disposed) return;
@@ -264,42 +336,60 @@ export default function ExperimentalTryOnPage() {
 
         avatarScene.updateMatrixWorld(true);
         let neckBone: THREE.Object3D | null = null;
+        let chestBone: THREE.Object3D | null = null;
         avatarScene.traverse((o) => {
           if (o.name === 'neck01') neckBone = o;
+          if (o.name === 'spine01') chestBone = o;
         });
-        if (neckBone) {
-          const avNeck = new THREE.Vector3();
-          (neckBone as THREE.Object3D).getWorldPosition(avNeck);
+
+        // Align garment collar smoothly to the avatar's neck & upper-chest center
+        if (neckBone || chestBone) {
+          const avAnchor = new THREE.Vector3();
+          const avChest = new THREE.Vector3();
+          if (neckBone) (neckBone as THREE.Object3D).getWorldPosition(avAnchor);
+          if (chestBone) (chestBone as THREE.Object3D).getWorldPosition(avChest);
+          const targetAnchorX = neckBone ? avAnchor.x : avChest.x;
+          const targetAnchorY = neckBone ? avAnchor.y - 0.015 : avChest.y + 0.14;
+          const targetAnchorZ = chestBone ? avChest.z + 0.01 : avAnchor.z + 0.015;
 
           const collarBox = new THREE.Box3();
+          const fullGarmentBox = new THREE.Box3();
           let hasCollar = false;
           garmentScene.traverse((o) => {
             const m = o as THREE.Mesh;
-            if (m.isMesh && m.name.includes('COLLAR')) {
+            if (m.isMesh && m.geometry.attributes.position) {
               m.geometry.computeBoundingBox();
               if (m.geometry.boundingBox) {
-                collarBox.union(m.geometry.boundingBox);
-                hasCollar = true;
+                fullGarmentBox.union(m.geometry.boundingBox);
+                if (m.name.includes('COLLAR')) {
+                  collarBox.union(m.geometry.boundingBox);
+                  hasCollar = true;
+                }
               }
             }
           });
+          const gRef = new THREE.Vector3();
           if (hasCollar) {
-            const gCollar = new THREE.Vector3();
-            collarBox.getCenter(gCollar);
-            const dx = avNeck.x - gCollar.x;
-            const dy = avNeck.y - gCollar.y - 0.015;
-            const dz = avNeck.z - gCollar.z + 0.025;
-            garmentScene.traverse((o) => {
-              const m = o as THREE.Mesh;
-              if (m.isMesh && m.geometry.attributes.position) {
-                m.geometry.translate(dx, dy, dz);
-              }
-            });
+            collarBox.getCenter(gRef);
+          } else {
+            fullGarmentBox.getCenter(gRef);
+            gRef.y = fullGarmentBox.max.y - 0.04;
           }
+          const dx = targetAnchorX - gRef.x;
+          const dy = targetAnchorY - gRef.y;
+          const dz = targetAnchorZ - gRef.z;
+
+          garmentScene.traverse((o) => {
+            const m = o as THREE.Mesh;
+            if (m.isMesh && m.geometry.attributes.position) {
+              m.geometry.translate(dx, dy, dz);
+            }
+          });
         }
 
         await client.init(avatarScene, garmentScene);
-        client.setFabric(mapFabricToSolverId(garmentMeta.fabric_profile?.id));
+        client.setFabric(fabricChoice);
+        client.setVisualizationMode(vizModeRef.current);
         const poseObj = ARTICULATED_POSES.find((p) => p.id === activePoseId);
         if (poseObj) client.setTargetPose(poseObj.state);
       })
@@ -317,6 +407,11 @@ export default function ExperimentalTryOnPage() {
 
       if (!pausedRef.current) {
         client.step(dt);
+        frameTick++;
+        if (frameTick % 10 === 0) {
+          const m = client.getMetrics();
+          if (m?.strainSummary) setStrainSummary(m.strainSummary);
+        }
       }
       controls.update();
       renderer.render(scene, camera);
@@ -349,7 +444,7 @@ export default function ExperimentalTryOnPage() {
   const handleResetCamera = () => {
     if (cameraRef.current && controlsRef.current) {
       cameraRef.current.position.set(0, 1.15, 2.05);
-      controlsRef.current.target.set(0, 1.05, -0.05);
+      controlsRef.current.target.set(0, 1.05, 0);
       controlsRef.current.update();
     }
   };
@@ -388,7 +483,6 @@ export default function ExperimentalTryOnPage() {
     }
   };
 
-  // Compute shopper-friendly size recommendation & per-size comparison
   const fitGuidance = useMemo(() => {
     const sizes = garmentMeta?.available_sizes?.length ? garmentMeta.available_sizes : ['S', 'M', 'L'];
     const allM = garmentMeta?.all_size_measurements || {};
@@ -396,7 +490,6 @@ export default function ExperimentalTryOnPage() {
       const m = allM[sz] || (sz === selectedSize ? garmentMeta?.measurements : null) || {};
       return {
         chest: Number(m.chest_circumference_cm ?? m.chest_cm ?? DEFAULT_SIZE_CHEST[sz] ?? 104),
-        waist: Number(m.waist_circumference_cm ?? m.waist_cm ?? DEFAULT_SIZE_WAIST[sz] ?? 100),
         shoulder: Number(m.shoulder_width_cm ?? m.shoulder_cm ?? DEFAULT_SIZE_SHOULDER[sz] ?? 46),
       };
     };
@@ -420,7 +513,7 @@ export default function ExperimentalTryOnPage() {
       expectedFit: currentComp?.fit || 'Recommendation unavailable',
       reason: recommended
         ? describeFitReason(selectedSize, currentComp.fit, currentComp.chestEase)
-        : 'Your size recommendation is currently unavailable. Please check your measurements or choose using the size guide.',
+        : 'Your size recommendation is currently unavailable. Please check your body profile or size guide.',
       comparisons,
       selectedDims: currentComp.dims,
     };
@@ -439,7 +532,7 @@ export default function ExperimentalTryOnPage() {
               {catalogProduct?.name || garmentMeta?.name || 'Boxy Crew Tee'}
             </h1>
             <p style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: '#151515' }}>
-              ₹{Number(catalogProduct?.price || 2999).toLocaleString('en-IN')} · Size {selectedSize} · {garmentMeta?.fabric_profile?.name || 'Cotton Waffle Knit (240 GSM)'}
+              ₹{Number(catalogProduct?.price || 2999).toLocaleString('en-IN')} · Size {selectedSize}
             </p>
             <div style={{ marginTop: '6px' }}>
               <Link to={`/product/${encodeURIComponent(sku)}`} style={{ fontSize: '12px', fontWeight: 800, color: '#151515', textDecoration: 'underline' }}>
@@ -447,7 +540,7 @@ export default function ExperimentalTryOnPage() {
               </Link>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <Link
               to="/cart"
               data-testid="view-cart-link"
@@ -495,13 +588,98 @@ export default function ExperimentalTryOnPage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px', alignItems: 'start' }}>
           {/* 3D Try-On Viewport */}
-          <div style={{ position: 'relative', border: '2px solid #151515', borderRadius: '14px', overflow: 'hidden', background: '#5a0b23', minHeight: '560px' }}>
-            {loadState === 'loading' && (
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800 }}>
-                Preparing your 3D fit preview...
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ position: 'relative', border: '2px solid #151515', borderRadius: '14px', overflow: 'hidden', background: '#5a0b23', minHeight: '560px' }}>
+              {loadState === 'loading' && (
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800 }}>
+                  Preparing your 3D fit preview...
+                </div>
+              )}
+              <div ref={mountRef} style={{ width: '100%', height: '560px' }} />
+
+              {/* View Mode Switcher Overlay (Normal vs Fit Strain Heatmap) */}
+              <div style={{ position: 'absolute', top: '12px', left: '12px', display: 'flex', gap: '6px' }}>
+                <button
+                  type="button"
+                  data-testid="viz-mode-normal"
+                  onClick={() => setVizMode('normal')}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    border: '2px solid #151515',
+                    background: vizMode === 'normal' ? '#D8FF3F' : '#FFFFFF',
+                    fontWeight: 900,
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Normal View
+                </button>
+                <button
+                  type="button"
+                  data-testid="viz-mode-strain"
+                  onClick={() => setVizMode('strain')}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    border: '2px solid #151515',
+                    background: vizMode === 'strain' ? '#FF3D9A' : '#FFFFFF',
+                    color: vizMode === 'strain' ? '#FFFFFF' : '#151515',
+                    fontWeight: 900,
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Fit Tension Heatmap
+                </button>
+              </div>
+            </div>
+
+            {vizMode === 'strain' && (
+              <div
+                data-testid="strain-heatmap-legend"
+                style={{ background: '#ffffff', border: '2px solid #151515', borderRadius: '12px', padding: '14px' }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+                  <strong style={{ fontSize: '13px' }}>How the Fit Tension Heatmap Works</strong>
+                  {strainSummary && (
+                    <span style={{ fontSize: '12px', fontWeight: 800 }}>
+                      Overall Feel: {strainSummary.overallComfort}
+                    </span>
+                  )}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '10px', fontSize: '11px', fontWeight: 800, textAlign: 'center' }}>
+                  <div style={{ padding: '6px', background: '#dbeafe', color: '#1e40af', borderRadius: '6px' }}>Blue · Relaxed</div>
+                  <div style={{ padding: '6px', background: '#dcfce7', color: '#166534', borderRadius: '6px' }}>Green · Comfortable</div>
+                  <div style={{ padding: '6px', background: '#fef3c7', color: '#92400e', borderRadius: '6px' }}>Amber · Snug</div>
+                  <div style={{ padding: '6px', background: '#fee2e2', color: '#991b1b', borderRadius: '6px' }}>Red · Tight</div>
+                </div>
+
+                {strainSummary && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '8px', fontSize: '11px' }}>
+                    {[
+                      { label: 'Chest', val: strainSummary.chestPct },
+                      { label: 'Shoulders', val: strainSummary.shouldersPct },
+                      { label: 'Underarms', val: strainSummary.underarmsPct },
+                      { label: 'Waist', val: strainSummary.waistPct },
+                    ].map((z) => {
+                      const st = zoneLabel(z.val);
+                      return (
+                        <div key={z.label} style={{ padding: '6px 8px', background: st.bg, color: st.color, borderRadius: '6px', textAlign: 'center' }}>
+                          <div style={{ fontWeight: 800 }}>{z.label}</div>
+                          <div>{st.text}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <p style={{ margin: 0, fontSize: '11px', color: '#64748b' }}>
+                  Colors reflect simulated fabric stretch on the 3D model, not physical lab garment testing.
+                </p>
               </div>
             )}
-            <div ref={mountRef} style={{ width: '100%', height: '560px' }} />
           </div>
 
           {/* Shopper Fit & Purchase Controls */}
@@ -557,16 +735,21 @@ export default function ExperimentalTryOnPage() {
 
             {/* Body Profile Selector */}
             <div style={{ background: '#fff', border: '2px solid #151515', borderRadius: '14px', padding: '16px' }}>
-              <label style={{ fontSize: '12px', fontWeight: 800, display: 'block', marginBottom: '8px', textTransform: 'uppercase' }}>
-                Your Body Profile
-              </label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 800, textTransform: 'uppercase' }}>
+                  Body Profile
+                </label>
+                <Link to="/avatar" style={{ fontSize: '11px', fontWeight: 800, color: '#151515' }}>
+                  Edit My Avatar →
+                </Link>
+              </div>
               <select
                 data-testid="avatar-select"
                 value={selectedAvatarId}
                 onChange={(e) => setSelectedAvatarId(e.target.value)}
                 style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '2px solid #151515', fontWeight: 700, fontSize: '13px', background: '#FFF8F1' }}
               >
-                {STAGING_AVATAR_PROFILES.map((a) => (
+                {avatarOptions.map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.label}
                   </option>
@@ -575,6 +758,36 @@ export default function ExperimentalTryOnPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#475569', marginTop: '8px' }}>
                 <span>Your chest: <strong>{Math.round(activeAvatar.chestCm)} cm</strong></span>
                 <span>Garment chest ({selectedSize}): <strong>{fitGuidance.selectedDims.chest} cm</strong></span>
+              </div>
+            </div>
+
+            {/* Fabric Feel Selector */}
+            <div style={{ background: '#fff', border: '2px solid #151515', borderRadius: '14px', padding: '16px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>
+                Fabric Drape Style
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                {[
+                  { id: 'waffle_knit_240', label: 'Soft Cotton Knit' },
+                  { id: 'rigid_poplin_140', label: 'Crisp Woven Poplin' },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setFabricChoice(f.id)}
+                    style={{
+                      padding: '8px',
+                      borderRadius: '8px',
+                      border: '1.5px solid #151515',
+                      background: fabricChoice === f.id ? '#D8FF3F' : '#FFF8F1',
+                      fontWeight: 800,
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {f.label}
+                  </button>
+                ))}
               </div>
             </div>
 

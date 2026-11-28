@@ -125,6 +125,11 @@ def login(payload: LoginRequest, response: Response):
             status_code=403,
             detail="This is a seller account. Please use Seller Login.",
         )
+    if user["role"] == "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="This is an administrator account. Please use Admin Login.",
+        )
     if user["role"] != "shopper":
         raise HTTPException(
             status_code=403,
@@ -155,6 +160,13 @@ def seller_login(payload: LoginRequest, response: Response):
             status_code=403,
             detail="Seller account credentials required for Seller Portal.",
         )
+    if user["status"] == "rejected":
+        reason = user.get("rejection_reason")
+        detail = "Your seller application was not approved."
+        if reason:
+            detail += f" Reason: {reason}"
+        detail += " You can submit an updated seller application."
+        raise HTTPException(status_code=403, detail=detail)
     if not user["seller_approved"] or user["status"] == "pending":
         raise HTTPException(
             status_code=403,
@@ -174,6 +186,7 @@ def apply_for_seller(payload: SellerApplyRequest):
     """
     Accepts a non-privileged seller onboarding request.
     Never grants active seller permissions or logs in without WearWise admin approval.
+    Permits re-application only for previously rejected seller applications with valid password.
     """
     ensure_auth_seed_and_migration()
     email = payload.email.lower().strip()
@@ -181,17 +194,51 @@ def apply_for_seller(payload: SellerApplyRequest):
         raise HTTPException(status_code=400, detail="Valid business email is required")
     if len(payload.password or "") < 6:
         raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
-    if db.find_one("users", email=email):
-        raise HTTPException(status_code=409, detail="An account or application with this email already exists")
 
     store_name = payload.store_name.strip()
     if len(store_name) < 2:
         raise HTTPException(status_code=400, detail="Store name is required")
 
     now_iso = datetime.now(timezone.utc).isoformat()
+    owner_name = (payload.owner_name or payload.name or store_name).strip()
+
+    existing = db.find_one("users", email=email)
+    if existing:
+        existing_norm = normalize_user_record(existing)
+        if existing_norm["role"] == "seller" and existing_norm["status"] == "rejected":
+            if not verify_password(payload.password, existing.get("password_hash", "")):
+                raise HTTPException(status_code=403, detail="Please enter the password for your previous application to resubmit.")
+            db.update_one(
+                "users",
+                {"id": existing["id"]},
+                {
+                    "name": owner_name,
+                    "owner_name": owner_name,
+                    "store_name": store_name,
+                    "store_slug": _slugify(store_name),
+                    "phone": (payload.phone or "").strip() or None,
+                    "business_type": (payload.business_type or "Apparel Brand").strip(),
+                    "business_address": (payload.business_address or "").strip() or None,
+                    "store_description": (payload.store_description or "").strip(),
+                    "status": "pending",
+                    "is_active": False,
+                    "seller_approved": False,
+                    "rejection_reason": None,
+                    "updatedAt": now_iso,
+                },
+            )
+            return {
+                "status": "pending_approval",
+                "message": "Your updated seller application has been resubmitted and is under review.",
+                "email": email,
+                "store_name": store_name,
+            }
+        raise HTTPException(status_code=409, detail="An account or application with this email already exists")
+
     pending_seller = {
         "id": f"slr-{uuid.uuid4().hex[:8]}",
-        "name": payload.name.strip() or store_name,
+        "name": owner_name,
+        "owner_name": owner_name,
         "email": email,
         "password_hash": hash_password(payload.password),
         "role": "seller",
@@ -201,9 +248,13 @@ def apply_for_seller(payload: SellerApplyRequest):
         "brand_id": str(uuid.uuid4()),
         "store_name": store_name,
         "store_slug": _slugify(store_name),
+        "phone": (payload.phone or "").strip() or None,
         "business_email": email,
+        "business_type": (payload.business_type or "Apparel Brand").strip(),
+        "business_address": (payload.business_address or "").strip() or None,
         "store_description": (payload.store_description or "").strip(),
         "brand_tagline": "",
+        "rejection_reason": None,
         "createdAt": now_iso,
     }
     db.insert("users", pending_seller)
@@ -315,21 +366,21 @@ def admin_update_seller_status(
     if not target or (target.get("role") or "shopper") != "seller":
         raise HTTPException(status_code=404, detail="Seller account not found")
     new_status = payload.status.lower().strip()
-    if new_status not in {"active", "pending", "suspended"}:
-        raise HTTPException(status_code=400, detail="Status must be active, pending, or suspended")
+    if new_status not in {"active", "pending", "rejected", "suspended"}:
+        raise HTTPException(status_code=400, detail="Status must be active, pending, rejected, or suspended")
 
     approved = (
         payload.seller_approved
         if payload.seller_approved is not None
         else (new_status == "active")
     )
-    updated = db.update_one(
-        "users",
-        {"id": seller_id},
-        {
-            "status": new_status,
-            "is_active": new_status == "active",
-            "seller_approved": bool(approved),
-        },
-    )
+    now_iso = datetime.now(timezone.utc).isoformat()
+    updates = {
+        "status": new_status,
+        "is_active": new_status == "active",
+        "seller_approved": bool(approved) if new_status == "active" else False,
+        "rejection_reason": (payload.rejection_reason or "").strip() or None if new_status == "rejected" else None,
+        "verified_at": now_iso if new_status == "active" else target.get("verified_at"),
+    }
+    updated = db.update_one("users", {"id": seller_id}, updates)
     return UserResponse(**sanitize_user_for_client(updated))

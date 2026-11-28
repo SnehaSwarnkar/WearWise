@@ -73,8 +73,8 @@ class DefaultDevAuthHeaderProvider implements AuthHeaderProvider {
     const headers: Record<string, string> = {};
     if (this.token) {
       headers['Authorization'] = `Bearer ${this.token}`;
-    } else {
-      // In development mode, use Bearer shorthand with UUID
+    } else if (!getCsrfToken()) {
+      // Only use dev shorthand headers when there is no active HTTP-only cookie session
       const principalId = this.role === 'user' ? this.devUserId : this.devBrandId;
       headers['Authorization'] = `Bearer ${principalId}`;
       if (this.role === 'user') {
@@ -285,10 +285,15 @@ export class WearWiseApiClient {
   }
 
   public async updateControls(profileId: string, payload: UpdateControlsRequest): Promise<BodyProfile> {
-    return this.request<BodyProfile>(`/api/v1/profiles/${profileId}/controls`, {
+    const res = await this.request<any>(`/api/v1/profiles/${profileId}/controls`, {
       method: 'PUT',
       body: JSON.stringify(payload),
     });
+    return {
+      ...res,
+      current_revision: res.current_revision ?? res.new_revision,
+      shape_controls: res.shape_controls ?? res.controls,
+    } as BodyProfile;
   }
 
   // ---------------------------------------------------------------------------
@@ -315,7 +320,10 @@ export class WearWiseApiClient {
       ...this.authProvider.getAuthHeaders(),
     };
 
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, {
+      headers,
+      credentials: 'include',
+    });
     if (!response.ok) {
       throw new ApiClientError('GLB_FETCH_FAILED', `Failed to load 3D GLB asset (${response.status})`, response.status);
     }

@@ -77,3 +77,28 @@ def test_cross_service_cookie_session_csrf_and_revocation():
         sess_col.update_one({"jti": jti}, {"$set": {"revoked": True}})
         r_revoked = c.get("/api/v1/merchant/garments")
         assert r_revoked.status_code == 401
+
+
+def test_shopper_can_fetch_published_garment_binary_but_not_private_merchant_revision():
+    """
+    Published garments expose read-only binary GLB through /shopper-asset/{size} for customers,
+    while private /revisions/{rev}/assets/{size} stays strictly merchant-only (403 for shoppers).
+    """
+    shopper_jwt = create_token(uuid.uuid4(), principal_type="shopper")
+    hdr = {"Authorization": f"Bearer {shopper_jwt}"}
+
+    meta = body_client.get(
+        "/api/v1/merchant/garments/TSH-WW-PHASE11-ACCEPTANCE-001/shopper-asset?size=M",
+        headers=hdr,
+    )
+    if meta.status_code == 200:
+        data = meta.json()
+        assert "/shopper-asset/M" in data["asset_url"]
+        bin_res = body_client.get(data["asset_url"], headers=hdr)
+        assert bin_res.status_code == 200
+        assert len(bin_res.content) > 1000
+        priv_res = body_client.get(
+            f"/api/v1/merchant/garments/{data['garment_id']}/revisions/{data['revision']}/assets/M",
+            headers=hdr,
+        )
+        assert priv_res.status_code == 403

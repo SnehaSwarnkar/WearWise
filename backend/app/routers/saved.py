@@ -82,10 +82,13 @@ def add_to_wishlist(payload: SaveWishlistRequest):
         id=str(uuid.uuid4())[:8],
         session_id=payload.session_id,
         product_id=payload.product_id,
+        sku=payload.sku,
+        category=payload.category,
         name=payload.name,
         price=payload.price,
         image=payload.image,
         brand=payload.brand,
+        try_on_mode=payload.try_on_mode,
         created_at=now,
     )
     db.insert("wishlist", item.model_dump())

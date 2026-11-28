@@ -14,7 +14,15 @@ import {
   WorkerInMsg,
   WorkerOutMsg,
 } from './clothWorker';
-import { SimulationLifecycleState, SimulationMetrics, WeldedClothSolver } from './WeldedClothSolver';
+import {
+  applyArticulatedPoseToRig,
+  createPoseRigScratch,
+  SimulationLifecycleState,
+  SimulationMetrics,
+  WeldedClothSolver,
+} from './WeldedClothSolver';
+
+export type ClothVisualizationMode = 'normal' | 'strain';
 
 export interface ClientMetrics extends SimulationMetrics {
   workerMode: 'web_worker' | 'main_thread_fallback';
@@ -28,24 +36,29 @@ export class WorkerClothClient {
   private busy = false;
   private epoch = 0;
   private state: SimulationLifecycleState = 'IDLE';
+  private vizMode: ClothVisualizationMode = 'normal';
 
-  private garmentBindings: { mesh: THREE.Mesh; vertexToParticle: Int32Array; vertCount: number }[] = [];
+  private garmentBindings: {
+    mesh: THREE.Mesh;
+    vertexToParticle: Int32Array;
+    vertCount: number;
+    origMatColor?: THREE.Color;
+    origVertexColors?: boolean;
+  }[] = [];
   private mainBones = new Map<string, THREE.Bone>();
   private mainRestQuats = new Map<string, THREE.Quaternion>();
+  private mainRestUpperWorldQuats: { L?: THREE.Quaternion; R?: THREE.Quaternion } = {};
+  private poseScratch = createPoseRigScratch();
   private currentPose: ArticulationState = { ...NEUTRAL_POSE };
   private targetPose: ArticulationState = { ...NEUTRAL_POSE };
   private fabricId = 'waffle_knit_240';
+  private latestStrain: Float32Array = new Float32Array(0);
 
   private lastStepSentAt = 0;
   private workerCommMs = 0;
   private latestMetrics: ClientMetrics | null = null;
   private onMetricsCb?: (m: ClientMetrics) => void;
   private onErrorCb?: (msg: string) => void;
-
-  private tmpParentQ = new THREE.Quaternion();
-  private tmpInvParentQ = new THREE.Quaternion();
-  private tmpQ = new THREE.Quaternion();
-  private tmpLocalQ = new THREE.Quaternion();
 
   public setCallbacks(onMetrics: (m: ClientMetrics) => void, onError?: (msg: string) => void): void {
     this.onMetricsCb = onMetrics;
@@ -94,7 +107,9 @@ export class WorkerClothClient {
           if (msg.epoch !== this.epoch) {
             // Recycle stale buffers cleanly without mutating state
             if ('posBuffer' in msg && msg.posBuffer) {
-              w.postMessage({ type: 'RECYCLE', buffer: msg.posBuffer } as WorkerInMsg, [msg.posBuffer]);
+              const sBuf = 'strainBuffer' in msg ? msg.strainBuffer : undefined;
+              const xfer: Transferable[] = sBuf ? [msg.posBuffer, sBuf] : [msg.posBuffer];
+              w.postMessage({ type: 'RECYCLE', buffer: msg.posBuffer, strainBuffer: sBuf } as WorkerInMsg, xfer);
             }
             return;
           }
@@ -114,8 +129,17 @@ export class WorkerClothClient {
             const rtt = Math.max(0, performance.now() - this.lastStepSentAt - msg.workerSolveMs);
             this.workerCommMs = Number(rtt.toFixed(2));
             const posArr = new Float32Array(msg.posBuffer);
+            const strainArr = new Float32Array(msg.strainBuffer);
+            if (this.latestStrain.length !== strainArr.length) {
+              this.latestStrain = new Float32Array(strainArr.length);
+            }
+            this.latestStrain.set(strainArr);
             this.applyPositionsToMainMeshes(posArr);
-            w.postMessage({ type: 'RECYCLE', buffer: msg.posBuffer } as WorkerInMsg, [msg.posBuffer]);
+            this.applyStrainColorsIfEnabled();
+            w.postMessage(
+              { type: 'RECYCLE', buffer: msg.posBuffer, strainBuffer: msg.strainBuffer } as WorkerInMsg,
+              [msg.posBuffer, msg.strainBuffer]
+            );
 
             this.state = msg.metrics.simState;
             this.latestMetrics = { ...msg.metrics, workerMode: 'web_worker', workerCommMs: this.workerCommMs };
@@ -126,8 +150,17 @@ export class WorkerClothClient {
           if (msg.type === 'RESET_ACK') {
             this.busy = false;
             const posArr = new Float32Array(msg.posBuffer);
+            const strainArr = new Float32Array(msg.strainBuffer);
+            if (this.latestStrain.length !== strainArr.length) {
+              this.latestStrain = new Float32Array(strainArr.length);
+            }
+            this.latestStrain.set(strainArr);
             this.applyPositionsToMainMeshes(posArr);
-            w.postMessage({ type: 'RECYCLE', buffer: msg.posBuffer } as WorkerInMsg, [msg.posBuffer]);
+            this.applyStrainColorsIfEnabled();
+            w.postMessage(
+              { type: 'RECYCLE', buffer: msg.posBuffer, strainBuffer: msg.strainBuffer } as WorkerInMsg,
+              [msg.posBuffer, msg.strainBuffer]
+            );
 
             this.state = 'STABLE';
             this.latestMetrics = {
@@ -188,7 +221,9 @@ export class WorkerClothClient {
   private bindMainThreadSkeletonAndGarment(avatarRoot: THREE.Object3D, garmentRoot: THREE.Object3D): void {
     this.mainBones.clear();
     this.mainRestQuats.clear();
+    this.mainRestUpperWorldQuats = {};
     this.garmentBindings = [];
+    avatarRoot.updateMatrixWorld(true);
 
     avatarRoot.traverse((obj) => {
       const sk = obj as THREE.SkinnedMesh;
@@ -208,6 +243,15 @@ export class WorkerClothClient {
           if (b) {
             this.mainBones.set(name, b);
             this.mainRestQuats.set(name, b.quaternion.clone());
+            if (name === 'upperarm01.L') {
+              const wq = new THREE.Quaternion();
+              b.getWorldQuaternion(wq);
+              this.mainRestUpperWorldQuats.L = wq;
+            } else if (name === 'upperarm01.R') {
+              const wq = new THREE.Quaternion();
+              b.getWorldQuaternion(wq);
+              this.mainRestUpperWorldQuats.R = wq;
+            }
           }
         }
       }
@@ -233,8 +277,16 @@ export class WorkerClothClient {
         }
         vToP[i] = p;
       }
-      this.garmentBindings.push({ mesh: m, vertexToParticle: vToP, vertCount: posAttr.count });
+      const mat = m.material as THREE.MeshStandardMaterial | undefined;
+      this.garmentBindings.push({
+        mesh: m,
+        vertexToParticle: vToP,
+        vertCount: posAttr.count,
+        origMatColor: mat?.color ? mat.color.clone() : undefined,
+        origVertexColors: Boolean(mat?.vertexColors),
+      });
     });
+    this.latestStrain = new Float32Array(nextIdx);
   }
 
   private serializeAvatar(avatarRoot: THREE.Object3D): SerializedAvatarInit | null {
@@ -294,55 +346,69 @@ export class WorkerClothClient {
     }
   }
 
-  private rotateMainBoneWorldAxis(boneName: string, axis: THREE.Vector3, angleDeg: number, accumulate = false): void {
-    const bone = this.mainBones.get(boneName);
-    const restQ = this.mainRestQuats.get(boneName);
-    if (!bone || !restQ) return;
-    if (!accumulate) bone.quaternion.copy(restQ);
-    if (Math.abs(angleDeg) < 1e-4) {
-      bone.updateMatrixWorld(true);
-      return;
-    }
-    const rad = (angleDeg * Math.PI) / 180.0;
-    if (bone.parent) {
-      bone.parent.updateMatrixWorld(true);
-      bone.parent.getWorldQuaternion(this.tmpParentQ);
-      this.tmpInvParentQ.copy(this.tmpParentQ).invert();
-      this.tmpQ.setFromAxisAngle(axis, rad);
-      this.tmpLocalQ.copy(this.tmpInvParentQ).multiply(this.tmpQ).multiply(this.tmpParentQ);
-      bone.quaternion.premultiply(this.tmpLocalQ);
-    }
-    bone.updateMatrixWorld(true);
+  private applyPoseToMainSkeleton(pose: ArticulationState): void {
+    applyArticulatedPoseToRig(this.mainBones, this.mainRestQuats, this.mainRestUpperWorldQuats, pose, this.poseScratch);
   }
 
-  private applyPoseToMainSkeleton(pose: ArticulationState): void {
-    const axisX = new THREE.Vector3(1, 0, 0);
-    const axisY = new THREE.Vector3(0, 1, 0);
-    const axisZ = new THREE.Vector3(0, 0, 1);
-
-    const spineNames = ['spine04', 'spine03', 'spine02', 'spine01'];
-    for (const s of spineNames) {
-      this.rotateMainBoneWorldAxis(s, axisX, pose.torsoForwardLean / 4, false);
-      this.rotateMainBoneWorldAxis(s, axisZ, -pose.torsoLateralLean / 4, true);
-      this.rotateMainBoneWorldAxis(s, axisY, pose.torsoTwist / 4, true);
+  public setVisualizationMode(mode: ClothVisualizationMode): void {
+    this.vizMode = mode;
+    for (const b of this.garmentBindings) {
+      const mat = b.mesh.material as THREE.MeshStandardMaterial | undefined;
+      if (!mat) continue;
+      if (mode === 'strain') {
+        mat.vertexColors = true;
+        if (mat.color) mat.color.setHex(0xffffff);
+      } else {
+        mat.vertexColors = Boolean(b.origVertexColors);
+        if (mat.color && b.origMatColor) mat.color.copy(b.origMatColor);
+      }
+      mat.needsUpdate = true;
     }
-    this.rotateMainBoneWorldAxis('clavicle.L', axisZ, pose.clavicleLift, false);
-    this.rotateMainBoneWorldAxis('clavicle.R', axisZ, -pose.clavicleLift, false);
-    this.rotateMainBoneWorldAxis('upperarm01.L', axisZ, pose.shoulderElevL, false);
-    this.rotateMainBoneWorldAxis('upperarm01.L', axisX, -pose.armForwardL, true);
-    this.rotateMainBoneWorldAxis('upperarm01.R', axisZ, -pose.shoulderElevR, false);
-    this.rotateMainBoneWorldAxis('upperarm01.R', axisX, -pose.armForwardR, true);
-    this.rotateMainBoneWorldAxis('lowerarm01.L', axisX, -pose.elbowFlexL, false);
-    this.rotateMainBoneWorldAxis('lowerarm01.R', axisX, -pose.elbowFlexR, false);
+    this.applyStrainColorsIfEnabled();
+  }
 
-    const fL = this.mainBones.get('lowerarm02.L'), rFL = this.mainRestQuats.get('lowerarm02.L');
-    if (fL && rFL) { fL.quaternion.copy(rFL).multiply(this.tmpQ.setFromAxisAngle(axisY, (pose.forearmTwist * Math.PI) / 180)); fL.updateMatrixWorld(true); }
-    const fR = this.mainBones.get('lowerarm02.R'), rFR = this.mainRestQuats.get('lowerarm02.R');
-    if (fR && rFR) { fR.quaternion.copy(rFR).multiply(this.tmpQ.setFromAxisAngle(axisY, (-pose.forearmTwist * Math.PI) / 180)); fR.updateMatrixWorld(true); }
-    const wL = this.mainBones.get('wrist.L'), rWL = this.mainRestQuats.get('wrist.L');
-    if (wL && rWL) { wL.quaternion.copy(rWL).multiply(this.tmpQ.setFromAxisAngle(axisX, (pose.wristFlex * Math.PI) / 180)); wL.updateMatrixWorld(true); }
-    const wR = this.mainBones.get('wrist.R'), rWR = this.mainRestQuats.get('wrist.R');
-    if (wR && rWR) { wR.quaternion.copy(rWR).multiply(this.tmpQ.setFromAxisAngle(axisX, (pose.wristFlex * Math.PI) / 180)); wR.updateMatrixWorld(true); }
+  private applyStrainColorsIfEnabled(): void {
+    if (this.vizMode !== 'strain' || this.latestStrain.length === 0) return;
+    // Map simulated relative edge stretch into perceptual fit heatmap colors:
+    //   <= -1.5%: relaxed blue  |  ~0%: emerald green  |  ~3%: amber  |  >= 6%: tight red
+    for (const b of this.garmentBindings) {
+      let colorAttr = b.mesh.geometry.attributes.color as THREE.BufferAttribute | undefined;
+      if (!colorAttr || colorAttr.count !== b.vertCount) {
+        colorAttr = new THREE.BufferAttribute(new Float32Array(b.vertCount * 3), 3);
+        b.mesh.geometry.setAttribute('color', colorAttr);
+      }
+      for (let i = 0; i < b.vertCount; i++) {
+        const s = this.latestStrain[b.vertexToParticle[i]] || 0;
+        let r = 0.14, g = 0.72, bl = 0.46; // Comfortable emerald default
+        if (s < -0.008) {
+          // Relaxed / loose drape -> cool blue
+          const t = Math.min(1, (-s - 0.008) / 0.032);
+          r = 0.16 - 0.04 * t;
+          g = 0.72 - 0.24 * t;
+          bl = 0.50 + 0.46 * t;
+        } else if (s <= 0.022) {
+          // Comfortable -> soft lime-green
+          const t = Math.max(0, (s + 0.008) / 0.03);
+          r = 0.14 + 0.42 * t;
+          g = 0.72 + 0.12 * t;
+          bl = 0.46 - 0.24 * t;
+        } else if (s <= 0.048) {
+          // Fitted/snug amber -> warm orange
+          const t = (s - 0.022) / 0.026;
+          r = 0.88 + 0.10 * t;
+          g = 0.80 - 0.36 * t;
+          bl = 0.16 - 0.06 * t;
+        } else {
+          // High simulated stretch -> tight red
+          const t = Math.min(1, (s - 0.048) / 0.035);
+          r = 0.96 - 0.06 * t;
+          g = 0.36 - 0.24 * t;
+          bl = 0.12 + 0.08 * t;
+        }
+        colorAttr.setXYZ(i, r, g, bl);
+      }
+      colorAttr.needsUpdate = true;
+    }
   }
 
   public setTargetPose(pose: Partial<ArticulationState>): void {
@@ -365,6 +431,8 @@ export class WorkerClothClient {
       this.worker.postMessage({ type: 'RESET', epoch: this.epoch } as WorkerInMsg);
     } else {
       this.fallbackSolver.reset();
+      this.latestStrain = this.fallbackSolver.getStrainBufferCopy(this.latestStrain);
+      this.applyStrainColorsIfEnabled();
       this.state = 'STABLE';
       this.latestMetrics = { ...this.fallbackSolver.getMetrics(), simState: 'STABLE', resetEpoch: this.epoch, workerMode: 'main_thread_fallback', workerCommMs: 0 };
       this.onMetricsCb?.(this.latestMetrics);
@@ -389,14 +457,16 @@ export class WorkerClothClient {
           type: 'STEP',
           epoch: this.epoch,
           dtSec,
-          pose: this.targetPose,
+          pose: { ...this.currentPose },
           fabricId: this.fabricId,
         } as WorkerInMsg);
       }
     } else {
       this.fallbackSolver.setFabric(this.fabricId);
-      this.fallbackSolver.setTargetPose(this.targetPose);
+      this.fallbackSolver.setExactPose(this.currentPose);
       this.fallbackSolver.step(dtSec);
+      this.latestStrain = this.fallbackSolver.getStrainBufferCopy(this.latestStrain);
+      this.applyStrainColorsIfEnabled();
       this.latestMetrics = { ...this.fallbackSolver.getMetrics(), workerMode: 'main_thread_fallback', workerCommMs: 0 };
     }
   }

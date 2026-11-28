@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import '../App.css';
 
 /**
- * Dual-Portal WearWise Authentication Entry Experience (`/auth`)
- * Clearly separates Shopper Portal vs Seller Portal entry points.
+ * Role-Separated WearWise Authentication Entry Experience (`/auth`)
+ * Clearly separates Customer, Seller, and Admin portals.
  */
 export default function AuthLandingPage() {
   return (
@@ -13,7 +13,7 @@ export default function AuthLandingPage() {
       <div className="auth-shape auth-shape-lime" />
       <div className="auth-shape auth-shape-pink" />
 
-      <div style={{ position: 'relative', zIndex: 1, width: 'min(980px, 100%)' }}>
+      <div style={{ position: 'relative', zIndex: 1, width: 'min(1100px, 100%)' }}>
         <div
           style={{
             display: 'flex',
@@ -28,7 +28,7 @@ export default function AuthLandingPage() {
             Wear<span>Wise</span>
           </Link>
           <Link
-            to="/explore"
+            to="/shop"
             style={{
               color: '#fff8f1',
               fontSize: '13px',
@@ -37,29 +37,29 @@ export default function AuthLandingPage() {
               letterSpacing: '0.04em',
             }}
           >
-            Browse Public Marketplace →
+            Browse Storefront →
           </Link>
         </div>
 
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '24px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '22px',
           }}
         >
-          {/* SHOPPER LOGIN PORTAL */}
+          {/* CUSTOMER PORTAL */}
           <section
             data-testid="portal-card-shopper"
             style={{
               background: '#fff8f1',
               border: '3px solid #151515',
               boxShadow: '10px 10px 0 #d8ff3f',
-              padding: '38px 34px',
+              padding: '34px 28px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              gap: '22px',
+              gap: '20px',
             }}
           >
             <div>
@@ -69,22 +69,25 @@ export default function AuthLandingPage() {
               <h1
                 style={{
                   fontFamily: '"Archivo Black", sans-serif',
-                  fontSize: 'clamp(30px, 4vw, 42px)',
-                  lineHeight: 0.94,
-                  letterSpacing: '-1.8px',
+                  fontSize: 'clamp(28px, 3.5vw, 38px)',
+                  lineHeight: 0.96,
+                  letterSpacing: '-1.5px',
                   color: '#151515',
-                  margin: '0 0 14px',
+                  margin: '0 0 12px',
                 }}
               >
-                SHOPPER <span style={{ color: '#ff3d9a', fontFamily: '"Playfair Display", serif', fontStyle: 'italic' }}>LOGIN</span>
+                CUSTOMER{' '}
+                <span style={{ color: '#ff3d9a', fontFamily: '"Playfair Display", serif', fontStyle: 'italic' }}>
+                  LOGIN
+                </span>
               </h1>
               <p style={{ fontSize: '15px', color: '#454854', lineHeight: 1.6, margin: 0 }}>
                 Discover fashion, find your fit and shop with WearWise.
               </p>
-              <ul style={{ margin: '18px 0 0', paddingLeft: '18px', color: '#2b2d36', fontSize: '13px', lineHeight: 1.7 }}>
-                <li>Explore dual-mode Image &amp; 3D Try-On garments</li>
-                <li>Save wardrobe items, looks, and personal body fit profiles</li>
-                <li>Track bag items, checkout, and order history</li>
+              <ul style={{ margin: '16px 0 0', paddingLeft: '18px', color: '#2b2d36', fontSize: '13px', lineHeight: 1.7 }}>
+                <li>Create your personal 3D avatar from simple body details</li>
+                <li>Preview how garments fit &amp; check size guidance before ordering</li>
+                <li>Save wishlist items, track orders, and manage your bag</li>
               </ul>
             </div>
 
@@ -95,7 +98,7 @@ export default function AuthLandingPage() {
                 className="auth-submit"
                 style={{ textAlign: 'center', textDecoration: 'none' }}
               >
-                SIGN IN AS SHOPPER ✦
+                SIGN IN AS CUSTOMER ✦
               </Link>
               <Link
                 to="/register"
@@ -112,23 +115,23 @@ export default function AuthLandingPage() {
                   letterSpacing: '0.05em',
                 }}
               >
-                CREATE SHOPPER ACCOUNT →
+                CREATE CUSTOMER ACCOUNT →
               </Link>
             </div>
           </section>
 
-          {/* SELLER LOGIN PORTAL */}
+          {/* SELLER PORTAL */}
           <section
             data-testid="portal-card-seller"
             style={{
               background: '#fff8f1',
               border: '3px solid #151515',
               boxShadow: '10px 10px 0 #8d6bff',
-              padding: '38px 34px',
+              padding: '34px 28px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              gap: '22px',
+              gap: '20px',
             }}
           >
             <div>
@@ -138,22 +141,25 @@ export default function AuthLandingPage() {
               <h2
                 style={{
                   fontFamily: '"Archivo Black", sans-serif',
-                  fontSize: 'clamp(30px, 4vw, 42px)',
-                  lineHeight: 0.94,
-                  letterSpacing: '-1.8px',
+                  fontSize: 'clamp(28px, 3.5vw, 38px)',
+                  lineHeight: 0.96,
+                  letterSpacing: '-1.5px',
                   color: '#151515',
-                  margin: '0 0 14px',
+                  margin: '0 0 12px',
                 }}
               >
-                SELLER <span style={{ color: '#8d6bff', fontFamily: '"Playfair Display", serif', fontStyle: 'italic' }}>LOGIN</span>
+                SELLER{' '}
+                <span style={{ color: '#8d6bff', fontFamily: '"Playfair Display", serif', fontStyle: 'italic' }}>
+                  LOGIN
+                </span>
               </h2>
               <p style={{ fontSize: '15px', color: '#454854', lineHeight: 1.6, margin: 0 }}>
                 Manage your products, publish garments and grow your store.
               </p>
-              <ul style={{ margin: '18px 0 0', paddingLeft: '18px', color: '#2b2d36', fontSize: '13px', lineHeight: 1.7 }}>
-                <li>Create listings, upload photos, and manage inventory</li>
-                <li>Configure Image Try-On &amp; 3D digital garment preparation</li>
-                <li>View store orders and fulfill customer purchases</li>
+              <ul style={{ margin: '16px 0 0', paddingLeft: '18px', color: '#2b2d36', fontSize: '13px', lineHeight: 1.7 }}>
+                <li>Create listings, upload product photography, and manage stock</li>
+                <li>Configure garment sizing &amp; virtual try-on readiness</li>
+                <li>Process customer orders and track shipments</li>
               </ul>
             </div>
 
@@ -186,7 +192,68 @@ export default function AuthLandingPage() {
                   fontSize: '13px',
                 }}
               >
-                Request Seller Access (WearWise Approval Required) →
+                Apply as a Seller (Admin Approval Required) →
+              </Link>
+            </div>
+          </section>
+
+          {/* ADMIN PORTAL */}
+          <section
+            data-testid="portal-card-admin"
+            style={{
+              background: '#fff8f1',
+              border: '3px solid #151515',
+              boxShadow: '10px 10px 0 #ff3d9a',
+              padding: '34px 28px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              gap: '20px',
+            }}
+          >
+            <div>
+              <div className="auth-eyebrow" style={{ color: '#ff3d9a' }}>
+                ■ PLATFORM GOVERNANCE
+              </div>
+              <h2
+                style={{
+                  fontFamily: '"Archivo Black", sans-serif',
+                  fontSize: 'clamp(28px, 3.5vw, 38px)',
+                  lineHeight: 0.96,
+                  letterSpacing: '-1.5px',
+                  color: '#151515',
+                  margin: '0 0 12px',
+                }}
+              >
+                ADMIN{' '}
+                <span style={{ color: '#ff3d9a', fontFamily: '"Playfair Display", serif', fontStyle: 'italic' }}>
+                  CONSOLE
+                </span>
+              </h2>
+              <p style={{ fontSize: '15px', color: '#454854', lineHeight: 1.6, margin: 0 }}>
+                Review seller applications, moderate marketplace listings, and monitor platform operations.
+              </p>
+              <ul style={{ margin: '16px 0 0', paddingLeft: '18px', color: '#2b2d36', fontSize: '13px', lineHeight: 1.7 }}>
+                <li>Approve, reject, or suspend merchant seller accounts</li>
+                <li>Moderate catalog products &amp; view full audit history</li>
+                <li>Access internal diagnostics &amp; service health</li>
+              </ul>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <Link
+                to="/admin/login"
+                data-testid="enter-admin-login"
+                className="auth-submit"
+                style={{
+                  textAlign: 'center',
+                  textDecoration: 'none',
+                  background: '#ff3d9a',
+                  color: '#ffffff',
+                  border: '2px solid #151515',
+                }}
+              >
+                SIGN IN AS ADMIN ■
               </Link>
             </div>
           </section>
